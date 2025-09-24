@@ -92,7 +92,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch {}
+    } catch { }
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -133,7 +133,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch {}
+            } catch { }
             setHintRole(json.role);
           }
         } else {
@@ -141,14 +141,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch {}
+          } catch { }
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch {}
+        } catch { }
       }
     })();
     return () => {
@@ -243,7 +243,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch {}
+      } catch { }
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -340,11 +340,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
-                        active
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
                           ? "bg-[#F5B301] text-[#0B2239]"
                           : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                      }`}
+                        }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -549,7 +548,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch {}
+      } catch { }
       setMe(null);
       setHintRole(null);
       router.replace(`/${locale}`);
@@ -637,9 +636,21 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <div className="mx-auto max-w-screen-2xl px-6">
           <div className="flex h-20 items-center justify-between">
             {/* logo → home */}
-            <Link href={homeHref} className="flex items-center gap-3" aria-label={t("logoAlt")}>
-              <Image src="/logo_MTR.png" alt={t("logoAlt")} width={110} height={100} className="object-contain" priority />
+            <Link
+              href={homeHref}
+              className="flex items-center gap-3 relative left-6 top-2"
+              aria-label={t("logoAlt")}
+            >
+              <Image
+                src="/logo_MTR.png"
+                alt={t("logoAlt")}
+                width={110}
+                height={100}
+                className="object-contain"
+                priority
+              />
             </Link>
+
 
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
