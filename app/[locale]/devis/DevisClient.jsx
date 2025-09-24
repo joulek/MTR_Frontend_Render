@@ -17,10 +17,8 @@ import fillImg from "@/public/devis/dresser.png";
 import grillImg from "@/public/devis/grille.png";
 import autreImg from "@/public/devis/autre.jpg";
 
-import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
-
-
+import SiteHeader from "@/components/SiteHeader";  // sticky header :contentReference[oaicite:2]{index=2}
+import SiteFooter from "@/components/SiteFooter";  // full-width footer :contentReference[oaicite:3]{index=3}
 
 export default function DevisPage() {
   const [type, setType] = useState("compression");
@@ -48,65 +46,55 @@ export default function DevisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="flex min-h-screen flex-col bg-gray-50">
       <SiteHeader />
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-[#002147] text-center">{t("title")}</h1>
-        <p className="text-gray-600 mt-1 text-center">{t("subtitle")}</p>
+      <main className="flex-1 p-6">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-3xl font-bold text-[#002147] text-center">{t("title")}</h1>
+          <p className="text-gray-600 mt-1 text-center">{t("subtitle")}</p>
 
-        {/* Liste des types */}
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {TYPES.map(({ key, label, Icon, img }) => {
-            const active = type === key;
-            return (
-              <button
-                key={key}
-                onClick={() => setType(key)}
-                className={[
-                  "rounded-xl border p-4 text-left transition group h-full",
-                  active ? "border-[#ffb400] bg-[#fff7e6] shadow"
-                    : "border-gray-200 bg-white hover:border-[#ffb400]/60 hover:shadow-md"
-                ].join(" ")}
-              >
-                <div className="flex items-center gap-3 h-full">
-                  {/* Image si présente, sinon icône */}
-                  {img ? (
-                    <div className={`relative w-10 h-10 overflow-hidden rounded-lg ring-1 ${active ? "ring-[#ffb400]" : "ring-gray-200"}`}>
-                      <Image
-                        src={img}
-                        alt={label}
-                        fill
-                        sizes="80px"
-                        className="object-cover"
-                        priority={false}
-                      />
+          {/* Liste des types */}
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {TYPES.map(({ key, label, Icon, img }) => {
+              const active = type === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setType(key)}
+                  className={[
+                    "rounded-xl border p-4 text-left transition group h-full",
+                    active ? "border-[#ffb400] bg-[#fff7e6] shadow"
+                           : "border-gray-200 bg-white hover:border-[#ffb400]/60 hover:shadow-md"
+                  ].join(" ")}
+                >
+                  <div className="flex items-center gap-3 h-full">
+                    {img ? (
+                      <div className={`relative w-10 h-10 overflow-hidden rounded-lg ring-1 ${active ? "ring-[#ffb400]" : "ring-gray-200"}`}>
+                        <Image src={img} alt={label} fill sizes="80px" className="object-cover" />
+                      </div>
+                    ) : (
+                      <span className={["inline-flex items-center justify-center rounded-lg p-2",
+                        active ? "bg-[#ffb400]/15 text-[#b36b00]" : "bg-gray-100 text-gray-700"].join(" ")}
+                        aria-hidden
+                      >
+                        {Icon ? <Icon className="w-5 h-5" /> : null}
+                      </span>
+                    )}
+                    <div className="flex items-center">
+                      <div className="font-semibold text-[#002147]">{label}</div>
                     </div>
-                  ) : (
-                    <span
-                      className={[
-                        "inline-flex items-center justify-center rounded-lg p-2",
-                        active ? "bg-[#ffb400]/15 text-[#b36b00]" : "bg-gray-100 text-gray-700"
-                      ].join(" ")}
-                      aria-hidden
-                    >
-                      {Icon ? <Icon className="w-5 h-5" /> : null}
-                    </span>
-                  )}
-
-                  <div className="flex items-center">
-                    <div className="font-semibold text-[#002147]">{label}</div>
                   </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* Formulaire affiché */}
-        <div className="mt-8 bg-white rounded-2xl shadow p-6">
-          {renderForm()}
+          {/* Formulaire affiché */}
+          <div className="mt-8 bg-white rounded-2xl shadow p-6">
+            {renderForm()}
+          </div>
         </div>
-      </div>
+      </main>
       <SiteFooter />
     </div>
   );
