@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import SiteFooter from "@/components/SiteFooter"; // ⬅️ AJOUT
 
 /* -------------------- Config -------------------- */
 const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
@@ -457,171 +458,176 @@ export default function ReclamationClient() {
 
   /* -------------------- Render -------------------- */
   return (
-    <section className="mx-auto max-w-5xl px-3 sm:px-6 lg:px-8 py-6">
-      {/* Titre */}
-      <div className="text-center mb-5">
-        <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#002147]">
-          {t("title")}
-        </h1>
-        <p className="mt-1.5 text-sm text-gray-600">{t("subtitle")}</p>
-      </div>
+    <>
+      <section className="mx-auto max-w-5xl px-3 sm:px-6 lg:px-8 py-6">
+        {/* Titre */}
+        <div className="text-center mb-5">
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#002147]">
+            {t("title")}
+          </h1>
+          <p className="mt-1.5 text-sm text-gray-600">{t("subtitle")}</p>
+        </div>
 
-      {/* Carte */}
-      <div className="rounded-2xl bg-white shadow-[0_8px_24px_rgba(0,0,0,.06)] border border-gray-100 p-4 md:p-6">
-        <form onSubmit={handleSubmit}>
-          <SectionTitle>{t("sections.docInfo")}</SectionTitle>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            <SelectBase
-              name="typeDoc"
-              value={form.typeDoc}
-              onChange={onChange}
-              label={t("fields.typeDoc")}
-              required
-              options={typeDocOptions}
-              placeholder={t("selectPlaceholder")}
-            />
-            <Input
-              name="numero"
-              label={t("fields.numero")}
-              required
-              placeholder={t("placeholders.numero")}
-              value={form.numero}
-              onChange={onChange}
-            />
-
-            <PrettyDatePicker
-              label={t("fields.dateLivraison")}
-              name="dateLivraison"
-              value={form.dateLivraison}
-              onChange={(val) => setField("dateLivraison", clampISOToToday(val))}
-              maxDate={new Date()}
-              t={t}
-            />
-
-            <Input
-              name="referenceProduit"
-              label={t("fields.referenceProduit")}
-              placeholder={t("placeholders.referenceProduit")}
-              value={form.referenceProduit}
-              onChange={onChange}
-            />
-            <Input
-              type="number"
-              min="0"
-              name="quantite"
-              label={t("fields.quantite")}
-              placeholder={t("placeholders.quantite")}
-              value={form.quantite}
-              onChange={onChange}
-            />
-          </div>
-
-          <SectionTitle>{t("sections.claim")}</SectionTitle>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-            <SelectBase
-              name="nature"
-              value={form.nature}
-              onChange={onChange}
-              label={t("fields.nature")}
-              required
-              options={natureOptions}
-              placeholder={t("selectPlaceholder")}
-            />
-            {form.nature === "autre" && (
-              <Input
-                name="natureAutre"
-                label={t("fields.natureOther")}
+        {/* Carte */}
+        <div className="rounded-2xl bg-white shadow-[0_8px_24px_rgba(0,0,0,.06)] border border-gray-100 p-4 md:p-6">
+          <form onSubmit={handleSubmit}>
+            <SectionTitle>{t("sections.docInfo")}</SectionTitle>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+              <SelectBase
+                name="typeDoc"
+                value={form.typeDoc}
+                onChange={onChange}
+                label={t("fields.typeDoc")}
                 required
-                value={form.natureAutre}
+                options={typeDocOptions}
+                placeholder={t("selectPlaceholder")}
+              />
+              <Input
+                name="numero"
+                label={t("fields.numero")}
+                required
+                placeholder={t("placeholders.numero")}
+                value={form.numero}
                 onChange={onChange}
               />
-            )}
 
-            <SelectBase
-              name="attente"
-              value={form.attente}
-              onChange={onChange}
-              label={t("fields.attente")}
-              required
-              options={attenteOptions}
-              placeholder={t("selectPlaceholder")}
-            />
-            {form.attente === "autre" && (
+              <PrettyDatePicker
+                label={t("fields.dateLivraison")}
+                name="dateLivraison"
+                value={form.dateLivraison}
+                onChange={(val) => setField("dateLivraison", clampISOToToday(val))}
+                maxDate={new Date()}
+                t={t}
+              />
+
               <Input
-                name="attenteAutre"
-                label={t("fields.attenteOther")}
-                required
-                value={form.attenteAutre}
+                name="referenceProduit"
+                label={t("fields.referenceProduit")}
+                placeholder={t("placeholders.referenceProduit")}
+                value={form.referenceProduit}
                 onChange={onChange}
               />
-            )}
-          </div>
-
-          <SectionTitle>{t("sections.attachments")}</SectionTitle>
-          <p className="text-xs text-gray-500 mb-2">{t("files.formats")}</p>
-
-          <label
-            htmlFor="files"
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-            onDragLeave={() => setIsDragging(false)}
-            onDrop={onDrop}
-            className={`flex flex-col items-center justify-center cursor-pointer rounded-2xl text-center transition
-                        min-h-[110px] md:min-h-[130px] p-5 bg-white
-                        border-2 border-dashed ${isDragging ? "border-yellow-500 ring-2 ring-yellow-300" : "border-yellow-500"}`}
-            aria-label={t("aria.dropzone")}
-            title={t("aria.dropzone")}
-          >
-            {files.length === 0 ? (
-              <p className="text-sm font-medium text-[#002147]">{t("files.drop")}</p>
-            ) : (
-              <div className="w-full text-center">
-                <p className="text-sm font-semibold text-[#002147] mb-1">
-                  {t("files.selected", { count: files.length })}
-                </p>
-                <p className="mx-auto max-w-[900px] truncate text-[13px] text-[#002147]">
-                  {files.map((f) => f.name).join(", ")}
-                </p>
-                <p className="text-[11px] text-[#002147]/70 mt-1">
-                  {t("files.total", { kb: (files.reduce((s, f) => s + f.size, 0) / 1024).toFixed(0) })}
-                </p>
-              </div>
-            )}
-            <input
-              id="files"
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/*,application/pdf"
-              className="hidden"
-              onChange={(e) => handleFileList(e.target.files, { append: true })}
-            />
-          </label>
-
-          <div ref={alertRef} aria-live="polite" className="mt-4">
-            {message && (
-              <Alert
-                type={message.startsWith("✅") ? "success" : message.startsWith("⚠️") ? "info" : "error"}
-                message={message}
+              <Input
+                type="number"
+                min="0"
+                name="quantite"
+                label={t("fields.quantite")}
+                placeholder={t("placeholders.quantite")}
+                value={form.quantite}
+                onChange={onChange}
               />
-            )}
-          </div>
+            </div>
 
-          <div className="mt-6">
-            <button
-              type="submit"
-              disabled={submitting}
-              className={`w-full rounded-xl font-semibold py-3 transition-all
-                ${submitting
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-gradient-to-r from-[#002147] to-[#01346b] text-white shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[0px]"}`}
-              aria-label={t("aria.submit")}
-              title={t("aria.submit")}
+            <SectionTitle>{t("sections.claim")}</SectionTitle>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+              <SelectBase
+                name="nature"
+                value={form.nature}
+                onChange={onChange}
+                label={t("fields.nature")}
+                required
+                options={natureOptions}
+                placeholder={t("selectPlaceholder")}
+              />
+              {form.nature === "autre" && (
+                <Input
+                  name="natureAutre"
+                  label={t("fields.natureOther")}
+                  required
+                  value={form.natureAutre}
+                  onChange={onChange}
+                />
+              )}
+
+              <SelectBase
+                name="attente"
+                value={form.attente}
+                onChange={onChange}
+                label={t("fields.attente")}
+                required
+                options={attenteOptions}
+                placeholder={t("selectPlaceholder")}
+              />
+              {form.attente === "autre" && (
+                <Input
+                  name="attenteAutre"
+                  label={t("fields.attenteOther")}
+                  required
+                  value={form.attenteAutre}
+                  onChange={onChange}
+                />
+              )}
+            </div>
+
+            <SectionTitle>{t("sections.attachments")}</SectionTitle>
+            <p className="text-xs text-gray-500 mb-2">{t("files.formats")}</p>
+
+            <label
+              htmlFor="files"
+              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={onDrop}
+              className={`flex flex-col items-center justify-center cursor-pointer rounded-2xl text-center transition
+                          min-h-[110px] md:min-h-[130px] p-5 bg-white
+                          border-2 border-dashed ${isDragging ? "border-yellow-500 ring-2 ring-yellow-300" : "border-yellow-500"}`}
+              aria-label={t("aria.dropzone")}
+              title={t("aria.dropzone")}
             >
-              {submitting ? t("button.sending") : t("button.send")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </section>
+              {files.length === 0 ? (
+                <p className="text-sm font-medium text-[#002147]">{t("files.drop")}</p>
+              ) : (
+                <div className="w-full text-center">
+                  <p className="text-sm font-semibold text-[#002147] mb-1">
+                    {t("files.selected", { count: files.length })}
+                  </p>
+                  <p className="mx-auto max-w-[900px] truncate text-[13px] text-[#002147]">
+                    {files.map((f) => f.name).join(", ")}
+                  </p>
+                  <p className="text-[11px] text-[#002147]/70 mt-1">
+                    {t("files.total", { kb: (files.reduce((s, f) => s + f.size, 0) / 1024).toFixed(0) })}
+                  </p>
+                </div>
+              )}
+              <input
+                id="files"
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="image/*,application/pdf"
+                className="hidden"
+                onChange={(e) => handleFileList(e.target.files, { append: true })}
+              />
+            </label>
+
+            <div ref={alertRef} aria-live="polite" className="mt-4">
+              {message && (
+                <Alert
+                  type={message.startsWith("✅") ? "success" : message.startsWith("⚠️") ? "info" : "error"}
+                  message={message}
+                />
+              )}
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="submit"
+                disabled={submitting}
+                className={`w-full rounded-xl font-semibold py-3 transition-all
+                  ${submitting
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#002147] to-[#01346b] text-white shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[0px]"}`}
+                aria-label={t("aria.submit")}
+                title={t("aria.submit")}
+              >
+                {submitting ? t("button.sending") : t("button.send")}
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      {/* ⬇️ Footer ajouté — aucune autre modification */}
+      <SiteFooter locale={locale} />
+    </>
   );
 }
