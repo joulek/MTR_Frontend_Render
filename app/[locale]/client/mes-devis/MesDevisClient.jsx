@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { FiSearch, FiXCircle, FiFileText } from "react-icons/fi";
 import Pagination from "@/components/Pagination";
+import SiteFooter from "@/components/SiteFooter";
+
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com";
 
@@ -599,6 +601,8 @@ export default function MesDevisClient() {
           </>
         )}
       </div>
+      <SiteFooter locale={locale} />
+
     </div>
   );
 }
