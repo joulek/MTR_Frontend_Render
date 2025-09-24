@@ -23,17 +23,8 @@ export default function SiteFooter({ locale = "fr" }) {
   ];
 
   const contacts = [
-    {
-      name: "Chorki Hbaeib",
-      phone: "+216 98 331 896",
-      tel: "tel:+21698331896",
-    },
-    {
-      name: "Mohamed Hbaeib",
-      phone: "+216 98 333 883",
-      tel: "tel:+21698333883",
-
-    },
+    { name: "Chorki Hbaeib", phone: "+216 98 331 896", tel: "tel:+21698331896" },
+    { name: "Mohamed Hbaeib", phone: "+216 98 333 883", tel: "tel:+21698333883" },
   ];
 
   return (
@@ -120,7 +111,7 @@ export default function SiteFooter({ locale = "fr" }) {
           </ul>
         </div>
 
-        {/* Col 4 : Contacts (nouvelle section) */}
+        {/* Col 4 : Contacts */}
         <div>
           <h5 className="text-lg font-semibold">
             {t("column.contacts", { default: "Contacts" })}
@@ -130,15 +121,9 @@ export default function SiteFooter({ locale = "fr" }) {
               <li key={i} className="flex flex-col">
                 <span className="font-semibold">{c.name}</span>
                 <div className="flex items-center gap-2">
-                  <a
-                    href={c.tel}
-                    className="hover:text-[#F5B301]"
-                    dir="ltr"
-                    aria-label={`${c.name} téléphone`}
-                  >
+                  <a href={c.tel} className="hover:text-[#F5B301]" dir="ltr" aria-label={`${c.name} téléphone`}>
                     {c.phone}
                   </a>
-
                 </div>
               </li>
             ))}
@@ -149,7 +134,9 @@ export default function SiteFooter({ locale = "fr" }) {
       {/* Bas de footer */}
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-sm text-white/80 md:flex-row">
-          <p>{t("copyright", { year: new Date().getFullYear() })}</p>
+          <p className="text-[#F5B301]">
+            {t("copyright", { year: new Date().getFullYear() })}
+          </p>
           <div className="flex items-center gap-4">
             <Link href={anchor("apropos")} className="hover:text-[#F5B301]">
               {t("links.about")}
@@ -157,17 +144,12 @@ export default function SiteFooter({ locale = "fr" }) {
             <Link href={`/${locale}/help-desk`} className="hover:text-[#F5B301]">
               {t("links.helpdesk")}
             </Link>
-            <Link
-              href={`/${locale}/privacy-policy`}
-              className="hover:text-[#F5B301]"
-            >
+            <Link href={`/${locale}/privacy-policy`} className="hover:text-[#F5B301]">
               {t("links.privacy")}
             </Link>
           </div>
         </div>
       </div>
-
-      {/* Back to top */}
       <a
         href="#accueil"
         className="fixed bottom-6 right-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#F5B301] text-[#0B2239] shadow-xl ring-1 ring-black/10 transition hover:-translate-y-0.5"
