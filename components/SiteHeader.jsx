@@ -311,7 +311,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       >
         <button
           type="button"
-          className="group relative px-3 py-2 text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]"
+          className="group relative px-3 py-2 text-[16px] font-bold  text-[#0B2239] hover:text-[#F5B301]"
           aria-haspopup="true"
           aria-expanded={menuOpen ? "true" : "false"}
         >
@@ -422,7 +422,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       return () => document.removeEventListener("mousedown", onDoc);
     }, []);
 
-    const itemCls = "px-3 py-2 text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]";
+    const itemCls = "px-3 py-2 text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]";
 
     return (
       <>
@@ -643,7 +643,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
-              <Link href={homeHref} className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]">
+              <Link href={homeHref} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]">
                 {t("nav.home")}
               </Link>
 
@@ -652,7 +652,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("presentation")}
-                    className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]"
+                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
                     role="link"
                   >
                     {t("nav.company")}
@@ -661,7 +661,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("contact")}
-                    className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]"
+                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
                     role="link"
                   >
                     {t("nav.contact")}
@@ -669,7 +669,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("localisation")}
-                    className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]"
+                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
                     role="link"
                   >
                     {t("nav.location")}
