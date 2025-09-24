@@ -17,6 +17,7 @@ import fillImg from "@/public/devis/dresser.png";
 import grillImg from "@/public/devis/grille.png";
 import autreImg from "@/public/devis/autre.jpg";
 
+import SiteFooter from "@/components/SiteFooter";
 
 
 
@@ -104,6 +105,7 @@ export default function DevisPage() {
           {renderForm()}
         </div>
       </div>
+       <SiteFooter />
     </div>
   );
 }
