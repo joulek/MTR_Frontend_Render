@@ -18,6 +18,7 @@ import grillImg from "@/public/devis/grille.png";
 import autreImg from "@/public/devis/autre.jpg";
 
 import SiteFooter from "@/components/SiteFooter";
+import SiteHeader from "@/components/SiteHeader";
 
 
 
@@ -31,7 +32,7 @@ export default function DevisPage() {
     { key: "torsion", label: t("types.torsion") || "", img: torsionImg },
     { key: "fil", label: t("types.fil") || "", img: fillImg },
     { key: "grille", label: t("types.grille") || "", img: grillImg },
-    { key: "autre", label: t("types.autre") || "",  img: autreImg },
+    { key: "autre", label: t("types.autre") || "", img: autreImg },
   ];
 
   const renderForm = () => {
@@ -48,6 +49,7 @@ export default function DevisPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <SiteHeader />
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-[#002147] text-center">{t("title")}</h1>
         <p className="text-gray-600 mt-1 text-center">{t("subtitle")}</p>
@@ -63,7 +65,7 @@ export default function DevisPage() {
                 className={[
                   "rounded-xl border p-4 text-left transition group h-full",
                   active ? "border-[#ffb400] bg-[#fff7e6] shadow"
-                         : "border-gray-200 bg-white hover:border-[#ffb400]/60 hover:shadow-md"
+                    : "border-gray-200 bg-white hover:border-[#ffb400]/60 hover:shadow-md"
                 ].join(" ")}
               >
                 <div className="flex items-center gap-3 h-full">
@@ -105,7 +107,7 @@ export default function DevisPage() {
           {renderForm()}
         </div>
       </div>
-       <SiteFooter />
+      <SiteFooter />
     </div>
   );
 }
