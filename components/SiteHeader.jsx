@@ -218,20 +218,15 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       prodsByCat.set(cid, arr);
     });
 
-    // condition bande blanche
-    const showRightSpacer = (() => {
-      if (!hoveredParent) return false;
-      const hasChildren = (childrenMap.get(hoveredParent) || []).length > 0;
-      const parentObj = cats.find((c) => (c?._id || pickName(c, locale)) === hoveredParent);
-      const parentKey = parentObj?._id || hoveredParent;
-      const prodsRaw = prodsByCat.get(parentKey) || [];
-      const uniq = new Set(prodsRaw.map((p) => p?._id || pickProdName(p, locale)));
-      const hasProductsPanel = uniq.size >= 2;
-      return hasChildren || hasProductsPanel;
-    })();
+    // ====== CHANGEMENT 1 : bande blanche visible dès qu'un parent est survolé ======
+    const showRightSpacer = Boolean(hoveredParent);
 
+    // ====== CHANGEMENT 2 : styles pour la bande (pseudo-élément) ======
     const ulBase = "relative w-64 rounded-lg bg-white p-2 shadow-2xl ring-1 ring-slate-200";
-    const ulWithSpacer = ulBase + " after:content-[''] after:absolute after:top-0 after:right-[-8px] after:w-2 after:h-full";
+    const ulWithSpacer =
+      ulBase +
+      " after:content-[''] after:absolute after:top-0 after:right-[-8px] after:w-2 after:h-full" +
+      " after:bg-white after:shadow-2xl after:ring-1 after:ring-slate-200 after:rounded-lg after:pointer-events-none";
     const ulCls = showRightSpacer ? ulWithSpacer : ulBase;
 
     return (
@@ -250,7 +245,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         </button>
 
         {menuOpen && (
-          <div className="absolute left-0 top-full z-50 before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-2">
+          <div className="absolute left-0 top-full z-50 before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-2 before:bg-white before:pointer-events-none">
             <ul className={ulCls}>
               {tops.map((parent) => {
                 const id = getId(parent);
