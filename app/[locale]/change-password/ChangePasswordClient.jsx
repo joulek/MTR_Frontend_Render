@@ -7,7 +7,7 @@ import Image from "next/image";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import SiteHeader from "@/components/SiteHeader";
 
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
 
 export default function ChangePasswordClient() {
   const t = useTranslations("auth");

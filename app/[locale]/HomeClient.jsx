@@ -10,7 +10,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
 /* ---------------------------- API backend ---------------------------- */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
 /* ---------- Anim helpers ---------- */

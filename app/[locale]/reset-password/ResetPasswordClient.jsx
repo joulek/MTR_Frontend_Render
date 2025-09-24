@@ -9,7 +9,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 // 🔹 Import header
 import SiteHeader from "@/components/SiteHeader";
 
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
 
 export default function ResetPasswordClient() {
   const t = useTranslations("auth");

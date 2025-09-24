@@ -1,6 +1,6 @@
 // app/api/register/route.js
 import { NextResponse } from "next/server";
-const BACKEND_URL = "https://backend-mtr.onrender.com";
+const BACKEND_URL = "https://mtr-backend-render.onrender.com";
 
 export async function POST(request) {
   try {

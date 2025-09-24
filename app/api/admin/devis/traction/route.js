@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com";
 
 export async function GET(request) {
   const token = request.cookies.get("token")?.value;

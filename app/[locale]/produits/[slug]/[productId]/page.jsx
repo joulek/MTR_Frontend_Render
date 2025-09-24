@@ -3,7 +3,7 @@ import ProductDetailClient from "./ProductDetailClient";
 import { getTranslations } from "next-intl/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.mtr-industry.tn";
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
 /* ---------- helpers ---------- */

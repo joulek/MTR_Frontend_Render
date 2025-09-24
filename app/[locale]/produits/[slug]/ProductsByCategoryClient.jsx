@@ -8,7 +8,7 @@ import SiteFooter from "@/components/SiteFooter";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 /* -------------------- Consts -------------------- */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 const BACKEND_HOST = "backend-mtr.onrender.com";
 const AUTOPLAY_MS = 4000;

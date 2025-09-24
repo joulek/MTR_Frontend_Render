@@ -7,7 +7,7 @@ import { Facebook, MoreVertical, User, LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 /* ---------------------------- API backend ---------------------------- */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
 /* --------------------------- Helpers --------------------------- */

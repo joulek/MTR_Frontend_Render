@@ -7,7 +7,7 @@ import SiteHeader from "@/components/SiteHeader";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ------------------------------- Config API ------------------------------- */
-const BACKEND = "https://backend-mtr.onrender.com";
+const BACKEND = "https://mtr-backend-render.onrender.com";
 const API = `${BACKEND}/api`;
 
 /* ------------------------------- Utils texte ------------------------------ */

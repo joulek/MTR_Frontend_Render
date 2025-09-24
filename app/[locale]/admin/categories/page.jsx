@@ -14,7 +14,7 @@ import {
 } from "react-icons/fi";
 import Pagination from "@/components/Pagination";
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com";
 
 function imgSrc(u) {
   if (!u) return "";

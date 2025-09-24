@@ -7,7 +7,7 @@ import { Home, MessageSquareWarning, HelpCircle, KeyRound } from "lucide-react";
 
 const NAVY = "#0B1E3A";
 const YELLOW = "#F7C600";
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com";
 
 /* ---------- UI PRIMITIVES ---------- */
 

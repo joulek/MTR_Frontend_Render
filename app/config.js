@@ -1,1 +1,1 @@
-export const BACKEND_URL = "https://backend-mtr.onrender.com";
+export const BACKEND_URL = "https://mtr-backend-render.onrender.com";

@@ -26,7 +26,7 @@ export default function RegisterPage() {
   const HEADER_H = 72;
 
   const BACKEND =
-    (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr.onrender.com").replace(/\/$/, "");
+    (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
