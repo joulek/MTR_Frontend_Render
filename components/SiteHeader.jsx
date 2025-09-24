@@ -636,20 +636,21 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <div className="mx-auto max-w-screen-2xl px-6">
           <div className="flex h-20 items-center justify-between">
             {/* logo → home */}
-            <Link
-              href={homeHref}
-              className="flex items-center gap-3 relative left-6 top-2"
-              aria-label={t("logoAlt")}
-            >
-              <Image
-                src="/logo_MTR.png"
-                alt={t("logoAlt")}
-                width={110}
-                height={100}
-                className="object-contain"
-                priority
-              />
-            </Link>
+           <Link
+  href={homeHref}
+  className="flex items-center gap-3 ml-10 mt-3"
+  aria-label={t("logoAlt")}
+>
+  <Image
+    src="/logo_MTR.png"
+    alt={t("logoAlt")}
+    width={110}
+    height={100}
+    className="object-contain"
+    priority
+  />
+</Link>
+
 
 
             {/* nav desktop */}
