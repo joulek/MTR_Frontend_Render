@@ -442,68 +442,68 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       </div>
 
       {/* barre principale */}
-      <div className="border-b border-slate-200 bg-white/95 backdrop-blur shadow-md">     
-         <div className="mx-auto max-w-screen-2xl px-6">
-        <div className="flex h-20 md:h-24 items-center justify-between">
-          <Link href={homeHref} className="flex items-center gap-3" aria-label={t("logoAlt")}>
-            <img src="/logo_MTR.png" alt={t("logoAlt")} width={130} height={130} className="object-contain" />
-          </Link>
-
-          {/* nav desktop */}
-          <nav className="hidden items-center gap-3 md:flex">
-            <Link href={homeHref} className="px-4 py-3 text-[16px] md:text-[18px] font-medium text-[#0B2239] hover:text-[#F5B301]"
-            >
-              {t("nav.home")}
+      <div className="border-b border-slate-200 bg-white/95 backdrop-blur shadow-md">
+        <div className="mx-auto max-w-screen-2xl px-6">
+          <div className="flex h-20 md:h-24 items-center justify-between">
+            <Link href={homeHref} className="flex items-center gap-3" aria-label={t("logoAlt")}>
+              <img src="/logo_MTR.png" alt={t("logoAlt")} width={130} height={130} className="object-contain" />
             </Link>
 
-            {!isLoggedClient || isHome ? (
-              <>
-                <button type="button" onClick={() => goToSection("presentation")} className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]" role="link">
-                  {t("nav.company")}
-                </button>
-                {!loadingCats && <ProductsMenu cats={categories} locale={locale} />}
-                <button type="button" onClick={() => goToSection("contact")} className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]" role="link">
-                  {t("nav.contact")}
-                </button>
-                <button type="button" onClick={() => goToSection("localisation")} className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]" role="link">
-                  {t("nav.location")}
-                </button>
-              </>
-            ) : (
-              !loadingCats && <ProductsMenu cats={categories} locale={locale} />
-            )}
+            {/* nav desktop */}
+            <nav className="hidden items-center gap-3 md:flex">
+              <Link href={homeHref} className="px-4 py-3 text-[16px] md:text-[18px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+              >
+                {t("nav.home")}
+              </Link>
 
-            {isLoggedClient && <ClientNavItemsDesktop />}
-          </nav>
+              {!isLoggedClient || isHome ? (
+                <>
+                  <button type="button" onClick={() => goToSection("presentation")} className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]" role="link">
+                    {t("nav.company")}
+                  </button>
+                  {!loadingCats && <ProductsMenu cats={categories} locale={locale} />}
+                  <button type="button" onClick={() => goToSection("contact")} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]" role="link">
+                    {t("nav.contact")}
+                  </button>
+                  <button type="button" onClick={() => goToSection("localisation")} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]" role="link">
+                    {t("nav.location")}
+                  </button>
+                </>
+              ) : (
+                !loadingCats && <ProductsMenu cats={categories} locale={locale} />
+              )}
 
-          {/* actions droite */}
-          <div className="flex items-center gap-3">
-            {isLoggedClient ? (
-              <UserMenu />
-            ) : (
-              <>
-                <Link href={`/${locale}/login`} className="hidden md:inline-block rounded-full bg-[#F5B301] px-5 py-3 text-[16px] md:text-[18px] ...
- font-semibold text-[#0B2239] shadow hover:brightness-95">
-                  {t("actions.login")}
-                </Link>
-                <Link href={`/${locale}/devis`} className="hidden md:inline-block rounded-full bg-[#F5B301] px-5 py-3 text-[16px] md:text-[18px] ...
- font-semibold text-[#0B2239] shadow hover:brightness-95">
-                  {t("actions.askQuote")}
-                </Link>
-              </>
-            )}
+              {isLoggedClient && <ClientNavItemsDesktop />}
+            </nav>
 
-            {/* menu mobile */}
-            <button
-              onClick={() => setOpen((s) => !s)}
-              aria-label={t("actions.openMenu")}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden"
-            >
-              ☰
-            </button>
+            {/* actions droite */}
+            <div className="flex items-center gap-3">
+              {isLoggedClient ? (
+                <UserMenu />
+              ) : (
+                <>
+                  <Link href={`/${locale}/login`} className="hidden md:inline-block rounded-full bg-[#F5B301] px-4 py-2.5 text-[15px] md:text-[16px] font-semibold text-[#0B2239] shadow hover:brightness-95">
+
+                    {t("actions.login")}
+                  </Link>
+                  <Link href={`/${locale}/devis`} className="hidden md:inline-block rounded-full bg-[#F5B301] px-4 py-2.5 text-[15px] md:text-[16px] font-semibold text-[#0B2239] shadow hover:brightness-95">
+
+                    {t("actions.askQuote")}
+                  </Link>
+                </>
+              )}
+
+              {/* menu mobile */}
+              <button
+                onClick={() => setOpen((s) => !s)}
+                aria-label={t("actions.openMenu")}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden"
+              >
+                ☰
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
         {/* mobile drawer */}
         {open && (
