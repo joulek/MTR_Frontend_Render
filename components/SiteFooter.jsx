@@ -145,7 +145,7 @@ export default function SiteFooter({ locale = "fr" }) {
       {/* Back to top */}
       <a
         href="#accueil"
-        className="fixed bottom-6 right-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#F5B301] text-[#0B2239] shadow-xl ring-1 ring-black/10 transition hover:-translate-y-0.5"
+        className="fixed bottom-6 right-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#0B2239]  text-[#F5B301]  shadow-xl ring-1 ring-black/10 transition hover:-translate-y-0.5"
         aria-label={t("backToTop")}
         title={t("backToTop")}
       >
