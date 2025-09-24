@@ -76,7 +76,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch { }
+    } catch {}
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
     if (!localStorage.getItem("mtr_locale") && (pathLocale === "fr" || pathLocale === "en")) {
@@ -104,15 +104,15 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           const json = await r.json();
           setMe(json || null);
           if (json?.role) {
-            try { localStorage.setItem("mtr_role", json.role); } catch { }
+            try { localStorage.setItem("mtr_role", json.role); } catch {}
           }
         } else {
           setMe(null);
-          try { localStorage.removeItem("mtr_role"); } catch { }
+          try { localStorage.removeItem("mtr_role"); } catch {}
         }
       } catch {
         setMe(null);
-        try { localStorage.removeItem("mtr_role"); } catch { }
+        try { localStorage.removeItem("mtr_role"); } catch {}
       }
     })();
     return () => { alive = false; };
@@ -185,7 +185,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   const switchLang = useCallback((next) => {
     if (next === locale) return;
     setLocale(next);
-    try { localStorage.setItem("mtr_locale", next); } catch { }
+    try { localStorage.setItem("mtr_locale", next); } catch {}
     if (typeof document !== "undefined") document.documentElement.lang = next;
     const nextPath = swapLocaleInPath(pathname, next);
     router.push(nextPath, { scroll: false });
@@ -262,8 +262,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active ? "bg-[#F5B301] text-[#0B2239]" : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
+                        active ? "bg-[#F5B301] text-[#0B2239]" : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                      }`}
                     >
                       {label}{hasChildren ? (<span className="ml-3 text-xs opacity-70">›</span>) : null}
                     </Link>
@@ -396,16 +397,16 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   async function handleLogout() {
     try {
       await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch { }
+    } catch {}
     try {
       localStorage.removeItem("mtr_role");
       localStorage.removeItem("userRole");
       localStorage.removeItem("rememberMe");
-    } catch { }
+    } catch {}
     setMe(null);
     router.replace(`/${locale}`);
     router.refresh();
-    try { window.dispatchEvent(new CustomEvent("mtr:auth", { detail: { state: "logout" } })); } catch { }
+    try { window.dispatchEvent(new CustomEvent("mtr:auth", { detail: { state: "logout" } })); } catch {}
     if (typeof onLogout === "function") onLogout();
   }
 
@@ -442,17 +443,16 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       </div>
 
       {/* barre principale */}
-      <div className="border-b border-slate-200 bg-white/95 backdrop-blur shadow-md">
+      <div className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-screen-2xl px-6">
-          <div className="flex h-20 md:h-24 items-center justify-between">
+          <div className="flex h-16 items-center justify-between">
             <Link href={homeHref} className="flex items-center gap-3" aria-label={t("logoAlt")}>
-              <img src="/logo_MTR.png" alt={t("logoAlt")} width={130} height={130} className="object-contain" />
+              <img src="/logo_MTR.png" alt={t("logoAlt")} width={100} height={100} className="object-contain" />
             </Link>
 
             {/* nav desktop */}
-            <nav className="hidden items-center gap-3 md:flex">
-              <Link href={homeHref} className="px-4 py-3 text-[16px] md:text-[18px] font-bold text-[#0B2239] hover:text-[#F5B301]"
-              >
+            <nav className="hidden items-center gap-1 md:flex">
+              <Link href={homeHref} className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]">
                 {t("nav.home")}
               </Link>
 
@@ -462,10 +462,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     {t("nav.company")}
                   </button>
                   {!loadingCats && <ProductsMenu cats={categories} locale={locale} />}
-                  <button type="button" onClick={() => goToSection("contact")} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]" role="link">
+                  <button type="button" onClick={() => goToSection("contact")} className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]" role="link">
                     {t("nav.contact")}
                   </button>
-                  <button type="button" onClick={() => goToSection("localisation")} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]" role="link">
+                  <button type="button" onClick={() => goToSection("localisation")} className="px-3 py-2 text-[15px] md:text-[16px] font-medium text-[#0B2239] hover:text-[#F5B301]" role="link">
                     {t("nav.location")}
                   </button>
                 </>
@@ -482,12 +482,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 <UserMenu />
               ) : (
                 <>
-                  <Link href={`/${locale}/login`} className="hidden md:inline-block rounded-full bg-[#F5B301] px-4 py-2.5 text-[15px] md:text-[16px] font-semibold text-[#0B2239] shadow hover:brightness-95">
-
+                  <Link href={`/${locale}/login`} className="hidden md:inline-block rounded-full bg-[#F5B301] px-4 py-2 text-[15px] md:text-[16px] font-semibold text-[#0B2239] shadow hover:brightness-95">
                     {t("actions.login")}
                   </Link>
-                  <Link href={`/${locale}/devis`} className="hidden md:inline-block rounded-full bg-[#F5B301] px-4 py-2.5 text-[15px] md:text-[16px] font-semibold text-[#0B2239] shadow hover:brightness-95">
-
+                  <Link href={`/${locale}/devis`} className="hidden md:inline-block rounded-full bg-[#F5B301] px-4 py-2 text-[15px] md:text-[16px] font-semibold text-[#0B2239] shadow hover:brightness-95">
                     {t("actions.askQuote")}
                   </Link>
                 </>
