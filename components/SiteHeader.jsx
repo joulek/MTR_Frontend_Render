@@ -648,7 +648,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               aria-label={t("logoAlt")}
             >
               <Image
-                src="/logoMTR.jpg"
+                src="/logo_MTR.png"
                 alt={t("logoAlt")}
                 width={400}
                 height={250}
