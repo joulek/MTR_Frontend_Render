@@ -749,7 +749,7 @@
         }
       },
       "quotesListPage": {
-        "title": "Liste des devis (par demande)",
+        "title": "Liste des devis",
         "filters": {
           "type": {
             "title": "Type de demande",

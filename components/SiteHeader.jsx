@@ -539,21 +539,27 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     );
   };
 
-  async function handleLogout() {
+ async function handleLogout() {
+  try {
+    await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
+  } catch { /* ignore */ }
+  finally {
     try {
-      await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch {
-    } finally {
-      try {
-        localStorage.removeItem("mtr_role");
-        localStorage.removeItem("userRole");
-        localStorage.removeItem("rememberMe");
-      } catch { }
-      setMe(null);
-      setHintRole(null);
-      router.replace(`/${locale}`);
-    }
+      localStorage.removeItem("mtr_role");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("rememberMe");
+    } catch {}
+
+    setMe(null);
+    setHintRole(null);
+
+    // 🔒 Remplacer l'entrée d'historique et repartir à la Home
+    const home = `/${locale}`;
+    // location.replace remplace l'entrée courante -> le "back" ne revient pas sur la page protégée
+    window.location.replace(home);
   }
+}
+
 
   /* ======================= RENDER ======================= */
   return (
@@ -642,7 +648,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               aria-label={t("logoAlt")}
             >
               <Image
-                src="/logo_MTR.png"
+                src="/logo.png"
                 alt={t("logoAlt")}
                 width={110}
                 height={100}

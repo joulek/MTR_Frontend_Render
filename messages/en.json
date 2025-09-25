@@ -418,7 +418,7 @@
         }
       },
       "quotesListPage": {
-        "title": "Quotes list (by request)",
+        "title": "Quotes list",
         "filters": {
           "type": {
             "title": "Request type",
