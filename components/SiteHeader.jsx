@@ -650,8 +650,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               <Image
                 src="/logo.png"
                 alt={t("logoAlt")}
-                width={110}
-                height={100}
+                width={200}
+                height={150}
                 className="object-contain"
                 priority
               />
