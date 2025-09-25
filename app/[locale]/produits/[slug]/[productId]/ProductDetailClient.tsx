@@ -19,7 +19,7 @@ const pick = (obj: any, frKey: string, enKey: string, locale = "fr") =>
 
 /* ------------------------------- Utils image ------------------------------ */
 const PLACEHOLDER = "/placeholder.png";
-const BACKEND_HOST = "backend-mtr.onrender.com";
+const BACKEND_HOST = "mtr-backend-render.onrender.com";
 
 const toUrl = (src: any = "") => {
   try {
