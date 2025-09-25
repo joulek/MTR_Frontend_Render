@@ -58,7 +58,7 @@ export default function LoginPage() {
         if (role === "admin") router.push(`/${locale}/admin`);
         else if (role === "client")
           router.push(
-            `/${locale}/client/home`
+            `/${locale}/client/devis`
           ); // Redirection vers la page de devis pour un client
         else router.push(`/${locale}/home`);
       }
