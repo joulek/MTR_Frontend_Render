@@ -6,15 +6,42 @@ import { useTranslations, useLocale } from "next-intl";
 import { FiEdit2, FiSearch, FiXCircle, FiPlus, FiTrash2, FiX, FiCheck } from "react-icons/fi";
 import Pagination from "@/components/Pagination";
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com";
+/* ---------- BACKEND origin (toujours https, sans slash final) ---------- */
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
 const CARD_WRAPPER = "mx-auto w-full max-w-6xl px-3 sm:px-6";
 
-// ---------- Helpers ----------
+/* ---------- Helpers ---------- */
 const DEBUG = typeof window !== "undefined" && process.env.NODE_ENV !== "production";
 const dlog = (...args) => { if (DEBUG) console.log("[AdminProducts]", ...args); };
 
-const buildAbsUrl = (u) =>
-  !u ? "" : /^https?:\/\//i.test(u) ? u : `${BACKEND.replace(/\/$/, "")}/${String(u).replace(/^\//, "")}`;
+/** Construit une URL ABSOLUE vers le backend, même si la valeur en DB est:
+ *  - un lien http(s) vers un ancien domaine (on garde juste le pathname)
+ *  - un simple nom de fichier (on préfixe /uploads/)
+ *  - un chemin relatif sans /uploads
+ */
+const toBackendUrl = (u) => {
+  if (!u) return "";
+  if (typeof u !== "string") u = u?.url || "";
+  u = String(u).trim();
+
+  // Si c'est une URL absolue => on retire l'origine (évite mixed content & mauvais domaine)
+  if (/^https?:\/\//i.test(u)) {
+    try {
+      const parsed = new URL(u);
+      u = parsed.pathname || "/";
+    } catch {
+      // ignore
+    }
+  }
+
+  // Normaliser en chemin backend
+  if (!u.startsWith("/")) u = "/" + u;
+  if (!/^\/uploads\//i.test(u)) {
+    u = "/uploads/" + u.replace(/^\/+/, "");
+  }
+
+  return `${BACKEND}${u}`;
+};
 
 const resolveCategory = (cat, cats) => {
   if (!cat) return null;
@@ -22,10 +49,11 @@ const resolveCategory = (cat, cats) => {
   return cat;
 };
 
+/** Normalise le tableau d'images d'un produit quelle que soit la forme */
 const normalizeImages = (p) => {
   const raw = p?.images ?? p?.imageUrls ?? p?.photos ?? [];
   return (Array.isArray(raw) ? raw : [])
-    .map((x) => (typeof x === "string" ? buildAbsUrl(x) : buildAbsUrl(x?.url)))
+    .map((x) => toBackendUrl(typeof x === "string" ? x : x?.url))
     .filter(Boolean);
 };
 
@@ -510,7 +538,6 @@ export default function AdminProductsPage() {
             /* options */
             pageSizeOptions={[5, 10, 20, 50]}
           />
-
         </div>
       </div>
 
