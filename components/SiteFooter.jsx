@@ -23,8 +23,8 @@ export default function SiteFooter({ locale = "fr" }) {
   ];
 
   const contacts = [
-    { name: "Chorki Hbaeib", phone: "+216 98 331 896", tel: "tel:+21698331896" },
-    { name: "Mohamed Hbaeib", phone: "+216 98 333 883", tel: "tel:+21698333883" },
+    { name: "Chorki Hbaeib", phone: "+216 74 850 999 / 74 863 888 ", tel: "tel:+216 74 850 999 / 74 863 888 " },
+    { name: "Mohamed Hbaeib", phone: "+216 74 858 863 / 74 864 863", tel: "tel:+216 74 858 863 / 74 864 863" },
   ];
 
   return (
