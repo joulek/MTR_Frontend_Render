@@ -329,8 +329,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
                       className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
-                          ? "bg-[#F5B301] text-[#0B2239]"
-                          : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                        ? "bg-[#F5B301] text-[#0B2239]"
+                        : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
                         }`}
                     >
                       {label}
@@ -487,7 +487,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         </button>
 
         {uOpen && (
-<div className="absolute left-0 md:left-auto md:right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl z-50">
+          <div className="absolute left-0 md:left-auto md:right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl z-50">
             <Link
               href={`/${locale}/client/profile`}
               onClick={() => setUOpen(false)}
@@ -534,7 +534,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 h-auto min-h-[40px] py-1 text-[12px] sm:text-[14px]">
             <nav className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <button type="button" onClick={() => goToSection("apropos")} className="opacity-90 transition hover:text-[#F5B301]" role="link">
-                {t("topbar.about")}
+                {t("topbar.apropos")}
               </button>
 
               <span className="hidden sm:inline opacity-40">|</span>
