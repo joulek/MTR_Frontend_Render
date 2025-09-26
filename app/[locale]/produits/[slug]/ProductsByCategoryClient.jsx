@@ -267,7 +267,8 @@ export default function ProductsByCategoryPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="overflow-hidden rounded-3xl bg-white ring-1 ring-slate-200">
-                  <div className="h-56 bg-slate-200 animate-pulse" />
+                  {/* Skeleton en ratio fixe */}
+                  <div className="relative w-full aspect-[4/3] bg-slate-200 animate-pulse" />
                 </div>
               ))}
             </div>
@@ -280,28 +281,35 @@ export default function ProductsByCategoryPage() {
           {/* ===== CONTENU ===== */}
           {!loadingCats && !loadingProds && !error && !didAutoOpen && products.length > 0 && (
             <>
-              {/* MOBILE: liste verticale (1 carte/ligne) avec lien plein-cadre */}
+              {/* MOBILE: 1 carte/ligne — ratio fixe + contain */}
               <div className="sm:hidden space-y-6">
                 {products.map((p) => {
                   const title = pickName(p, locale);
                   const img = toUrlSafe(p.images?.[0]);
                   const href = `/${locale}/produits/${slug}/${p._id}`;
                   return (
-                    <article key={p._id} className="group relative h-64 overflow-hidden rounded-3xl shadow-lg ring-1 ring-slate-200">
-                      <Image src={img} alt={title} fill sizes="100vw" className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-110" />
+                    <article key={p._id} className="group relative overflow-hidden rounded-3xl shadow-lg ring-1 ring-slate-200 bg-white">
+                      <div className="relative w-full aspect-[4/3]">
+                        <Image
+                          src={img}
+                          alt={title}
+                          fill
+                          sizes="100vw"
+                          className="object-contain p-4 transition-transform duration-[800ms] ease-out group-hover:scale-105"
+                        />
+                      </div>
                       <div className="absolute left-3 bottom-3 z-10">
                         <span className="inline-flex items-center rounded-lg bg-black/60 px-3 py-1.5 text-[12px] font-semibold text-white shadow backdrop-blur-sm">
                           {title}
                         </span>
                       </div>
-                      {/* ➜ redirection (pas de lightbox) */}
                       <a href={href} className="absolute inset-0 z-20" aria-label={`Voir détail: ${title}`} />
                     </article>
                   );
                 })}
               </div>
 
-              {/* DESKTOP: carrousel conservé, avec lien plein-cadre */}
+              {/* DESKTOP: carrousel — ratio fixe + contain */}
               <motion.div {...fadeUp(0.06)} className="hidden sm:block mt-6">
                 <Carousel
                   items={products}
@@ -311,14 +319,21 @@ export default function ProductsByCategoryPage() {
                     const img = toUrlSafe(p.images?.[0]);
                     const href = `/${locale}/produits/${slug}/${p._id}`;
                     return (
-                      <article className="group relative h-72 lg:h-80 overflow-hidden rounded-3xl shadow-lg ring-1 ring-slate-200">
-                        <Image src={img} alt={title} fill sizes="(max-width:1024px) 62vw, 40vw" className="object-cover transition-transform duration-[800ms] ease-out group-hover:scale-110" />
+                      <article className="group relative overflow-hidden rounded-3xl shadow-lg ring-1 ring-slate-200 bg-white">
+                        <div className="relative w-full aspect-[4/3]">
+                          <Image
+                            src={img}
+                            alt={title}
+                            fill
+                            sizes="(max-width:1024px) 62vw, 40vw"
+                            className="object-contain p-4 transition-transform duration-[800ms] ease-out group-hover:scale-105"
+                          />
+                        </div>
                         <div className="absolute left-3 bottom-3 z-10">
                           <span className="inline-flex items-center rounded-lg bg-black/60 px-3 py-1.5 text-[12px] font-semibold text-white shadow backdrop-blur-sm">
                             {title}
                           </span>
                         </div>
-                        {/* ➜ redirection (pas de lightbox) */}
                         <a href={href} className="absolute inset-0 z-20" aria-label={`Voir détail: ${title}`} />
                       </article>
                     );
