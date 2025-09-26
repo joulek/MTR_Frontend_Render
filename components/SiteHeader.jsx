@@ -92,7 +92,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch { }
+    } catch {}
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -133,7 +133,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch { }
+            } catch {}
             setHintRole(json.role);
           }
         } else {
@@ -141,14 +141,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch { }
+          } catch {}
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch { }
+        } catch {}
       }
     })();
     return () => {
@@ -243,7 +243,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch { }
+      } catch {}
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -252,17 +252,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   );
 
   /* ======================= Sous-composants ======================= */
-  // ✅ ProductsMenu corrigé : aucun "pont" ni panneau droit s'il n'y a rien à montrer
   const ProductsMenu = ({ cats, locale }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [hoveredParent, setHoveredParent] = useState(null);
 
-    // IDs robustes (toujours _id si dispo)
     const catId = (c) => String(c?._id || c?.id || "");
     const catParentId = (c) =>
       String(c?.parent?._id || c?.parent || c?.parentId || c?.parent_id || "");
 
-    // enfants par parent
     const childrenMap = new Map();
     cats.forEach((c) => {
       const pid = catParentId(c);
@@ -273,7 +270,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     });
     const roots = cats.filter((c) => !catParentId(c));
 
-    // produits par catégorie
     const prodsByCat = new Map();
     const prodCatId = (p) =>
       String(p?.category?._id || p?.category || p?.categoryId || p?.category_id || "");
@@ -285,12 +281,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       prodsByCat.set(cid, arr);
     });
 
-    // panneau droit utile ?
     const hasRightPanel = (parentId) => {
       if (!parentId) return false;
       const hasChildren = (childrenMap.get(parentId)?.length || 0) > 0;
-
-      // produits uniques (≥2 requis pour afficher)
       const uniq = new Set(
         (prodsByCat.get(parentId) || []).map((p) => p?._id || p?.id || pickProdName(p, locale))
       );
@@ -320,11 +313,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
         {menuOpen && (
           <div className="absolute left-0 top-full z-50">
-            {/* Colonne de gauche */}
             <ul
               className={[
                 "relative w-64 rounded-lg bg-white p-2 shadow-2xl ring-1 ring-slate-200",
-                // 👉 ne tracer le “pont” que s’il y aura un panneau droit
                 showRight
                   ? "after:content-[''] after:absolute after:top-0 after:right-[-8px] after:w-2 after:h-full after:bg-transparent after:pointer-events-none"
                   : "",
@@ -340,10 +331,11 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
-                        ? "bg-[#F5B301] text-[#0B2239]"
-                        : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
+                        active
+                          ? "bg-[#F5B301] text-[#0B2239]"
+                          : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                      }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -353,10 +345,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               })}
             </ul>
 
-            {/* Colonne de droite – seulement si nécessaire */}
             {showRight && (
               <div className="absolute left-[100%] top-0 ml-2 w-72 rounded-lg bg-white p-2 shadow-2xl ring-1 ring-slate-200">
-                {/* Sous-catégories */}
                 {(childrenMap.get(hoveredParent) || []).length > 0 && (
                   <ul className="mb-1">
                     {(childrenMap.get(hoveredParent) || []).map((child) => (
@@ -372,7 +362,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   </ul>
                 )}
 
-                {/* Produits (≥2) */}
                 {(() => {
                   const uniq = new Map();
                   (prodsByCat.get(hoveredParent) || []).forEach((p) => {
@@ -548,18 +537,15 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch { }
+      } catch {}
 
       setMe(null);
       setHintRole(null);
 
-      // 🔒 Remplacer l'entrée d'historique et repartir à la Home
       const home = `/${locale}`;
-      // location.replace remplace l'entrée courante -> le "back" ne revient pas sur la page protégée
       window.location.replace(home);
     }
   }
-
 
   /* ======================= RENDER ======================= */
   return (
@@ -583,11 +569,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
               <Link
                 href={`/${locale}/help-desk`}
-                className="opacity-90 transition hover:text-[#F5B301]"
-              >
+                className="opacity-90 transition hover:text-[#F5B301]">
                 {t("topbar.helpdesk")}
               </Link>
-
 
               <span className="hidden sm:inline opacity-40">|</span>
 
@@ -642,33 +626,27 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       {/* barre principale */}
       <div className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-screen-2xl px-6">
-          <div className="flex h-20 items-center justify-between">
-            {/* logo → home */}
-            {/* logo → home */}
-            <div className="flex h-16 md:h-20 items-center justify-between relative">
-              {/* logo → home */}
-              <Link
-                href={homeHref}
-                aria-label={t("logoAlt")}
-                className="
-      flex items-center gap-2
-      absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1
-      md:static md:translate-x-0 md:translate-y-0 md:left-auto md:top-auto
-    "
-              >
-                <Image
-                  src="/logo_MTR.png"
-                  alt={t("logoAlt")}
-                  width={150}
-                  height={100}
-                  priority
-                  className="object-contain w-28 h-auto md:w-[150px]"
-                />
-              </Link>
-            </div>
-
-
-
+          {/* ↓↓↓ rangée rendue relative + plus basse en mobile */}
+          <div className="flex h-16 md:h-20 items-center justify-between relative">
+            {/* logo → home (centré en mobile, à gauche en desktop) */}
+            <Link
+              href={homeHref}
+              aria-label={t("logoAlt")}
+              className="
+                flex items-center justify-center
+                absolute inset-x-0 top-1
+                md:static md:inset-auto
+              "
+            >
+              <Image
+                src="/logo_MTR.png"
+                alt={t("logoAlt")}
+                width={150}
+                height={100}
+                priority
+                className="object-contain w-24 h-auto md:w-[150px]"
+              />
+            </Link>
 
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
