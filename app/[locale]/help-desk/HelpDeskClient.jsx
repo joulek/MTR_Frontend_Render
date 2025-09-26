@@ -90,19 +90,19 @@ export default function HelpDeskClient() {
     {
       icon: <PhoneCall className="h-5 w-5 text-[#F5B301]" />,
       title: t("cards.call.title"),
-      lines: [t("cards.call.line1"), t("cards.call.line2")],
-      cta: { label: t("cards.call.cta"), href: t("cards.call.href") },
+      lines: ["+216 98 333 896", "Lun–Ven, 8h–17h | Sam : 8h – 14h"],
+      cta: { label: t("cards.call.cta"), href: "tel:+21698333896" },
     },
     {
       icon: <Mail className="h-5 w-5 text-[#F5B301]" />,
       title: t("cards.email.title"),
-      lines: [t("cards.email.line1"), t("cards.email.line2")],
-      cta: { label: t("cards.email.cta"), href: t("cards.email.href") },
+      lines: ["contact@mtr.tn", "Réponse sous 24h ouvrées"],
+      cta: { label: t("cards.email.cta"), href: "mailto:contact@mtr.tn" },
     },
     {
       icon: <MessageSquare className="h-5 w-5 text-[#F5B301]" />,
       title: t("cards.quote.title"),
-      lines: [t("cards.quote.line1"), t("cards.quote.line2")],
+      lines: ["Spécifications, quantités, matière…", "Prototypage possible"],
       cta: { label: t("cards.quote.cta"), href: `/${locale}/devis` },
     },
   ];
@@ -132,22 +132,23 @@ export default function HelpDeskClient() {
       <motion.section variants={vSection} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="bg-white py-14">
         <div className="mx-auto max-w-7xl px-4">
           <motion.div variants={vStagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
-            <div className="grid gap-6 md:grid-cols-3 items-stretch">
+            <div className="grid gap-6 md:grid-cols-3">
               {cards.map((c, i) => (
                 <motion.article
                   key={i}
                   variants={vItem}
-                  className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200
-                             flex flex-col items-center justify-center text-center h-full"
+                  className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200 flex flex-col"
                 >
-                  <div className="mb-3 flex items-center gap-3 justify-center">
+                  {/* titre à gauche */}
+                  <div className="mb-3 inline-flex items-center gap-3 self-start">
                     <span className="grid h-11 w-11 place-items-center rounded-xl bg-[#0B2239]/5">{c.icon}</span>
                     <h3 className="text-lg font-bold text-[#0B2239]">{c.title}</h3>
                   </div>
-                  <ul className="space-y-1 text-sm text-slate-600 text-center">
+                  {/* données centrées */}
+                  <ul className="space-y-1 text-sm text-slate-600 text-center self-center">
                     {c.lines.map((l, j) => <li key={j}>{l}</li>)}
                   </ul>
-                  <a href={c.cta.href} className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#F5B301] px-4 py-2 text-sm font-semibold text-[#0B2239] hover:bg-[#F5B301]">
+                  <a href={c.cta.href} className="mt-5 self-center inline-flex items-center gap-2 rounded-full border border-[#F5B301] px-4 py-2 text-sm font-semibold text-[#0B2239] hover:bg-[#F5B301]">
                     {c.cta.label}
                   </a>
                 </motion.article>
@@ -194,7 +195,6 @@ export default function HelpDeskClient() {
             <h2 className="text-3xl font-extrabold text-[#0B2239]">{t("form.title")}</h2>
             <p className="mt-2 text-slate-600">{t("form.subtitle")}</p>
           </div>
-
           <form onSubmit={submitContact} className="rounded-3xl bg-white/90 p-6 shadow-xl ring-1 ring-slate-200 backdrop-blur">
             <div className="grid gap-5 sm:grid-cols-2">
               <div className="relative">
