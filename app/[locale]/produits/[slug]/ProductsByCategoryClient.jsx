@@ -130,7 +130,7 @@ function Carousel({ items, ariaLabel = "Carrousel", renderItem }) {
 
   return (
     <div className="relative">
-      {/* Le viewport EST relatif : les flèches se centrent toujours au milieu visible */}
+      {/* viewport scrollable */}
       <div
         ref={viewportRef}
         aria-label={ariaLabel}
@@ -146,29 +146,31 @@ function Carousel({ items, ariaLabel = "Carrousel", renderItem }) {
             {renderItem(it, i)}
           </div>
         ))}
-
-        {items.length > 1 && (
-          <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[200]">
-            <button
-              aria-label="Précédent"
-              onClick={prev}
-              type="button"
-              className="pointer-events-auto absolute left-2 top-1/2 -translate-y-1/2 grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow"
-            >
-              ‹
-            </button>
-            <button
-              aria-label="Suivant"
-              onClick={next}
-              type="button"
-              className="pointer-events-auto absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow"
-            >
-              ›
-            </button>
-          </div>
-        )}
       </div>
 
+      {/* ⬅️➡️ flèches ABSOLUES par rapport au conteneur global (pas au viewport) */}
+      {items.length > 1 && (
+        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[200]">
+          <button
+            aria-label="Précédent"
+            onClick={prev}
+            type="button"
+            className="pointer-events-auto absolute left-2 top-1/2 -translate-y-1/2 grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow"
+          >
+            ‹
+          </button>
+          <button
+            aria-label="Suivant"
+            onClick={next}
+            type="button"
+            className="pointer-events-auto absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow"
+          >
+            ›
+          </button>
+        </div>
+      )}
+
+      {/* bullets */}
       {items.length > 1 && (
         <div className="mt-5 flex items-center justify-center gap-2">
           {items.map((_, i) => (
@@ -222,7 +224,7 @@ export default function ProductsByCategoryPage() {
       const title = (c?.translations?.[locale] || c?.translations?.fr || c?.translations?.en || c?.label || "").trim();
       const s = c?.slug ? String(c.slug) : slugify(title);
       return s === slug;
-    }) || null;
+    })() || null;
   }, [categories, slug, locale]);
 
   /* fetch products */
