@@ -1729,26 +1729,26 @@
       "home": "Accueil"
     },
     "hero": {
-      "title": "Ressorts industriels & solutions de traction",
+      "title": "Ressorts industriels & articles métalliques sur mesure",
       "subtitle": "Qualité, précision, fiabilité – MTR conçoit et fabrique vos ressorts sur mesure.",
       "ctaContact": "Contact rapide",
       "ctaSpecialties": "Nos spécialités"
     },
     "presentation": {
       "years": "Années",
-      "wireRange": "Fil (mm)",
-      "grids": "Grilles",
-      "punch": "La qualité à chaque ressort, la fiabilité à chaque pas.",
+      "wireRange": "Clients partenaires",
+      "grids": "Pièces/an produites ",
+      "punch": "La qualité à chaque ressort, la fiabilité à chaque pas",
       "card1Title": "Fondation & activité",
       "card1Text1": "Fondée en 1994 par <strong>Monsieur Hbaieb Chokri</strong>, la <strong>Manufacture Tunisienne des Ressorts (MTR)</strong> est une entreprise tunisienne de type SARL, spécialisée depuis plus de 30 ans dans la conception et la fabrication de ressorts : ressorts de <strong>compression</strong>, de <strong>traction</strong>, de <strong>torsion</strong> et de <strong>forme</strong>.",
       "card2Title": "Savoir-faire & qualité",
       "card2Text1": "Forte d’un savoir-faire éprouvé et d’une maîtrise technique reconnue, MTR propose des <strong>solutions sur mesure</strong>, adaptées aux besoins les plus exigeants.",
       "card2Text2": "L’entreprise réalise des ressorts en fils métalliques de <strong>0,1 mm à 10 mm</strong> de diamètre, en <strong>petites ou grandes séries</strong>, selon les standards du client ou sur cahier des charges.",
       "card3Title": "Travail du fil & secteurs servis",
-      "card3Text1": "Dressage & coupe (1–12 mm), cintrage 2D/3D, grilles/cadres soudés, pièces techniques ou décoratives.",
+      "card3Text1": "Dressage & coupe (1–15 mm), Cintrage 2D/3D, Grilles et structures soudées, ainsi que pièces Techniques et Décoratives réalisées sur mesure.",
       "bullets": [
-        "Fils 0,1 mm à 10 mm",
-        "Séries petites à grandes",
+        "Solutions métalliques sur mesure",
+        "Production flexible",
         "Études & prototypage rapides",
         "Contrôle qualité interne"
       ],
@@ -1763,11 +1763,11 @@
     },
     "about": {
       "title": "À propos de MTR",
-      "subtitle": "L’essentiel en trois points : capacités, qualité et travail du fil.",
+      "subtitle": "L’essentiel en trois points : Expertise technique & applications industrielles.",
       "card1Title": "Fondation & activité",
       "li1": "<strong>Depuis 1994, </strong>plus de 30 ans d’expérience",
       "li2": "<strong>Ressorts sur mesure : </strong>compression, traction, torsion, forme",
-      "li3": "Fabrication en <strong>fils métalliques 0,1–10 mm </strong>selon plan ou cahier des charges",
+      "li3": "Fabrication en <strong>fils métalliques </strong>selon plan ou cahier des charges",
       "li4": "<strong>Savoir-faire élargi : </strong>fils dressés, cintrés 2D/3D et grilles soudées",
       "card2Title": "Savoir-faire & qualité",
       "li5": "<strong>Études & co-design,</strong> prototypage rapide",
@@ -1775,7 +1775,7 @@
       "li7": "<strong>Traçabilité complète</strong> des matières et procédés",
       "li8": "<strong>Production agile : </strong>du prototype aux grandes séries, délais optimisés",
       "card3Title": "Travail du fil & secteurs servis",
-      "li9": "<strong>Dressage & coupe 1–12 mm,</strong> cintrage 2D/3D",
+      "li9": "<strong>Dressage & coupe 1–15 mm,</strong> cintrage 2D/3D",
       "li10": "<strong>Grilles, cadres, formes et ensembles soudés</strong> sur mesure",
       "li11": "<strong>Finitions : </strong>peinture, chromage, galvanisation…",
       "li12": "Présent dans divers secteurs : <strong>automobile, électroménager, agriculture, électricité, bâtiment, sports & loisirs</strong>"

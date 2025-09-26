@@ -1480,26 +1480,26 @@
       "home": "Home"
     },
     "hero": {
-      "title": "Industrial springs & traction solutions",
+      "title": "Industrial springs & custom-made metal products",
       "subtitle": "Quality, precision, reliability — MTR designs and manufactures your custom springs.",
       "ctaContact": "Quick contact",
       "ctaSpecialties": "Our specialties"
     },
     "presentation": {
       "years": "Years",
-      "wireRange": "Wire (mm)",
-      "grids": "Grids",
-      "punch": "Quality in every spring, reliability at every step.",
+      "wireRange": "Partner Clients",
+      "grids": "Pieces/year produced",
+      "punch": "Quality in every spring, reliability at every step",
       "card1Title": "Founding & activity",
       "card1Text1": "Founded in 1994 by <strong>Mr. Hbaieb Chokri</strong>, the <strong>Manufacturer of Springs & Wireforms (MTR)</strong> is a Tunisian LLC specialized for over 30 years in designing and manufacturing springs: <strong>compression</strong>, <strong>extension</strong>, <strong>torsion</strong> and <strong>shaped</strong> springs.",
       "card2Title": "Expertise & quality",
       "card2Text1": "With proven expertise and recognized technical mastery, MTR delivers <strong>custom solutions</strong> for demanding needs.",
       "card2Text2": "We produce springs from <strong>0.1 mm to 10 mm</strong> wire, in <strong>small or large series</strong>, to standards or by specification.",
       "card3Title": "Wire processing & industrial applications",
-      "card3Text1": "Straightening & cutting (1–12 mm), 2D/3D bending, welded grids/frames, technical or decorative parts.",
+      "card3Text1": "Straightening & cutting (1–15 mm), 2D/3D bending, welded grids and structures, as well as custom-made technical and decorative parts.",
       "bullets": [
-        "Wire 0.1–10 mm",
-        "Small to large series",
+        "Custom metal solutions",
+        "Flexible production",
         "Studies & fast prototyping",
         "In-house quality control"
       ],
@@ -1514,11 +1514,11 @@
     },
     "about": {
       "title": "About MTR",
-      "subtitle": "Three essentials : capabilities, quality and wire working.",
+      "subtitle": "Three essentials : Technical Expertise & Industrial Applications.",
       "card1Title": "Founding & activity",
       "li1": "<strong>Since 1994, </strong>over 30 years of experience",
       "li2": "<strong>Custom springs : </strong>compression, tension, torsion, shape",
-      "li3": "Manufactured from<strong> 0.1–10 mm metal wire </strong> according to plans or specifications",
+      "li3": "Manufactured <strong>metal wire </strong> according to plans or specifications",
       "li4": "Extensive expertise : <strong>straightened wire, 2D/3D bent wire, and welded mesh</strong>",
       "card2Title": "Expertise & quality",
       "li5": "<strong>Research & co-design,</strong> rapid prototyping",
@@ -1526,7 +1526,7 @@
       "li7": "<strong>Full traceability</strong> of materials and processes",
       "li8": "<strong>Agile production: </strong>from prototypes to large-scale production, optimized lead times",
       "card3Title": "Wire processing & industrial applications",
-      "li9": "<strong>Straightening & cutting 1–12 mm,</strong> 2D/3D bending",
+      "li9": "<strong>Straightening & cutting 1–15 mm,</strong> 2D/3D bending",
       "li10": "Custom-made <strong>grids, frames, shapes, and welded assemblies</strong>",
       "li11": "<strong>Finishes: </strong>painting, chrome plating, galvanization, etc.",
       "li12": "Present in many fields: <strong>automotive, household appliances, agriculture, electricity, construction, sports & leisure</strong>"

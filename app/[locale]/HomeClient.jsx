@@ -276,11 +276,11 @@ export default function HomeClient() {
                     <div className="text-[11px] uppercase text-slate-500">{t("presentation.years")}</div>
                   </div>
                   <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white py-3">
-                    <div className="text-2xl font-extrabold text-[#0B2239]">0,1–10</div>
+                    <div className="text-2xl font-extrabold text-[#0B2239]">+500</div>
                     <div className="text-[11px] uppercase text-slate-500">{t("presentation.wireRange")}</div>
                   </div>
                   <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white py-3">
-                    <div className="text-2xl font-extrabold text-[#0B2239]">2D/3D</div>
+                    <div className="text-2xl font-extrabold text-[#0B2239]">+1M</div>
                     <div className="text-[11px] uppercase text-slate-500">{t("presentation.grids")}</div>
                   </div>
                 </div>
