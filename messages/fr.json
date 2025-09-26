@@ -22,7 +22,7 @@
       "blocks": {
         "collect": {
           "title": "Données que nous collectons",
-          "p1": "Nous collectons les informations que vous nous communiquez via nos formulaires (ex. <b>Nom</b>, <b>E-mail</b>, <b>Téléphone</b>, <b>Sujet</b>, <b>Message</b>, et données utiles au <b>devis</b> : type de pièce/ressort, dimensions, quantités, matières).",
+          "p1": "Nous collectons les informations que vous nous communiquez via nos formulaires (ex. <b>Nom</b>, <b>E-mail</b>, <b>Téléphone</b>, <b>Sujet</b>, <b>Message</b>, et données utiles au <b>devis</b>, type d’articles .dimensions , Quantités ...",
           "p2": "Des données de navigation non identifiantes (ex. pages visitées, appareil, navigateur) peuvent aussi être collectées pour améliorer l’expérience."
         },
         "usage": {
@@ -89,7 +89,7 @@
           "call": {
             "title": "Appel direct",
             "line1": "+216 98 333 896",
-            "line2": "Lun–Ven, 8h–17h",
+            "line2": "Lun–Ven, 8h–17h Sam : 8h – 14 h" ,
             "cta": "Appeler",
             "href": "tel:+21600000000"
           },
@@ -240,7 +240,7 @@
         "location": "Localisation"
       },
       "client": {
-        "claim": "Réclamarion",
+        "claim": "Réclamation",
         "myServices": "Mes services",
         "myQuotes": "Mes demandes devis",
         "myClaims": "Mes réclamations",

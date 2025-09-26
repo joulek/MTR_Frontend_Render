@@ -15,7 +15,7 @@
       "blocks": {
         "collect": {
           "title": "Data we collect",
-          "p1": "We collect the information you share via our forms (e.g., <b>Name</b>, <b>Email</b>, <b>Phone</b>, <b>Subject</b>, <b>Message</b>, and details useful for a <b>quote</b>: part/spring type, dimensions, quantities, materials).",
+          "p1": "We collect the information you share via our forms (e.g., <b>Name</b>, <b>Email</b>, <b>Phone</b>, <b>Subject</b>, <b>Message</b>, and details useful for a <b>quote</b>, item type, dimensions, quantities ...",
           "p2": "Non-identifying browsing data (e.g., pages visited, device, browser) may also be collected to improve the experience."
         },
         "usage": {
@@ -1291,7 +1291,7 @@
           "call": {
             "title": "Call us",
             "line1": "+216 98 333 883",
-            "line2": "Mon–Fri, 8am–5pm",
+            "line2": "Mon–Fri, 8am–5pm Sat, 8am–2pm",
             "cta": "Call",
             "href": "tel:+21698333883"
           },

@@ -36,21 +36,20 @@ export default function HelpDeskClient() {
   const [okMsg, setOkMsg] = useState("");
   const [errMsg, setErrMsg] = useState("");
 
-  // timers pour auto-hide (✅ جديد)
   const okTimer = useRef(null);
   const errTimer = useRef(null);
 
   useEffect(() => {
     if (!okMsg) return;
     if (okTimer.current) clearTimeout(okTimer.current);
-    okTimer.current = setTimeout(() => setOkMsg(""), 3000); // يخفي بعد 3 ثواني
+    okTimer.current = setTimeout(() => setOkMsg(""), 3000);
     return () => { if (okTimer.current) clearTimeout(okTimer.current); };
   }, [okMsg]);
 
   useEffect(() => {
     if (!errMsg) return;
     if (errTimer.current) clearTimeout(errTimer.current);
-    errTimer.current = setTimeout(() => setErrMsg(""), 4000); // يخفي بعد 4 ثواني
+    errTimer.current = setTimeout(() => setErrMsg(""), 4000);
     return () => { if (errTimer.current) clearTimeout(errTimer.current); };
   }, [errMsg]);
 
@@ -74,7 +73,7 @@ export default function HelpDeskClient() {
     }
   };
 
-  /* ----- FAQ depuis i18n ----- */
+  /* ----- FAQ ----- */
   const faqs = useMemo(() => ([
     { q: t("faq.q1.t"), a: t("faq.q1.a") },
     { q: t("faq.q2.t"), a: t("faq.q2.a") },
@@ -86,7 +85,7 @@ export default function HelpDeskClient() {
   const [openIdx, setOpenIdx] = useState(null);
   const toggleFaq = (i) => setOpenIdx((p) => (p === i ? null : i));
 
-  /* ----- Cartes contact depuis i18n ----- */
+  /* ----- Cartes contact ----- */
   const cards = [
     {
       icon: <PhoneCall className="h-5 w-5 text-[#F5B301]" />,
@@ -123,7 +122,6 @@ export default function HelpDeskClient() {
           className="absolute inset-0 z-0 object-cover object-center"
         />
         <div className="absolute inset-0 z-10 bg-[#0B2239]/60" />
-        <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(60%_50%_at_20%_10%,rgba(255,255,255,0.06),transparent),radial-gradient(60%_40%_at_85%_80%,rgba(245,179,1,0.10),transparent)]" />
         <motion.div variants={vSection} initial="hidden" animate="show" className="relative z-20 mx-auto max-w-4xl px-4 pt-14 md:pt-20 pb-6 text-center">
           <h1 className="text-4xl font-extrabold md:text-5xl">{t("hero.title")}</h1>
           <p className="mt-4 text-white/80">{t("hero.subtitle")}</p>
@@ -134,14 +132,19 @@ export default function HelpDeskClient() {
       <motion.section variants={vSection} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="bg-white py-14">
         <div className="mx-auto max-w-7xl px-4">
           <motion.div variants={vStagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-3 items-stretch">
               {cards.map((c, i) => (
-                <motion.article key={i} variants={vItem} className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200">
-                  <div className="mb-3 inline-flex items-center gap-3">
+                <motion.article
+                  key={i}
+                  variants={vItem}
+                  className="rounded-3xl bg-white p-6 shadow-xl ring-1 ring-slate-200
+                             flex flex-col items-center justify-center text-center h-full"
+                >
+                  <div className="mb-3 flex items-center gap-3 justify-center">
                     <span className="grid h-11 w-11 place-items-center rounded-xl bg-[#0B2239]/5">{c.icon}</span>
                     <h3 className="text-lg font-bold text-[#0B2239]">{c.title}</h3>
                   </div>
-                  <ul className="space-y-1 text-sm text-slate-600">
+                  <ul className="space-y-1 text-sm text-slate-600 text-center">
                     {c.lines.map((l, j) => <li key={j}>{l}</li>)}
                   </ul>
                   <a href={c.cta.href} className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#F5B301] px-4 py-2 text-sm font-semibold text-[#0B2239] hover:bg-[#F5B301]">
@@ -156,13 +159,11 @@ export default function HelpDeskClient() {
 
       {/* FAQ */}
       <motion.section variants={vSection} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="relative bg-slate-50 py-16">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_40%_at_15%_10%,rgba(245,179,1,0.08),transparent),radial-gradient(60%_40%_at_85%_80%,rgba(11,34,57,0.06),transparent)]" />
         <div className="mx-auto max-w-4xl px-4">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-extrabold text-[#0B2239]">{t("faq.title")}</h2>
             <p className="mt-2 text-slate-600">{t("faq.subtitle")}</p>
           </div>
-
           <div className="divide-y divide-slate-200 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200">
             {faqs.map((item, i) => {
               const open = openIdx === i;
@@ -182,11 +183,6 @@ export default function HelpDeskClient() {
                 </div>
               );
             })}
-          </div>
-
-          <div className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-600">
-            <CheckCircle className="h-4 w-4 text-[#F5B301]" />
-            <span>{t("faq.checkline")}</span>
           </div>
         </div>
       </motion.section>
@@ -218,21 +214,10 @@ export default function HelpDeskClient() {
                 <label htmlFor="message" className={labelFloat}>{t("form.message")}</label>
               </div>
             </div>
-
-            {/* ✅ رسائل مع إخفاء تلقائي */}
             <div className="mt-4 space-y-2" aria-live="polite">
-              {okMsg && (
-                <p className="rounded-lg bg-green-50 px-3 py-2 text-green-700 ring-1 ring-green-200 transition-opacity duration-300">
-                  {okMsg}
-                </p>
-              )}
-              {errMsg && (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-red-700 ring-1 ring-red-200 transition-opacity duration-300">
-                  {errMsg}
-                </p>
-              )}
+              {okMsg && <p className="rounded-lg bg-green-50 px-3 py-2 text-green-700 ring-1 ring-green-200">{okMsg}</p>}
+              {errMsg && <p className="rounded-lg bg-red-50 px-3 py-2 text-red-700 ring-1 ring-red-200">{errMsg}</p>}
             </div>
-
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-sm text-slate-500">
                 <CheckCircle className="h-5 w-5 text-[#F5B301]" />
