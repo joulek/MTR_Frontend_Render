@@ -546,7 +546,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               <span className="hidden sm:inline opacity-40">|</span>
 
               {/* HELP DESK: lien sans tiret */}
-              <Link href={`/${locale}/helpdesk`} className="opacity-90 transition hover:text-[#F5B301]">
+              <Link href={`/${locale}/help-desk`} className="opacity-90 transition hover:text-[#F5B301]">
                 {t("topbar.helpdesk")}
               </Link>
 
