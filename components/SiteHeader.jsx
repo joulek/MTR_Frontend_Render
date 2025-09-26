@@ -89,7 +89,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch {}
+    } catch { }
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -130,7 +130,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch {}
+            } catch { }
             setHintRole(json.role);
           }
         } else {
@@ -138,14 +138,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch {}
+          } catch { }
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch {}
+        } catch { }
       }
     })();
     return () => {
@@ -239,7 +239,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch {}
+      } catch { }
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -247,7 +247,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     [pathname, router, locale]
   );
 
-  /* ===== Sous-composant menu produits ===== */
+  /* ===== Sub components ===== */
   const ProductsMenu = ({ cats, locale }) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const [hoveredParent, setHoveredParent] = useState(null);
@@ -328,11 +328,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
-                        active
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
                           ? "bg-[#F5B301] text-[#0B2239]"
                           : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                      }`}
+                        }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -396,7 +395,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     );
   };
 
-  /* --------- NAV items pour client (desktop) --------- */
+  /* --------- NAV items pour client --------- */
   const ClientNavItemsDesktop = () => {
     const [servicesOpen, setServicesOpen] = useState(false);
     const ref = useRef(null);
@@ -465,7 +464,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     </details>
   );
 
-  /* --------- Menu utilisateur (mobile & desktop) --------- */
+  /* --------- Menu utilisateur --------- */
   const UserMenu = () => {
     const [uOpen, setUOpen] = useState(false);
     const ref = useRef(null);
@@ -482,13 +481,13 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           type="button"
           onClick={() => setUOpen((s) => !s)}
           aria-label={t("userMenu.aria")}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] hover:bg-slate-50 z-30" /* z élevé */
+          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] hover:bg-slate-50"
         >
           <MoreVertical className="h-5 w-5" />
         </button>
 
         {uOpen && (
-          <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl z-[70]">
+          <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl z-50">
             <Link
               href={`/${locale}/client/profile`}
               onClick={() => setUOpen(false)}
@@ -516,12 +515,12 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   async function handleLogout() {
     try {
       await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch {} finally {
+    } catch { } finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch {}
+      } catch { }
       window.location.replace(`/${locale}`);
     }
   }
@@ -591,16 +590,17 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       {/* ========= barre principale ========= */}
       <div className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-screen-2xl px-6">
+          {/* rangée relative pour pouvoir centrer/élever اللوجو */}
           <div className="flex items-center justify-between h-16 md:h-20 relative">
-            {/* LOGO */}
+            {/* LOGO — centré و مرفوع شوية في الموبايل */}
             <Link
               href={homeHref}
               aria-label={t("logoAlt")}
               className="
-                flex items-center justify-center
-                absolute left-1/2 -translate-x-1/2 top-0
-                md:static md:translate-x-0 md:left-auto md:top-auto
-              "
+    flex items-center justify-center
+    absolute left-1/2 -translate-x-1/2 -top-2  // 🔼 décale vers le haut en mobile
+    md:static md:translate-x-0 md:left-auto md:top-auto
+  "
             >
               <Image
                 src="/logo_MTR.png"
@@ -612,13 +612,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               />
             </Link>
 
+
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
               <Link href={homeHref} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]">
                 {t("nav.home")}
               </Link>
 
-              {!isLoggedClient || isHome ? (
+              {(!isLoggedClient || isHome) ? (
                 <>
                   <button type="button" onClick={() => goToSection("presentation")} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]" role="link">
                     {t("nav.company")}
@@ -638,22 +639,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               {isLoggedClient && <ClientNavItemsDesktop />}
             </nav>
 
-            {/* actions droite (mobile + desktop) */}
+            {/* actions droite + burger (burger فوق اللوجو) */}
             <div className="flex items-center gap-3">
               {isLoggedClient ? (
-                <>
-                  {/* 1) MOBILE & DESKTOP : le menu utilisateur en premier et au-dessus du burger */}
-                  <UserMenu />
-                  {/* 2) Burger encore dispo en mobile si besoin */}
-                  <button
-                    onClick={() => setOpen((s) => !s)}
-                    aria-label={t("actions.openMenu")}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden z-20"
-                    type="button"
-                  >
-                    ☰
-                  </button>
-                </>
+                <UserMenu />
               ) : (
                 <>
                   <Link
@@ -668,18 +657,16 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   >
                     {t("actions.askQuote")}
                   </Link>
-
-                  {/* Burger pour visiteurs en mobile */}
-                  <button
-                    onClick={() => setOpen((s) => !s)}
-                    aria-label={t("actions.openMenu")}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden z-20"
-                    type="button"
-                  >
-                    ☰
-                  </button>
                 </>
               )}
+
+              <button
+                onClick={() => setOpen((s) => !s)}
+                aria-label={t("actions.openMenu")}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden z-20"
+              >
+                ☰
+              </button>
             </div>
           </div>
         </div>
@@ -688,46 +675,22 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         {open && (
           <div className="md:hidden border-top border-slate-200 bg-white">
             <div className="mx-auto max-w-screen-2xl px-4 py-3 flex flex-col gap-1">
-              <Link
-                href={homeHref}
-                className="rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
-                onClick={() => setOpen(false)}
-              >
+              <Link href={homeHref} className="rounded px-3 py-2 hover:bg-slate-50 text-[15px]" onClick={() => setOpen(false)}>
                 {t("nav.home")}
               </Link>
 
               {(!isLoggedClient || isHome) && (
                 <>
-                  <button
-                    type="button"
-                    onClick={() => goToSection("presentation", true)}
-                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
-                    role="link"
-                  >
+                  <button type="button" onClick={() => goToSection("presentation", true)} className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]" role="link">
                     {t("nav.company")}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => goToSection("specialites", true)}
-                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
-                    role="link"
-                  >
+                  <button type="button" onClick={() => goToSection("specialites", true)} className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]" role="link">
                     {t("nav.products")}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => goToSection("contact", true)}
-                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
-                    role="link"
-                  >
+                  <button type="button" onClick={() => goToSection("contact", true)} className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]" role="link">
                     {t("nav.contact")}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => goToSection("localisation", true)}
-                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
-                    role="link"
-                  >
+                  <button type="button" onClick={() => goToSection("localisation", true)} className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]" role="link">
                     {t("nav.location")}
                   </button>
                 </>
