@@ -89,7 +89,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch { }
+    } catch {}
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -130,7 +130,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch { }
+            } catch {}
             setHintRole(json.role);
           }
         } else {
@@ -138,14 +138,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch { }
+          } catch {}
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch { }
+        } catch {}
       }
     })();
     return () => {
@@ -212,22 +212,27 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     };
   }, []);
 
-  /* scroll vers sections */
+  /* scroll vers sections — utilise un hash pour fiabiliser la navigation */
   const [open, setOpen] = useState(false);
   const goToSection = useCallback(
     async (id, closeMenu) => {
-      const doScroll = () => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        if (location.hash) history.replaceState(null, "", location.pathname + location.search);
-        if (closeMenu) setOpen(false);
-      };
+      const hashUrl = `${homeHref}#${id}`;
+
+      // Si on n'est PAS sur la home → on navigue vers /{locale}#{id} (le navigateur scrolle quand la page est prête)
       if (!homePaths.includes(pathname)) {
-        await router.push(homeHref, { scroll: true });
-        setTimeout(doScroll, 60);
-      } else {
-        doScroll();
+        router.push(hashUrl, { scroll: true });
+        if (closeMenu) setOpen(false);
+        return;
       }
+
+      // Si on est déjà sur la home → scroll direct si l’élément existe, sinon on met le hash (le navigateur gèrera)
+      const el = typeof document !== "undefined" ? document.getElementById(id) : null;
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (typeof window !== "undefined") {
+        window.location.hash = id;
+      }
+      if (closeMenu) setOpen(false);
     },
     [pathname, router, homeHref]
   );
@@ -239,7 +244,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch { }
+      } catch {}
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -328,10 +333,11 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
-                        ? "bg-[#F5B301] text-[#0B2239]"
-                        : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
+                        active
+                          ? "bg-[#F5B301] text-[#0B2239]"
+                          : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                      }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -515,12 +521,12 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   async function handleLogout() {
     try {
       await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch { } finally {
+    } catch {} finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch { }
+      } catch {}
       window.location.replace(`/${locale}`);
     }
   }
@@ -534,12 +540,13 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 h-auto min-h-[40px] py-1 text-[12px] sm:text-[14px]">
             <nav className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <button type="button" onClick={() => goToSection("apropos")} className="opacity-90 transition hover:text-[#F5B301]" role="link">
-                {t("topbar.apropos")}
+                {t("topbar.about")}
               </button>
 
               <span className="hidden sm:inline opacity-40">|</span>
 
-              <Link href={`/${locale}/help-desk`} className="opacity-90 transition hover:text-[#F5B301]">
+              {/* HELP DESK: lien sans tiret */}
+              <Link href={`/${locale}/helpdesk`} className="opacity-90 transition hover:text-[#F5B301]">
                 {t("topbar.helpdesk")}
               </Link>
 
@@ -611,7 +618,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 className="object-contain w-24 h-auto md:w-[150px]"
               />
             </Link>
-
 
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
