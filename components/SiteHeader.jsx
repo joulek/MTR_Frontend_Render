@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 /* ---------------------------- API backend ---------------------------- */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://mtr-backend-render.onrender.com").replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
 /* --------------------------- Helpers --------------------------- */
