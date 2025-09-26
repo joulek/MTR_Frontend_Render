@@ -67,7 +67,7 @@ const fadeUp = (delay = 0) => ({
   animate: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut", delay } },
 });
 
-/* -------------------- Carousel (flèches fixées) -------------------- */
+/* -------------------- Carousel -------------------- */
 function Carousel({ items, ariaLabel = "Carrousel", renderItem }) {
   const viewportRef = useRef(null);
   const slideRef = useRef(null);
@@ -130,17 +130,15 @@ function Carousel({ items, ariaLabel = "Carrousel", renderItem }) {
 
   return (
     <div className="relative">
-      {/* viewport scrollable */}
       <div
         ref={viewportRef}
         aria-label={ariaLabel}
-        className="relative flex gap-6 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none]"
+        className="flex gap-6 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none]"
         style={{ scrollBehavior: "smooth" }}
         onMouseEnter={() => { isHoverRef.current = true; }}
         onMouseLeave={() => { isHoverRef.current = false; }}
       >
         <style jsx>{`div::-webkit-scrollbar{display:none;}`}</style>
-
         {items.map((it, i) => (
           <div key={i} ref={i === 0 ? slideRef : undefined} className="snap-start shrink-0 w-[88%] sm:w-[62%] lg:w-[46%] xl:w-[40%]">
             {renderItem(it, i)}
@@ -148,39 +146,20 @@ function Carousel({ items, ariaLabel = "Carrousel", renderItem }) {
         ))}
       </div>
 
-      {/* ⬅️➡️ flèches ABSOLUES par rapport au conteneur global (pas au viewport) */}
       {items.length > 1 && (
-        <div className="pointer-events-none absolute inset-y-0 left-0 right-0 z-[200]">
-          <button
-            aria-label="Précédent"
-            onClick={prev}
-            type="button"
-            className="pointer-events-auto absolute left-2 top-1/2 -translate-y-1/2 grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow"
-          >
-            ‹
-          </button>
-          <button
-            aria-label="Suivant"
-            onClick={next}
-            type="button"
-            className="pointer-events-auto absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow"
-          >
-            ›
-          </button>
-        </div>
+        <>
+          <button aria-label="Précédent" onClick={prev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-[200] grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow">‹</button>
+          <button aria-label="Suivant" onClick={next}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-[200] grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow">›</button>
+        </>
       )}
 
-      {/* bullets */}
       {items.length > 1 && (
         <div className="mt-5 flex items-center justify-center gap-2">
           {items.map((_, i) => (
-            <button
-              key={i}
-              aria-label={`Aller à l’élément ${i + 1}`}
-              onClick={() => scrollTo(i)}
-              type="button"
-              className={`h-2.5 rounded-full transition-all ${i === index ? "w-6 bg-[#0B2239]" : "w-2.5 bg-slate-300"}`}
-            />
+            <button key={i} aria-label={`Aller à l’élément ${i + 1}`} onClick={() => scrollTo(i)}
+              className={`h-2.5 rounded-full transition-all ${i === index ? "w-6 bg-[#0B2239]" : "w-2.5 bg-slate-300"}`} />
           ))}
         </div>
       )}
@@ -224,7 +203,7 @@ export default function ProductsByCategoryPage() {
       const title = (c?.translations?.[locale] || c?.translations?.fr || c?.translations?.en || c?.label || "").trim();
       const s = c?.slug ? String(c.slug) : slugify(title);
       return s === slug;
-    })() || null;
+    }) || null;
   }, [categories, slug, locale]);
 
   /* fetch products */
@@ -288,7 +267,7 @@ export default function ProductsByCategoryPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="overflow-hidden rounded-3xl bg-white ring-1 ring-slate-200">
-                  {/* Skeleton ratio fixe */}
+                  {/* Skeleton en ratio fixe */}
                   <div className="relative w-full aspect-[4/3] bg-slate-200 animate-pulse" />
                 </div>
               ))}
