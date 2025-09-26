@@ -341,8 +341,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
                       className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
-                          ? "bg-[#F5B301] text-[#0B2239]"
-                          : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                        ? "bg-[#F5B301] text-[#0B2239]"
+                        : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
                         }`}
                     >
                       {label}
@@ -539,26 +539,26 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     );
   };
 
- async function handleLogout() {
-  try {
-    await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-  } catch { /* ignore */ }
-  finally {
+  async function handleLogout() {
     try {
-      localStorage.removeItem("mtr_role");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("rememberMe");
-    } catch {}
+      await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
+    } catch { /* ignore */ }
+    finally {
+      try {
+        localStorage.removeItem("mtr_role");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("rememberMe");
+      } catch { }
 
-    setMe(null);
-    setHintRole(null);
+      setMe(null);
+      setHintRole(null);
 
-    // 🔒 Remplacer l'entrée d'historique et repartir à la Home
-    const home = `/${locale}`;
-    // location.replace remplace l'entrée courante -> le "back" ne revient pas sur la page protégée
-    window.location.replace(home);
+      // 🔒 Remplacer l'entrée d'historique et repartir à la Home
+      const home = `/${locale}`;
+      // location.replace remplace l'entrée courante -> le "back" ne revient pas sur la page protégée
+      window.location.replace(home);
+    }
   }
-}
 
 
   /* ======================= RENDER ======================= */
@@ -583,9 +583,11 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
               <Link
                 href={`/${locale}/help-desk`}
-                className="opacity-90 transition hover:text-[#F5B301]">
+                className="opacity-90 transition hover:text-[#F5B301]"
+              >
                 {t("topbar.helpdesk")}
               </Link>
+
 
               <span className="hidden sm:inline opacity-40">|</span>
 
@@ -642,20 +644,26 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <div className="mx-auto max-w-screen-2xl px-6">
           <div className="flex h-20 items-center justify-between">
             {/* logo → home */}
+            {/* logo → home */}
             <Link
               href={homeHref}
-              className="flex items-center gap-3 relative left-7 top-2"
               aria-label={t("logoAlt")}
+              className="
+    flex items-center gap-2
+    absolute left-1/2 -translate-x-1/2 top-2
+    md:static md:translate-x-0 md:left-auto md:top-auto
+  "
             >
               <Image
                 src="/logo_MTR.png"
                 alt={t("logoAlt")}
                 width={150}
                 height={100}
-                className="object-contain"
                 priority
+                className="object-contain w-28 h-auto md:w-[150px]"  // w-28 ≈ 112px en mobile
               />
             </Link>
+
 
 
             {/* nav desktop */}
