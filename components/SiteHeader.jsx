@@ -89,7 +89,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch {}
+    } catch { }
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -130,7 +130,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch {}
+            } catch { }
             setHintRole(json.role);
           }
         } else {
@@ -138,14 +138,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch {}
+          } catch { }
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch {}
+        } catch { }
       }
     })();
     return () => {
@@ -239,7 +239,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch {}
+      } catch { }
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -328,11 +328,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
-                        active
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
                           ? "bg-[#F5B301] text-[#0B2239]"
                           : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                      }`}
+                        }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -516,12 +515,12 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   async function handleLogout() {
     try {
       await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch {} finally {
+    } catch { } finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch {}
+      } catch { }
       window.location.replace(`/${locale}`);
     }
   }
@@ -598,10 +597,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               href={homeHref}
               aria-label={t("logoAlt")}
               className="
-                flex items-center justify-center
-                absolute left-1/2 -translate-x-1/2 top-1 z-10
-                md:static md:translate-x-0 md:left-auto md:top-auto
-              "
+    flex items-center justify-center
+    absolute left-1/2 -translate-x-1/2 -top-2  // 🔼 décale vers le haut en mobile
+    md:static md:translate-x-0 md:left-auto md:top-auto
+  "
             >
               <Image
                 src="/logo_MTR.png"
@@ -612,6 +611,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 className="object-contain w-24 h-auto md:w-[150px]"
               />
             </Link>
+
 
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
