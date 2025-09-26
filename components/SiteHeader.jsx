@@ -89,7 +89,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch {}
+    } catch { }
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -130,7 +130,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch {}
+            } catch { }
             setHintRole(json.role);
           }
         } else {
@@ -138,14 +138,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch {}
+          } catch { }
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch {}
+        } catch { }
       }
     })();
     return () => {
@@ -239,7 +239,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch {}
+      } catch { }
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -328,11 +328,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
-                        active
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
                           ? "bg-[#F5B301] text-[#0B2239]"
                           : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                      }`}
+                        }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -488,7 +487,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         </button>
 
         {uOpen && (
-          <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl z-50">
+<div className="absolute left-0 md:left-auto md:right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl z-50">
             <Link
               href={`/${locale}/client/profile`}
               onClick={() => setUOpen(false)}
@@ -516,12 +515,12 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   async function handleLogout() {
     try {
       await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch {} finally {
+    } catch { } finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch {}
+      } catch { }
       window.location.replace(`/${locale}`);
     }
   }
@@ -613,6 +612,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               />
             </Link>
 
+
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
               <Link href={homeHref} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]">
@@ -642,10 +642,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
             {/* actions droite + burger (burger فوق اللوجو) */}
             <div className="flex items-center gap-3">
               {isLoggedClient ? (
-                // ➜ inversion d'ordre en mobile : 3 points AVANT le burger
-                <span className="order-1 md:order-none">
-                  <UserMenu />
-                </span>
+                <UserMenu />
               ) : (
                 <>
                   <Link
@@ -666,7 +663,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               <button
                 onClick={() => setOpen((s) => !s)}
                 aria-label={t("actions.openMenu")}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden z-20 order-2 md:order-none"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden z-20"
               >
                 ☰
               </button>
