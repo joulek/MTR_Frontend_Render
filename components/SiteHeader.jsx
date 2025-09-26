@@ -645,24 +645,28 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           <div className="flex h-20 items-center justify-between">
             {/* logo → home */}
             {/* logo → home */}
-            <Link
-              href={homeHref}
-              aria-label={t("logoAlt")}
-              className="
-    flex items-center gap-2
-    absolute left-1/2 -translate-x-1/2 top-2
-    md:static md:translate-x-0 md:left-auto md:top-auto
-  "
-            >
-              <Image
-                src="/logo_MTR.png"
-                alt={t("logoAlt")}
-                width={150}
-                height={100}
-                priority
-                className="object-contain w-28 h-auto md:w-[150px]"  // w-28 ≈ 112px en mobile
-              />
-            </Link>
+            <div className="flex h-16 md:h-20 items-center justify-between relative">
+              {/* logo → home */}
+              <Link
+                href={homeHref}
+                aria-label={t("logoAlt")}
+                className="
+      flex items-center gap-2
+      absolute left-1/2 -translate-x-1/2 top-0 -translate-y-1
+      md:static md:translate-x-0 md:translate-y-0 md:left-auto md:top-auto
+    "
+              >
+                <Image
+                  src="/logo_MTR.png"
+                  alt={t("logoAlt")}
+                  width={150}
+                  height={100}
+                  priority
+                  className="object-contain w-28 h-auto md:w-[150px]"
+                />
+              </Link>
+            </div>
+
 
 
 
