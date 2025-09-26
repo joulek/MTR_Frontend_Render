@@ -148,18 +148,33 @@ function Carousel({ items, ariaLabel = "Carrousel", renderItem }) {
 
       {items.length > 1 && (
         <>
-          <button aria-label="Précédent" onClick={prev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-[200] grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow">‹</button>
-          <button aria-label="Suivant" onClick={next}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-[200] grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow">›</button>
+          {/* ↓ z-index abaissé pour ne pas recouvrir le header (z-40) */}
+          <button
+            aria-label="Précédent"
+            onClick={prev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow"
+          >
+            ‹
+          </button>
+          <button
+            aria-label="Suivant"
+            onClick={next}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 grid place-items-center h-11 w-11 rounded-full bg-white/90 shadow"
+          >
+            ›
+          </button>
         </>
       )}
 
       {items.length > 1 && (
         <div className="mt-5 flex items-center justify-center gap-2">
           {items.map((_, i) => (
-            <button key={i} aria-label={`Aller à l’élément ${i + 1}`} onClick={() => scrollTo(i)}
-              className={`h-2.5 rounded-full transition-all ${i === index ? "w-6 bg-[#0B2239]" : "w-2.5 bg-slate-300"}`} />
+            <button
+              key={i}
+              aria-label={`Aller à l’élément ${i + 1}`}
+              onClick={() => scrollTo(i)}
+              className={`h-2.5 rounded-full transition-all ${i === index ? "w-6 bg-[#0B2239]" : "w-2.5 bg-slate-300"}`}
+            />
           ))}
         </div>
       )}
@@ -177,7 +192,7 @@ export default function ProductsByCategoryPage() {
   const [products, setProducts] = useState([]);
   const [loadingProds, setLoadingProds] = useState(true);
   const [error, setError] = useState("");
-  const [didAutoOpen, setDidAutoOpen] = useState(false);
+  the [didAutoOpen, setDidAutoOpen] = useState(false);
 
   /* fetch categories */
   useEffect(() => {
