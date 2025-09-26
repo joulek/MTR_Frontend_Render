@@ -1413,13 +1413,13 @@
       },
       "nav": {
         "home": "Home",
-        "company": "Company",
+        "company": "Presentation",
         "products": "Products",
         "contact": "Contact",
         "location": "Location"
       },
       "client": {
-        "claim": "Make a claim",
+        "claim": "Claim",
         "myServices": "My services",
         "myQuotes": "My quote requests",
         "myClaims": "My claims",

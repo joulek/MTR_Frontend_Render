@@ -234,13 +234,13 @@
       },
       "nav": {
         "home": "Accueil",
-        "company": "L'entreprise",
+        "company": "Présentation",
         "products": "Produits",
         "contact": "Contact",
         "location": "Localisation"
       },
       "client": {
-        "claim": "Réclamer",
+        "claim": "Réclamarion",
         "myServices": "Mes services",
         "myQuotes": "Mes demandes devis",
         "myClaims": "Mes réclamations",
