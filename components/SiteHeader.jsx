@@ -89,7 +89,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch { }
+    } catch {}
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -130,7 +130,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch { }
+            } catch {}
             setHintRole(json.role);
           }
         } else {
@@ -138,14 +138,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch { }
+          } catch {}
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch { }
+        } catch {}
       }
     })();
     return () => {
@@ -244,7 +244,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch { }
+      } catch {}
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -333,10 +333,11 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
+                        active
                           ? "bg-[#F5B301] text-[#0B2239]"
                           : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                        }`}
+                      }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -518,21 +519,19 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   };
 
   async function handleLogout() {
-    // 1) purge côté front (cookies du domaine front + localStorage)
     try {
-      await fetch("/api/logout", { method: "POST", credentials: "include" });
-    } catch { }
-    try {
-      localStorage.removeItem("mtr_role");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("rememberMe");
-    } catch { }
-
-    // 2) top-level redirect vers le backend pour que le cookie Lax soit envoyé
-    const next = `/${locale}`;
-    const backend = BACKEND.replace(/^http:/, "https:"); // au cas où
-    window.location.href = `${backend}/auth/logout?next=${encodeURIComponent(next)}`;
+      await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
+    } catch {} finally {
+      try {
+        localStorage.removeItem("mtr_role");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("rememberMe");
+      } catch {}
+      window.location.replace(`/${locale}`);
+    }
   }
+
+
 
 
   /* ======================= RENDER ======================= */
