@@ -199,12 +199,7 @@ export default function DevisAutreList() {
             </button>
           </div>
 
-          {syncing && (
-            <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-800">
-              <span className="h-3 w-3 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
-              {t("states.syncing") ?? "Mise à jour…"}
-            </div>
-          )}
+          
         </div>
 
         {err && (

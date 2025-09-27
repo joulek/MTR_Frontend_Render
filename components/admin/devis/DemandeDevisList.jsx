@@ -109,7 +109,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
       <div className={WRAP}>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="text-1xl lg:text-2xl font-extrabold tracking-tight text-[#0B1E3A]">
-            Gestion des demandes devis
+            Tous les demandes devis
           </h1>
 
           <div className="relative w-full sm:w-[320px] lg:w-[420px]">
@@ -143,13 +143,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
             )}
           </div>
         </div>
-
-        {syncing && (
-          <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-800">
-            <span className="h-3 w-3 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
-            Mise à jour…
-          </div>
-        )}
 
         {error && (
           <p className="mt-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-red-700">
@@ -197,7 +190,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                         <td className="p-2.5 border-b border-gray-200">
                           <span
                             className={cn(
-                              "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
+                              "inline-flex items-center text-sm font-semibold capitalize",
                               r.type === "compression" && "bg-blue-100 text-blue-800",
                               r.type === "traction" && "bg-emerald-100 text-emerald-800",
                               r.type === "torsion" && "bg-fuchsia-100 text-fuchsia-800",
