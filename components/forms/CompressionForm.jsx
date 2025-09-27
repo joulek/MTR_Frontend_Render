@@ -38,8 +38,8 @@ export default function CompressionForm() {
   const localRole =
     typeof window !== "undefined"
       ? (localStorage.getItem("mtr_role") ||
-         localStorage.getItem("userRole") ||
-         getCookie("role"))
+        localStorage.getItem("userRole") ||
+        getCookie("role"))
       : null;
   const isAuthenticated = Boolean(localRole) || Boolean(user?.authenticated);
   const isClient = ((user?.role || localRole) === "client");
@@ -198,7 +198,7 @@ export default function CompressionForm() {
       });
 
       let payload = null;
-      try { payload = await res.json(); } catch {}
+      try { payload = await res.json(); } catch { }
 
       if (res.ok) {
         finishedRef.current = true;
@@ -215,7 +215,7 @@ export default function CompressionForm() {
         setErr(e2?.name === "AbortError" ? "Délai dépassé, réessayez." : "Erreur réseau.");
       }
     } finally {
-    setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -253,19 +253,19 @@ export default function CompressionForm() {
 
         <SectionTitle>{t("maindim")}</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <Input name="d"  label={t("diameterWire")}  required />
-          <Input name="DE" label={t("diameterExt")}  required />
-          <Input name="H"  label={t("boreDiameter")} />
-          <Input name="S"  label={t("guideDiameter")} />
+          <Input name="d" label={t("diameterWire")} required />
+          <Input name="DE" label={t("diameterExt")} required />
+          <Input name="H" label={t("boreDiameter")} />
+          <Input name="S" label={t("guideDiameter")} />
           <Input name="DI" label={t("diameterInt")} required />
-          <Input name="Lo" label={t("freeLength")}  required />
+          <Input name="Lo" label={t("freeLength")} required />
           <Input name="nbSpires" label={t("totalCoils")} required />
           <Input name="pas" label={t("pitch")} required />
           <Input name="quantite" label={t("quantity")} type="number" min="1" required />
 
-          <SelectBase name="matiere"     label={t("material")}        options={materialOptions}  placeholder={selectPlaceholder} required />
-          <SelectBase name="enroulement" label={t("windingDirection")} options={windOptions}      placeholder={selectPlaceholder} required />
-          <SelectBase name="extremite"   label={t("extremityType")}    options={extremityOptions} placeholder={selectPlaceholder} required />
+          <SelectBase name="matiere" label={t("material")} options={materialOptions} placeholder={selectPlaceholder} required />
+          <SelectBase name="enroulement" label={t("windingDirection")} options={windOptions} placeholder={selectPlaceholder} required />
+          <SelectBase name="extremite" label={t("extremityType")} options={extremityOptions} placeholder={selectPlaceholder} required />
         </div>
 
         <div className="mt-4 flex justify-center">
@@ -331,12 +331,14 @@ export default function CompressionForm() {
             type="submit"
             disabled={disabled}
             className={`w-full rounded-xl font-semibold py-3 transition-all
-              ${disabled
+    ${disabled
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-[#002147] to-[#01346b] text-white shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[0px]"}`}
+                : "bg-[#F7C600] text-[#0B1E3A] shadow-lg hover:shadow-xl hover:bg-[#FFD84D] focus:ring-2 focus:ring-[#F7C600]/40 hover:translate-y-[-1px] active:translate-y-0"}
+  `}
           >
             {buttonLabel}
           </button>
+
 
           <div ref={alertRef} aria-live="polite" className="mt-3">
             {loading ? (
@@ -368,9 +370,9 @@ function SectionTitle({ children, className = "" }) {
 function Alert({ type = "info", message }) {
   const base = "w-full rounded-xl px-4 py-3 text-sm font-medium border flex items-start gap-2";
   const styles =
-    type === "error"   ? "bg-red-50 text-red-700 border-red-200" :
-    type === "success" ? "bg-green-50 text-green-700 border-green-200" :
-                         "bg-blue-50 text-blue-700 border-blue-200";
+    type === "error" ? "bg-red-50 text-red-700 border-red-200" :
+      type === "success" ? "bg-green-50 text-green-700 border-green-200" :
+        "bg-blue-50 text-blue-700 border-blue-200";
   return (
     <div className={`${base} ${styles}`}>
       <span className="mt-0.5">•</span>
