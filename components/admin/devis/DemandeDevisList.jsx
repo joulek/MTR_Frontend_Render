@@ -191,12 +191,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                           <span
                             className={cn(
                               "inline-flex items-center text-sm font-semibold capitalize",
-                              r.type === "compression" && "bg-blue-100 text-blue-800",
-                              r.type === "traction" && "bg-emerald-100 text-emerald-800",
-                              r.type === "torsion" && "bg-fuchsia-100 text-fuchsia-800",
-                              r.type === "fil" && "bg-amber-100 text-amber-800",
-                              r.type === "grille" && "bg-cyan-100 text-cyan-800",
-                              (!r.type || r.type === "autre") && "bg-gray-200 text-gray-800"
+                              r.type === "compression" ,
+                              r.type === "traction" ,
+                              r.type === "torsion" ,
+                              r.type === "fil" ,
+                              r.type === "grille" ,
+                              (!r.type || r.type === "autre") 
                             )}
                           >
                             {r.type || "-"}
