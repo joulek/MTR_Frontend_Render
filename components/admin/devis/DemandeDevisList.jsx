@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 
 /* ---------------------------- API backend ---------------------------- */
 const BACKEND = (
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
+  process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com"
 ).replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
@@ -117,11 +117,11 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr className="text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-              <th className="px-4 py-3">Demande #</th>
+              <th className="px-4 py-3">Demande</th>
               <th className="px-4 py-3">Type</th>
               <th className="px-4 py-3">Client</th>
               <th className="px-4 py-3">Date</th>
-              <th className="px-4 py-3">Devis #</th>
+              <th className="px-4 py-3">PDF DDV </th>
               <th className="px-4 py-3">PDF</th>
             </tr>
           </thead>
