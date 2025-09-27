@@ -407,33 +407,29 @@
     },
     "admin": {
       "demandsListPage": {
-      "title": "Quote requests management",
-      "search": {
-        "placeholder": "Search: quote, request, client, type, date…",
-        "aria": "Search a request",
-        "clear": "Clear search"
-      },
-      "table": {
-        "headers": {
-          "demande": "Request",
-          "type": "Type",
-          "client": "Client",
-          "date": "Date",
-          "pdfDdv": "DDV PDF",
-          "pdf": "PDF"
+        "title": "Quote requests management",
+        "search": {
+          "placeholder": "Search: quote, request, client, type, date…",
+          "aria": "Search requests",
+          "clear": "Clear search"
+        },
+        "table": {
+          "headers": {
+            "demande": "Request",
+            "type": "Type",
+            "client": "Client",
+            "date": "Date",
+            "pdfDdv": "DDV PDF",
+            "pdf": "PDF"
+          }
+        },
+        "actions": {
+          "open": "Open"
+        },
+        "messages": {
+          "noData": "No quote requests"
         }
       },
-      "actions": { "open": "Open" },
-      "messages": { "noData": "No quote requests" },
-      "types": {
-        "compression": "compression",
-        "traction": "traction",
-        "torsion": "torsion",
-        "fil": "wire",
-        "grille": "mesh",
-        "autre": "other"
-      }
-    },
       "devisAdmin": {
         "title": "Quote requests management",
         "types": {
@@ -1438,7 +1434,7 @@
         "about": "About",
         "helpdesk": "Help Desk",
         "presentation": "Overview",
-         "contact": "Contact"
+        "contact": "Contact"
       },
       "nav": {
         "home": "Home",

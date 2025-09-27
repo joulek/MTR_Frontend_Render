@@ -1,3 +1,4 @@
+// components/admin/demandes/DemandeDevisList.jsx
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
@@ -42,7 +43,10 @@ function useDebounced(value, delay = 350) {
 
 /* ---------------------------- Component ---------------------------- */
 export default function DemandeDevisList({ type = "all", query = "" }) {
-  const t = useTranslations("admin.demandsListPage");
+  // i18n namespaces (clés à créer sous auth.admin.demandsListPage)
+  const t = useTranslations("auth.admin.demandsListPage");
+  // libellés type déjà existants sous auth.admin.devisAdmin.types
+  const tTypes = useTranslations("auth.admin.devisAdmin.types");
 
   const [q, setQ] = useState(query);
   const qDebounced = useDebounced(q, 400);
@@ -77,7 +81,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           type: type || "all",
           q: qDebounced || "",
           page: String(page),
-          limit: String(pageSize),
+          limit: String(pageSize), // l’endpoint “compact” attend limit
         });
 
         const res = await fetch(`${API}/devis/demandes/compact?` + params.toString(), {
@@ -106,7 +110,29 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
     load(rows.length > 0);
   }, [load]);
 
-  const typeLabel = (v) => t.optional(`types.${v}`, { default: v || dash });
+  const typeLabel = (v) => {
+    // map explicite pour éviter MISSING_MESSAGE si valeur inattendue
+    const map = {
+      compression: tTypes("compression"),
+      traction: tTypes("traction"),
+      torsion: tTypes("torsion"),
+      fil: tTypes("fill"),      // ⚠️ ta clé existante est "fill" pour le type "fil"
+      grille: tTypes("grille"),
+      autre: tTypes("autre"),
+    };
+    return map[v] ?? (v || dash);
+  };
+
+  const typeBadgeClass = (v) =>
+    cn(
+      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
+      v === "compression" && "bg-blue-100 text-blue-800",
+      v === "traction" && "bg-emerald-100 text-emerald-800",
+      v === "torsion" && "bg-fuchsia-100 text-fuchsia-800",
+      v === "fil" && "bg-amber-100 text-amber-800",
+      v === "grille" && "bg-cyan-100 text-cyan-800",
+      (!v || v === "autre") && "bg-gray-200 text-gray-800"
+    );
 
   return (
     <div className="py-6 space-y-6">
@@ -196,9 +222,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                         </td>
 
                         <td className="p-2.5 border-b border-gray-200">
-                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold capitalize text-gray-800">
-                            {typeLabel(r.type)}
-                          </span>
+                          <span className={typeBadgeClass(r.type)}>{typeLabel(r.type)}</span>
                         </td>
 
                         <td className="p-2.5 border-b border-gray-200">
@@ -333,6 +357,14 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 }
 
 DemandeDevisList.propTypes = {
-  type: PropTypes.oneOf(["all", "compression", "traction", "torsion", "fil", "grille", "autre"]),
+  type: PropTypes.oneOf([
+    "all",
+    "compression",
+    "traction",
+    "torsion",
+    "fil",
+    "grille",
+    "autre",
+  ]),
   query: PropTypes.string,
 };
