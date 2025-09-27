@@ -1,9 +1,9 @@
-// components/admin/demandes/DemandeDevisList.jsx
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { FiSearch, FiXCircle, FiFileText } from "react-icons/fi";
+import { useTranslations } from "next-intl";
 import Pagination from "@/components/Pagination";
 
 /* ---------------------------- API backend ---------------------------- */
@@ -14,6 +14,7 @@ const API = `${BACKEND}/api`;
 
 /* ---------------------------- Utils ---------------------------- */
 const WRAP = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
+const dash = "—";
 
 function cn(...cls) {
   return cls.filter(Boolean).join(" ");
@@ -21,13 +22,13 @@ function cn(...cls) {
 function formatDate(d) {
   try {
     const dt = new Date(d);
-    if (Number.isNaN(dt.getTime())) return "-";
+    if (Number.isNaN(dt.getTime())) return dash;
     return `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     })}`;
   } catch {
-    return "-";
+    return dash;
   }
 }
 function useDebounced(value, delay = 350) {
@@ -41,10 +42,12 @@ function useDebounced(value, delay = 350) {
 
 /* ---------------------------- Component ---------------------------- */
 export default function DemandeDevisList({ type = "all", query = "" }) {
+  const t = useTranslations("admin.demandsListPage");
+
   const [q, setQ] = useState(query);
   const qDebounced = useDebounced(q, 400);
 
-  // pagination (même UX que Grille)
+  // pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -74,7 +77,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           type: type || "all",
           q: qDebounced || "",
           page: String(page),
-          limit: String(pageSize), // l’endpoint “compact” attend limit
+          limit: String(pageSize),
         });
 
         const res = await fetch(`${API}/devis/demandes/compact?` + params.toString(), {
@@ -90,7 +93,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         setRows(Array.isArray(data.items) ? data.items : []);
         setTotal(Number(data.total) || 0);
       } catch (err) {
-        setError(err?.message || "Erreur inconnue");
+        setError(err?.message || "Error");
       } finally {
         if (silent) setSyncing(false);
         else setLoading(false);
@@ -103,13 +106,15 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
     load(rows.length > 0);
   }, [load]);
 
+  const typeLabel = (v) => t.optional(`types.${v}`, { default: v || dash });
+
   return (
     <div className="py-6 space-y-6">
-      {/* Toolbar (copie du style Grille) */}
+      {/* Toolbar */}
       <div className={WRAP}>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="text-1xl lg:text-2xl font-extrabold tracking-tight text-[#0B1E3A]">
-            Tous les demandes devis
+            {t("title")}
           </h1>
 
           <div className="relative w-full sm:w-[320px] lg:w-[420px]">
@@ -124,8 +129,8 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                 setQ(e.target.value);
                 setPage(1);
               }}
-              placeholder="Rechercher : devis, demande, client, type, date…"
-              aria-label="Rechercher"
+              placeholder={t("search.placeholder")}
+              aria-label={t("search.aria")}
               className="w-full rounded-xl border border-gray-300 bg-white px-10 pr-9 py-2 text-sm text-[#0B1E3A] shadow focus:border-[#F7C600] focus:ring-2 focus:ring-[#F7C600]/30 outline-none transition"
             />
             {q && (
@@ -135,7 +140,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                   setQ("");
                   setPage(1);
                 }}
-                aria-label="Effacer la recherche"
+                aria-label={t("search.clear")}
                 className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
               >
                 <FiXCircle size={16} />
@@ -151,7 +156,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         )}
       </div>
 
-      {/* Table responsive (même design que Grille) */}
+      {/* Table responsive */}
       <div className={WRAP}>
         {loading && rows.length === 0 ? (
           <div className="space-y-2 animate-pulse">
@@ -160,7 +165,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
             <div className="h-10 bg-gray-100 rounded" />
           </div>
         ) : total === 0 ? (
-          <p className="text-gray-500">Aucune demande de devis</p>
+          <p className="text-gray-500">{t("messages.noData")}</p>
         ) : (
           <>
             {/* TABLE >= md */}
@@ -169,43 +174,36 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                 <table className="min-w-[900px] w-full table-auto text-[13px] lg:text-sm border-separate border-spacing-0">
                   <thead>
                     <tr>
-                      <th className="p-2.5 text-left">Demande</th>
-                      <th className="p-2.5 text-left">Type</th>
-                      <th className="p-2.5 text-left">Client</th>
-                      <th className="p-2.5 text-left whitespace-nowrap">Date</th>
-                      <th className="p-2.5 text-left whitespace-nowrap">PDF DDV</th>
-                      <th className="p-2.5 text-left whitespace-nowrap">PDF</th>
+                      <th className="p-2.5 text-left">{t("table.headers.demande")}</th>
+                      <th className="p-2.5 text-left">{t("table.headers.type")}</th>
+                      <th className="p-2.5 text-left">{t("table.headers.client")}</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((r) => (
-                      <tr key={r.demandeNumero ?? `${r.type}-${r._id}`} className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors">
+                      <tr
+                        key={r.demandeNumero ?? `${r.type}-${r._id}`}
+                        className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors"
+                      >
                         <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
-                            <span className="font-mono">{r.demandeNumero || "-"}</span>
+                            <span className="font-mono">{r.demandeNumero || dash}</span>
                           </div>
                         </td>
 
                         <td className="p-2.5 border-b border-gray-200">
-                          <span
-                            className={cn(
-                              "inline-flex items-center text-sm font-semibold capitalize",
-                              r.type === "compression" ,
-                              r.type === "traction" ,
-                              r.type === "torsion" ,
-                              r.type === "fil" ,
-                              r.type === "grille" ,
-                              (!r.type || r.type === "autre") 
-                            )}
-                          >
-                            {r.type || "-"}
+                          <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold capitalize text-gray-800">
+                            {typeLabel(r.type)}
                           </span>
                         </td>
 
                         <td className="p-2.5 border-b border-gray-200">
                           <span className="block truncate max-w-[18rem]" title={r.client || ""}>
-                            {r.client || "-"}
+                            {r.client || dash}
                           </span>
                         </td>
 
@@ -221,12 +219,14 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                              aria-label={t("actions.open")}
+                              title={t("actions.open")}
                             >
                               <FiFileText size={16} />
-                              Ouvrir
+                              {t("actions.open")}
                             </a>
                           ) : (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-400">{dash}</span>
                           )}
                         </td>
 
@@ -238,12 +238,14 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                               target="_blank"
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                              aria-label={t("actions.open")}
+                              title={t("actions.open")}
                             >
                               <FiFileText size={16} />
-                              Ouvrir
+                              {t("actions.open")}
                             </a>
                           ) : (
-                            <span className="text-gray-400">—</span>
+                            <span className="text-gray-400">{dash}</span>
                           )}
                         </td>
                       </tr>
@@ -274,7 +276,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
-                      <span className="font-mono">{r.demandeNumero || "-"}</span>
+                      <span className="font-mono">{r.demandeNumero || dash}</span>
                     </div>
 
                     {(r.ddvPdf || r.devisPdf) ? (
@@ -283,29 +285,29 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                        aria-label="Ouvrir"
-                        title="Ouvrir"
+                        aria-label={t("actions.open")}
+                        title={t("actions.open")}
                       >
                         <FiFileText size={16} />
-                        Ouvrir
+                        {t("actions.open")}
                       </a>
                     ) : (
-                      <span className="text-gray-400 text-sm">—</span>
+                      <span className="text-gray-400 text-sm">{dash}</span>
                     )}
                   </div>
 
                   <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <p className="text-[11px] font-semibold text-gray-500">Type</p>
-                      <p className="truncate capitalize">{r.type || "-"}</p>
+                      <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.type")}</p>
+                      <p className="truncate capitalize">{typeLabel(r.type)}</p>
                     </div>
                     <div>
-                      <p className="text-[11px] font-semibold text-gray-500">Date</p>
+                      <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.date")}</p>
                       <p className="truncate">{formatDate(r.date)}</p>
                     </div>
                     <div className="col-span-2">
-                      <p className="text-[11px] font-semibold text-gray-500">Client</p>
-                      <p className="truncate">{r.client || "-"}</p>
+                      <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.client")}</p>
+                      <p className="truncate">{r.client || dash}</p>
                     </div>
                   </div>
                 </div>
@@ -331,14 +333,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 }
 
 DemandeDevisList.propTypes = {
-  type: PropTypes.oneOf([
-    "all",
-    "compression",
-    "traction",
-    "torsion",
-    "fil",   // ← correction (pas "fill")
-    "grille",
-    "autre",
-  ]),
+  type: PropTypes.oneOf(["all", "compression", "traction", "torsion", "fil", "grille", "autre"]),
   query: PropTypes.string,
 };

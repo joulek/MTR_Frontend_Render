@@ -737,6 +737,34 @@
       }
     },
     "admin": {
+      "demandsListPage": {
+      "title": "Gestion des demandes devis",
+      "search": {
+        "placeholder": "Rechercher : devis, demande, client, type, date…",
+        "aria": "Rechercher une demande",
+        "clear": "Effacer la recherche"
+      },
+      "table": {
+        "headers": {
+          "demande": "Demande",
+          "type": "Type",
+          "client": "Client",
+          "date": "Date",
+          "pdfDdv": "PDF DDV",
+          "pdf": "PDF"
+        }
+      },
+      "actions": { "open": "Ouvrir" },
+      "messages": { "noData": "Aucune demande de devis" },
+      "types": {
+        "compression": "compression",
+        "traction": "traction",
+        "torsion": "torsion",
+        "fil": "fil",
+        "grille": "grille",
+        "autre": "autre"
+      }
+    },
       "devisAdmin": {
         "title": "Gestion des demandes devis",
         "types": {
