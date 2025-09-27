@@ -54,8 +54,8 @@ function Alert({ type = "info", message }) {
     type === "error"
       ? "bg-red-50 text-red-700 border-red-200"
       : type === "success"
-      ? "bg-green-50 text-green-700 border-green-200"
-      : "bg-blue-50 text-blue-700 border-blue-200";
+        ? "bg-green-50 text-green-700 border-green-200"
+        : "bg-blue-50 text-blue-700 border-blue-200";
   return (
     <div className={`${base} ${styles}`}>
       <span className="mt-0.5">•</span>
@@ -139,7 +139,7 @@ function PrettyDatePicker({ label, value, onChange, name, required, maxDate, t }
   const selected = fromISO(value);
   const [month, setMonth] = useState(
     () => (selected ? new Date(selected.getFullYear(), selected.getMonth(), 1)
-                    : new Date(new Date().getFullYear(), new Date().getMonth(), 1))
+      : new Date(new Date().getFullYear(), new Date().getMonth(), 1))
   );
   const wrapRef = useRef(null);
 
@@ -149,7 +149,7 @@ function PrettyDatePicker({ label, value, onChange, name, required, maxDate, t }
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  const daysShort = t.raw("datepicker.daysShort") || ["Mo","Tu","We","Th","Fr","Sa","Su"];
+  const daysShort = t.raw("datepicker.daysShort") || ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
   const monthLabel = month.toLocaleDateString(locale || "fr-FR", { month: "long", year: "numeric" });
 
   const start = (() => {
@@ -613,9 +613,11 @@ export default function ReclamationClient() {
                 type="submit"
                 disabled={submitting}
                 className={`w-full rounded-xl font-semibold py-3 transition-all
-                  ${submitting
+  ${submitting
                     ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                    : "bg-gradient-to-r from-[#002147] to-[#01346b] text-white shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[0px]"}`}
+                    : "bg-[#F7C600] text-[#0B1E3A] shadow-lg hover:shadow-xl hover:bg-[#FFD84D] focus:ring-2 focus:ring-[#F7C600]/40 hover:translate-y-[-1px] active:translate-y-0"}`
+                }
+
                 aria-label={t("aria.submit")}
                 title={t("aria.submit")}
               >

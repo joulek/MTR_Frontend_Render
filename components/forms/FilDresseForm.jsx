@@ -37,8 +37,8 @@ export default function FilDresseForm() {
   const localRole =
     typeof window !== "undefined"
       ? (localStorage.getItem("mtr_role") ||
-         localStorage.getItem("userRole") ||
-         getCookie("role"))
+        localStorage.getItem("userRole") ||
+        getCookie("role"))
       : null;
   const isAuthenticated = Boolean(localRole) || Boolean(user?.authenticated);
   const isClient = ((user?.role || localRole) === "client");
@@ -100,13 +100,13 @@ export default function FilDresseForm() {
   /* ===== i18n/options (valeurs canoniques envoyées au backend) ===== */
   const lengthUnitOptions = [
     { value: "mm", label: "mm" },
-    { value: "m",  label: "m"  },
+    { value: "m", label: "m" },
   ];
 
   const unitLabels = t.raw("unitOptions") || ["pièces", "kg"];
   const qtyUnitOptions = [
     { value: "pieces", label: unitLabels[0] ?? "pièces" },
-    { value: "kg",     label: unitLabels[1] ?? "kg"     },
+    { value: "kg", label: unitLabels[1] ?? "kg" },
   ];
 
   const MAT_VALUES = ["Acier galvanisé", "Acier Noir", "Acier ressort", "Acier inoxydable"];
@@ -177,7 +177,7 @@ export default function FilDresseForm() {
       });
 
       let payload = null;
-      try { payload = await res.json(); } catch {}
+      try { payload = await res.json(); } catch { }
 
       if (res.ok) {
         finishedRef.current = true;
@@ -291,9 +291,10 @@ export default function FilDresseForm() {
             type="submit"
             disabled={disabled}
             className={`w-full rounded-xl font-semibold py-3 transition-all
-              ${disabled
+    ${disabled
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-[#002147] to-[#01346b] text-white shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[0px]"}`}
+                : "bg-[#F7C600] text-[#0B1E3A] shadow-lg hover:shadow-xl hover:bg-[#FFD84D] focus:ring-2 focus:ring-[#F7C600]/40 hover:translate-y-[-1px] active:translate-y-0"}
+  `}
           >
             {loading ? t("sending") : buttonLabel}
           </button>
@@ -328,9 +329,9 @@ function SectionTitle({ children, className = "" }) {
 function Alert({ type = "info", message }) {
   const base = "w-full rounded-xl px-4 py-3 text-sm font-medium border flex items-start gap-2";
   const styles =
-    type === "error"   ? "bg-red-50 text-red-700 border-red-200" :
-    type === "success" ? "bg-green-50 text-green-700 border-green-200" :
-                         "bg-blue-50 text-blue-700 border-blue-200";
+    type === "error" ? "bg-red-50 text-red-700 border-red-200" :
+      type === "success" ? "bg-green-50 text-green-700 border-green-200" :
+        "bg-blue-50 text-blue-700 border-blue-200";
   return (
     <div className={`${base} ${styles}`}>
       <span className="mt-0.5">•</span>

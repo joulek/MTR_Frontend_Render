@@ -36,8 +36,8 @@ export default function AutreArticleForm() {
   const localRole =
     typeof window !== "undefined"
       ? (localStorage.getItem("mtr_role") ||
-         localStorage.getItem("userRole") ||
-         getCookie("role"))
+        localStorage.getItem("userRole") ||
+        getCookie("role"))
       : null;
   const isAuthenticated = Boolean(localRole) || Boolean(user?.authenticated);
   const isClient = ((user?.role || localRole) === "client");
@@ -194,11 +194,11 @@ export default function AutreArticleForm() {
 
       // lecture & nettoyage
       const designation = (fd.get("designation") || "").toString().trim();
-      const dimensions  = (fd.get("dimensions")  || "").toString().trim();
-      const exigences   = (fd.get("exigences")   || "").toString().trim();
-      const remarques   = (fd.get("remarques")   || "").toString().trim();
-      const descLibre   = (fd.get("description") || "").toString().trim();
-      const qRaw        = (fd.get("quantite")    || "").toString().trim();
+      const dimensions = (fd.get("dimensions") || "").toString().trim();
+      const exigences = (fd.get("exigences") || "").toString().trim();
+      const remarques = (fd.get("remarques") || "").toString().trim();
+      const descLibre = (fd.get("description") || "").toString().trim();
+      const qRaw = (fd.get("quantite") || "").toString().trim();
       const qte = Math.max(1, Number.isFinite(Number(qRaw)) ? Number(qRaw) : 1);
       fd.set("quantite", String(qte));
 
@@ -209,14 +209,14 @@ export default function AutreArticleForm() {
       }
 
       // titre + description fallback
-      const matiere   = (fd.get("matiere") || "").toString().trim();
-      const titre     = designation || (matiere ? `Article (${matiere})` : "Article");
+      const matiere = (fd.get("matiere") || "").toString().trim();
+      const titre = designation || (matiere ? `Article (${matiere})` : "Article");
       let description = descLibre;
       if (!description) {
         const parts = [];
         if (dimensions) parts.push(`Dimensions : ${dimensions}`);
-        if (exigences)  parts.push(`Exigences : ${exigences}`);
-        if (remarques)  parts.push(`Remarques : ${remarques}`);
+        if (exigences) parts.push(`Exigences : ${exigences}`);
+        if (remarques) parts.push(`Remarques : ${remarques}`);
         description = parts.join("\n");
       }
       fd.set("titre", titre);
@@ -233,7 +233,7 @@ export default function AutreArticleForm() {
       });
 
       let payload = null;
-      try { payload = await res.json(); } catch {}
+      try { payload = await res.json(); } catch { }
 
       if (res.ok) {
         finishedRef.current = true;
@@ -275,8 +275,8 @@ export default function AutreArticleForm() {
         <SectionTitle>{t("mainInfo")}</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <Input name="designation" label={t("designation")} required />
-          <Input name="dimensions"  label={t("dimensions")} />
-          <Input name="quantite"    label={t("quantity")} type="number" min="1" required />
+          <Input name="dimensions" label={t("dimensions")} />
+          <Input name="quantite" label={t("quantity")} type="number" min="1" required />
 
           {/* Select Matière contrôlé */}
           <SelectBase
@@ -362,10 +362,10 @@ export default function AutreArticleForm() {
             type="submit"
             disabled={disabled}
             className={`w-full rounded-xl font-semibold py-3 transition-all
-              ${disabled
+    ${disabled
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-[#002147] to-[#01346b] text-white shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[0px]"}`}
-          >
+                : "bg-[#F7C600] text-[#0B1E3A] shadow-lg hover:shadow-xl hover:bg-[#FFD84D] focus:ring-2 focus:ring-[#F7C600]/40 hover:translate-y-[-1px] active:translate-y-0"}
+  `}>
             {buttonLabel}
           </button>
 
@@ -397,7 +397,7 @@ function SectionTitle({ children, className = "" }) {
   );
 }
 function Alert({ type = "info", message }) {
-  const base   = "w-full rounded-xl px-4 py-3 text-sm font-medium border flex items-start gap-2";
+  const base = "w-full rounded-xl px-4 py-3 text-sm font-medium border flex items-start gap-2";
   const styles =
     type === "error"
       ? "bg-red-50 text-red-700 border-red-200"

@@ -39,8 +39,8 @@ export default function GrilleMetalliqueForm() {
   const localRole =
     typeof window !== "undefined"
       ? (localStorage.getItem("mtr_role") ||
-         localStorage.getItem("userRole") ||
-         getCookie("role"))
+        localStorage.getItem("userRole") ||
+        getCookie("role"))
       : null;
   const isAuthenticated = Boolean(localRole) || Boolean(user?.authenticated);
   const isClient = ((user?.role || localRole) === "client");
@@ -99,14 +99,14 @@ export default function GrilleMetalliqueForm() {
   const materialOptions = t.has("materialChecks")
     ? t.raw("materialChecks")
     : (locale === "en"
-        ? ["Galvanized steel", "Black steel", "Stainless steel"]
-        : ["Acier galvanisé", "Acier Noir", "Inox"]);
+      ? ["Galvanized steel", "Black steel", "Stainless steel"]
+      : ["Acier galvanisé", "Acier Noir", "Inox"]);
 
   const finishOptions = t.has("finishChecks")
     ? t.raw("finishChecks")
     : (locale === "en"
-        ? ["Painting", "Chrome plating", "Galvanization", "Other"]
-        : ["Peinture", "Chromage", "Galvanisation", "Autre"]);
+      ? ["Painting", "Chrome plating", "Galvanization", "Other"]
+      : ["Peinture", "Chromage", "Galvanisation", "Autre"]);
 
   const selectPlaceholder = t.has("selectPlaceholder") ? t("selectPlaceholder") : "Sélectionnez…";
 
@@ -114,16 +114,16 @@ export default function GrilleMetalliqueForm() {
   const FR_MAT = ["Acier galvanisé", "Acier Noir", "Inox"];
   const EN_TO_FR_MAT = [
     { fr: "Acier galvanisé", en: ["Galvanized steel", "Galvanized steel wire", "Galvanised steel", "Galvanised steel wire", "Galvanization steel"] },
-    { fr: "Acier Noir",      en: ["Black steel", "Black steel wire", "Blackened steel"] },
-    { fr: "Inox",            en: ["Stainless steel", "Stainless steel wire", "Inox", "Stainless"] },
+    { fr: "Acier Noir", en: ["Black steel", "Black steel wire", "Blackened steel"] },
+    { fr: "Inox", en: ["Stainless steel", "Stainless steel wire", "Inox", "Stainless"] },
   ];
 
   const FR_FIN = ["Peinture", "Chromage", "Galvanisation", "Autre"];
   const EN_TO_FR_FIN = [
-    { fr: "Peinture",      en: ["Painting", "Painted", "Paint", "Coating", "Paint coat"] },
-    { fr: "Chromage",      en: ["Chrome plating", "Chrome-plating", "Chromium plating", "Chroming", "Chromed", "Chrome"] },
+    { fr: "Peinture", en: ["Painting", "Painted", "Paint", "Coating", "Paint coat"] },
+    { fr: "Chromage", en: ["Chrome plating", "Chrome-plating", "Chromium plating", "Chroming", "Chromed", "Chrome"] },
     { fr: "Galvanisation", en: ["Galvanization", "Galvanising", "Galvanizing", "Zinc plating", "Zinc-plating", "Hot-dip galvanizing", "Hot dip galvanizing", "Galvanized", "Galvanised"] },
-    { fr: "Autre",         en: ["Other", "None", "No finish", "Without finish"] },
+    { fr: "Autre", en: ["Other", "None", "No finish", "Without finish"] },
   ];
 
   function normalizeOne(fd, name, frList, groups) {
@@ -206,7 +206,7 @@ export default function GrilleMetalliqueForm() {
       });
 
       let payload = null;
-      try { payload = await res.json(); } catch {}
+      try { payload = await res.json(); } catch { }
 
       if (res.ok) {
         finishedRef.current = true;
@@ -273,8 +273,8 @@ export default function GrilleMetalliqueForm() {
           <Input name="D3" label={t("D3")} required />
           <Input name="quantite" label={t("quantity")} type="number" min="1" required />
 
-          <SelectBase name="matiere"  label={t("material")} options={materialOptions} placeholder={selectPlaceholder} required />
-          <SelectBase name="finition" label={t("finish")}   options={finishOptions}   placeholder={selectPlaceholder} required />
+          <SelectBase name="matiere" label={t("material")} options={materialOptions} placeholder={selectPlaceholder} required />
+          <SelectBase name="finition" label={t("finish")} options={finishOptions} placeholder={selectPlaceholder} required />
         </div>
 
         {/* Fichiers */}
@@ -333,9 +333,10 @@ export default function GrilleMetalliqueForm() {
             type="submit"
             disabled={disabled}
             className={`w-full rounded-xl font-semibold py-3 transition-all
-              ${disabled
+    ${disabled
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-[#002147] to-[#01346b] text-white shadow-lg hover:shadow-xl hover:translate-y-[-1px] active:translate-y-[0px]"}`}
+                : "bg-[#F7C600] text-[#0B1E3A] shadow-lg hover:shadow-xl hover:bg-[#FFD84D] focus:ring-2 focus:ring-[#F7C600]/40 hover:translate-y-[-1px] active:translate-y-0"}
+  `}
           >
             {buttonLabel}
           </button>
@@ -370,9 +371,9 @@ function SectionTitle({ children, className = "" }) {
 function Alert({ type = "info", message }) {
   const base = "w-full rounded-xl px-4 py-3 text-sm font-medium border flex items-start gap-2";
   const styles =
-    type === "error"   ? "bg-red-50 text-red-700 border-red-200" :
-    type === "success" ? "bg-green-50 text-green-700 border-green-200" :
-                         "bg-blue-50 text-blue-700 border-blue-200";
+    type === "error" ? "bg-red-50 text-red-700 border-red-200" :
+      type === "success" ? "bg-green-50 text-green-700 border-green-200" :
+        "bg-blue-50 text-blue-700 border-blue-200";
   return (
     <div className={`${base} ${styles}`}>
       <span className="mt-0.5">•</span>
