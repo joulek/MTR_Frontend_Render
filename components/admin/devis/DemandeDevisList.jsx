@@ -1,8 +1,10 @@
 // components/admin/demandes/DemandeDevisList.jsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import PropTypes from "prop-types";
+import { FiSearch, FiXCircle, FiFileText } from "react-icons/fi";
+import Pagination from "@/components/Pagination";
 
 /* ---------------------------- API backend ---------------------------- */
 const BACKEND = (
@@ -11,6 +13,8 @@ const BACKEND = (
 const API = `${BACKEND}/api`;
 
 /* ---------------------------- Utils ---------------------------- */
+const WRAP = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
+
 function cn(...cls) {
   return cls.filter(Boolean).join(" ");
 }
@@ -18,13 +22,10 @@ function formatDate(d) {
   try {
     const dt = new Date(d);
     if (Number.isNaN(dt.getTime())) return "-";
-    return dt.toLocaleString(undefined, {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
+    return `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
-    });
+    })}`;
   } catch {
     return "-";
   }
@@ -40,183 +41,298 @@ function useDebounced(value, delay = 350) {
 
 /* ---------------------------- Component ---------------------------- */
 export default function DemandeDevisList({ type = "all", query = "" }) {
+  const [q, setQ] = useState(query);
+  const qDebounced = useDebounced(q, 400);
+
+  // pagination (même UX que Grille)
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(20);
+  const [pageSize, setPageSize] = useState(10);
+
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
-  const [state, setState] = useState({ loading: false, error: "" });
-
-  // re-fetch quand type / query / page / limit changent
-  const qDebounced = useDebounced(query, 400);
-
   const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(total / limit)),
-    [total, limit]
+    () => Math.max(1, Math.ceil(total / pageSize)),
+    [total, pageSize]
   );
+
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setPage(1);
   }, [type, qDebounced]);
 
-  useEffect(() => {
-    let aborted = false;
-
-    async function run() {
-      setState({ loading: true, error: "" });
+  const load = useCallback(
+    async (silent = false) => {
       try {
+        setError("");
+        if (silent) setSyncing(true);
+        else if (rows.length === 0) setLoading(true);
+
         const params = new URLSearchParams({
           type: type || "all",
           q: qDebounced || "",
           page: String(page),
-          limit: String(limit),
+          limit: String(pageSize), // l’endpoint “compact” attend limit
         });
 
-        const res = await fetch(`${API}/devis/demandes/compact?` + params.toString());
+        const res = await fetch(`${API}/devis/demandes/compact?` + params.toString(), {
+          credentials: "include",
+          cache: "no-store",
+        });
 
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(`HTTP ${res.status} - ${txt}`);
+        const data = await res.json().catch(() => null);
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.message || `HTTP ${res.status}`);
         }
 
-        const data = await res.json();
-        if (aborted) return;
-
-        if (!data?.success) {
-          throw new Error(data?.message || "Réponse invalide");
-        }
-
-        setRows(data.items || []);
-        setTotal(data.total || 0);
-        setState({ loading: false, error: "" });
+        setRows(Array.isArray(data.items) ? data.items : []);
+        setTotal(Number(data.total) || 0);
       } catch (err) {
-        if (aborted) return;
-        setState({ loading: false, error: err?.message || "Erreur inconnue" });
+        setError(err?.message || "Erreur inconnue");
+      } finally {
+        if (silent) setSyncing(false);
+        else setLoading(false);
       }
-    }
+    },
+    [type, qDebounced, page, pageSize, rows.length]
+  );
 
-    run();
-    return () => {
-      aborted = true;
-    };
-  }, [type, qDebounced, page, limit]);
-
-  const onPrev = () => setPage((p) => Math.max(1, p - 1));
-  const onNext = () => setPage((p) => Math.min(totalPages, p + 1));
+  useEffect(() => {
+    load(rows.length > 0);
+  }, [load]);
 
   return (
-    <div className="space-y-4">
-      {/* Header infos */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div className="text-sm text-gray-600">
-          <h1>Demandes de devis</h1>
+    <div className="py-6 space-y-6">
+      {/* Toolbar (copie du style Grille) */}
+      <div className={WRAP}>
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <h1 className="text-1xl lg:text-2xl font-extrabold tracking-tight text-[#0B1E3A]">
+            Gestion des demandes devis
+          </h1>
+
+          <div className="relative w-full sm:w-[320px] lg:w-[420px]">
+            <FiSearch
+              aria-hidden
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
+            />
+            <input
+              value={q}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setPage(1);
+              }}
+              placeholder="Rechercher : devis, demande, client, type, date…"
+              aria-label="Rechercher"
+              className="w-full rounded-xl border border-gray-300 bg-white px-10 pr-9 py-2 text-sm text-[#0B1E3A] shadow focus:border-[#F7C600] focus:ring-2 focus:ring-[#F7C600]/30 outline-none transition"
+            />
+            {q && (
+              <button
+                type="button"
+                onClick={() => {
+                  setQ("");
+                  setPage(1);
+                }}
+                aria-label="Effacer la recherche"
+                className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+              >
+                <FiXCircle size={16} />
+              </button>
+            )}
+          </div>
         </div>
+
+        {syncing && (
+          <div className="mt-2 inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-800">
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-blue-400 border-t-transparent" />
+            Mise à jour…
+          </div>
+        )}
+
+        {error && (
+          <p className="mt-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-red-700">
+            {error}
+          </p>
+        )}
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr className="text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-              <th className="px-4 py-3">Demande</th>
-              <th className="px-4 py-3">Type</th>
-              <th className="px-4 py-3">Client</th>
-              <th className="px-4 py-3">Date</th>
-              <th className="px-4 py-3">PDF DDV </th>
-              <th className="px-4 py-3">PDF</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100 text-sm">
-            {state.loading && rows.length === 0 ? (
-              Array.from({ length: Math.min(5, limit) }).map((_, i) => (
-                <tr key={`sk-${i}`} className="animate-pulse">
-                  <td className="px-4 py-3">
-                    <div className="h-4 w-24 bg-gray-200 rounded" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="h-4 w-20 bg-gray-200 rounded" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="h-4 w-40 bg-gray-200 rounded" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="h-4 w-32 bg-gray-200 rounded" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="h-4 w-24 bg-gray-200 rounded" />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="h-4 w-12 bg-gray-200 rounded" />
-                  </td>
-                </tr>
-              ))
-            ) : rows.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-gray-500">
-                  Aucun résultat
-                </td>
-              </tr>
-            ) : (
-              rows.map((r) => (
-                <tr key={r.demandeNumero ?? `${r.type}-${r._id}`} className="hover:bg-yellow-50/40">
-                  <td className="px-4 py-3 font-medium text-[#0B1E3A]">
-                    {r.demandeNumero || "-"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={cn(
-                        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
-                        r.type === "compression" && "bg-blue-100 text-blue-800",
-                        r.type === "traction" && "bg-emerald-100 text-emerald-800",
-                        r.type === "torsion" && "bg-fuchsia-100 text-fuchsia-800",
-                        r.type === "fil" && "bg-amber-100 text-amber-800",
-                        r.type === "grille" && "bg-cyan-100 text-cyan-800",
-                        r.type === "autre" && "bg-gray-200 text-gray-800"
-                      )}
-                    >
-                      {r.type || "-"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">{r.client || "-"}</td>
-                  <td className="px-4 py-3 text-gray-600">{formatDate(r.date)}</td>
-                  <td className="px-4 py-3">
-                    {r.devisNumero || <span className="text-gray-400">—</span>}
-                  </td>
-                  <td className="px-4 py-3">
-                    {r.ddvPdf ? (
+      {/* Table responsive (même design que Grille) */}
+      <div className={WRAP}>
+        {loading && rows.length === 0 ? (
+          <div className="space-y-2 animate-pulse">
+            <div className="h-10 bg-gray-100 rounded" />
+            <div className="h-10 bg-gray-100 rounded" />
+            <div className="h-10 bg-gray-100 rounded" />
+          </div>
+        ) : total === 0 ? (
+          <p className="text-gray-500">Aucune demande de devis</p>
+        ) : (
+          <>
+            {/* TABLE >= md */}
+            <div className="hidden md:block">
+              <div className="-mx-4 md:mx-0 overflow-x-auto">
+                <table className="min-w-[900px] w-full table-auto text-[13px] lg:text-sm border-separate border-spacing-0">
+                  <thead>
+                    <tr>
+                      <th className="p-2.5 text-left">Demande</th>
+                      <th className="p-2.5 text-left">Type</th>
+                      <th className="p-2.5 text-left">Client</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">Date</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">PDF DDV</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">PDF</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr key={r.demandeNumero ?? `${r.type}-${r._id}`} className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors">
+                        <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
+                            <span className="font-mono">{r.demandeNumero || "-"}</span>
+                          </div>
+                        </td>
+
+                        <td className="p-2.5 border-b border-gray-200">
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
+                              r.type === "compression" && "bg-blue-100 text-blue-800",
+                              r.type === "traction" && "bg-emerald-100 text-emerald-800",
+                              r.type === "torsion" && "bg-fuchsia-100 text-fuchsia-800",
+                              r.type === "fil" && "bg-amber-100 text-amber-800",
+                              r.type === "grille" && "bg-cyan-100 text-cyan-800",
+                              (!r.type || r.type === "autre") && "bg-gray-200 text-gray-800"
+                            )}
+                          >
+                            {r.type || "-"}
+                          </span>
+                        </td>
+
+                        <td className="p-2.5 border-b border-gray-200">
+                          <span className="block truncate max-w-[18rem]" title={r.client || ""}>
+                            {r.client || "-"}
+                          </span>
+                        </td>
+
+                        <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                          {formatDate(r.date)}
+                        </td>
+
+                        {/* PDF DDV */}
+                        <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                          {r.ddvPdf ? (
+                            <a
+                              href={r.ddvPdf}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                            >
+                              <FiFileText size={16} />
+                              Ouvrir
+                            </a>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
+
+                        {/* PDF (devis) */}
+                        <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                          {r.devisPdf ? (
+                            <a
+                              href={r.devisPdf}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                            >
+                              <FiFileText size={16} />
+                              Ouvrir
+                            </a>
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="mt-3">
+                <Pagination
+                  page={page}
+                  pageSize={pageSize}
+                  total={total}
+                  onPageChange={(n) => setPage(Number(n))}
+                  onPageSizeChange={(s) => {
+                    setPageSize(Number(s));
+                    setPage(1);
+                  }}
+                  pageSizeOptions={[5, 10, 20, 50]}
+                />
+              </div>
+            </div>
+
+            {/* LISTE < md */}
+            <div className="md:hidden divide-y divide-gray-200">
+              {rows.map((r) => (
+                <div key={r.demandeNumero ?? `${r.type}-${r._id}`} className="py-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
+                      <span className="font-mono">{r.demandeNumero || "-"}</span>
+                    </div>
+
+                    {(r.ddvPdf || r.devisPdf) ? (
                       <a
-                        href={r.ddvPdf}
+                        href={r.ddvPdf || r.devisPdf}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-yellow-700 hover:text-yellow-900 underline underline-offset-2"
+                        className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                        aria-label="Ouvrir"
+                        title="Ouvrir"
                       >
-                        Ouvrir
-                      </a>
-                    ) : r.devisPdf ? (
-                      <a
-                        href={r.devisPdf}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-yellow-700 hover:text-yellow-900 underline underline-offset-2"
-                      >
+                        <FiFileText size={16} />
                         Ouvrir
                       </a>
                     ) : (
-                      <span className="text-gray-400">—</span>
+                      <span className="text-gray-400 text-sm">—</span>
                     )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  </div>
 
-      {/* Error */}
-      {state.error ? (
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {state.error}
-        </div>
-      ) : null}
+                  <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-500">Type</p>
+                      <p className="truncate capitalize">{r.type || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-semibold text-gray-500">Date</p>
+                      <p className="truncate">{formatDate(r.date)}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-[11px] font-semibold text-gray-500">Client</p>
+                      <p className="truncate">{r.client || "-"}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <Pagination
+                page={page}
+                pageSize={pageSize}
+                total={total}
+                onPageChange={(n) => setPage(Number(n))}
+                onPageSizeChange={(s) => {
+                  setPageSize(Number(s));
+                  setPage(1);
+                }}
+                pageSizeOptions={[5, 10, 20, 50]}
+              />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
@@ -227,7 +343,7 @@ DemandeDevisList.propTypes = {
     "compression",
     "traction",
     "torsion",
-    "fill",
+    "fil",   // ← correction (pas "fill")
     "grille",
     "autre",
   ]),

@@ -16,7 +16,7 @@ const inter = Inter({
 
 /* ---------------------------- API backend ---------------------------- */
 const BACKEND = (
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000"
+  process.env.NEXT_PUBLIC_BACKEND_URL 
 ).replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
