@@ -14,7 +14,7 @@ import DevisGrilleList from "@/components/admin/devis/DevisGrilleList";
 // import DevisAllList from "@/components/admin/devis/DevisAllList"; // si tu en as une
 
 // ---- Nouvelle liste demandes ----
-import DemandeDevisList from "@/components/admin/devis";
+import DemandeDevisList from "@/components/admin/devis/DemandeDevisList";
 
 export default function AdminDevisSelector() {
   const t = useTranslations("auth.admin.devisAdmin");
