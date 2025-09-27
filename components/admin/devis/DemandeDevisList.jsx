@@ -52,6 +52,10 @@ function getClientLabel(r) {
   return "";
 }
 
+// 🔗 construire les liens côté front (évite localhost en prod)
+const ddvHref = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
+const devisHref = (r) => (r.devisNumero ? `${BACKEND}/files/devis/${r.devisNumero}.pdf` : null);
+
 /* ---------------------------- Component ---------------------------- */
 export default function DemandeDevisList({ type = "all", query = "" }) {
   // i18n namespaces (clés à créer sous auth.admin.demandsListPage)
@@ -127,7 +131,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
       compression: tTypes("compression"),
       traction: tTypes("traction"),
       torsion: tTypes("torsion"),
-      fil: tTypes("fill"),      // ⚠️ ta clé existante est "fill" pour le type "fil"
+      fil: tTypes("fill"), // ⚠️ ta clé existante est "fill" pour "fil"
       grille: tTypes("grille"),
       autre: tTypes("autre"),
     };
@@ -217,6 +221,8 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
+                      {/* 🔹 nouvelle colonne */}
+                      <th className="p-2.5 text-left whitespace-nowrap">Fichiers joints</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -254,9 +260,24 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 
                           {/* PDF DDV */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            {r.ddvPdf ? (
+                            <a
+                              href={ddvHref(r)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                              aria-label={t("actions.open")}
+                              title={t("actions.open")}
+                            >
+                              <FiFileText size={16} />
+                              {t("actions.open")}
+                            </a>
+                          </td>
+
+                          {/* PDF (devis) */}
+                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                            {devisHref(r) ? (
                               <a
-                                href={r.ddvPdf}
+                                href={devisHref(r)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
@@ -271,20 +292,10 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             )}
                           </td>
 
-                          {/* PDF (devis) */}
+                          {/* 🔹 Fichiers joints (compteur) */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            {r.devisPdf ? (
-                              <a
-                                href={r.devisPdf}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                                aria-label={t("actions.open")}
-                                title={t("actions.open")}
-                              >
-                                <FiFileText size={16} />
-                                {t("actions.open")}
-                              </a>
+                            {Number(r.attachments) > 0 ? (
+                              <span className="text-[#0B1E3A] font-medium">{r.attachments}</span>
                             ) : (
                               <span className="text-gray-400">{dash}</span>
                             )}
@@ -323,9 +334,9 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                         <span className="font-mono">{r.demandeNumero || dash}</span>
                       </div>
 
-                      {(r.ddvPdf || r.devisPdf) ? (
+                      {(ddvHref(r) || devisHref(r)) ? (
                         <a
-                          href={r.ddvPdf || r.devisPdf}
+                          href={ddvHref(r) || devisHref(r)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
@@ -352,6 +363,11 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       <div className="col-span-2">
                         <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.client")}</p>
                         <p className="truncate" title={clientLabel || ""}>{clientLabel || dash}</p>
+                      </div>
+                      {/* 🔹 Fichiers joints (mobile) */}
+                      <div className="col-span-2">
+                        <p className="text-[11px] font-semibold text-gray-500">Fichiers joints</p>
+                        <p className="truncate">{Number(r.attachments) > 0 ? r.attachments : dash}</p>
                       </div>
                     </div>
                   </div>
