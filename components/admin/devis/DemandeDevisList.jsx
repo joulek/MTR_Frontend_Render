@@ -126,12 +126,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const typeBadgeClass = (v) =>
     cn(
       "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
-      v === "compression" && "bg-blue-100 text-blue-800",
-      v === "traction" && "bg-emerald-100 text-emerald-800",
-      v === "torsion" && "bg-fuchsia-100 text-fuchsia-800",
-      v === "fil" && "bg-amber-100 text-amber-800",
-      v === "grille" && "bg-cyan-100 text-cyan-800",
-      (!v || v === "autre") && "bg-gray-200 text-gray-800"
+      v === "compression" ,
+      v === "traction" ,
+      v === "torsion" ,
+      v === "fil" ,
+      v === "grille",
+      (!v || v === "autre") 
     );
 
   return (
