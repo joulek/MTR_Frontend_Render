@@ -11,7 +11,7 @@ import DevisTorsionList from "@/components/admin/devis/DevisTorsionList";
 import DevisAutreList from "@/components/admin/devis/DevisAutreList";
 import DevisFilList from "@/components/admin/devis/DevisFillList"; // ← rename Fill -> Fil
 import DevisGrilleList from "@/components/admin/devis/DevisGrilleList";
-import DemandeDevisList from "@/components/admin/demandes/DemandeDevisList"; // ← dossier 'demandes'
+import DemandeDevisList from "@/components/admin/devis/DemandeDevisList"; // ← dossier 'demandes'
 
 export default function AdminDevisSelector() {
   const t = useTranslations("auth.admin.devisAdmin");
