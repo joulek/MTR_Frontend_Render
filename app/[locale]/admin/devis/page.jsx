@@ -1,24 +1,27 @@
-// app/[locale]/admin/devis/AdminDevisSelector.jsx (أو وين موجود عندك)
+// app/[locale]/admin/devis/AdminDevisSelector.jsx
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
-// Pages admin (listes)
+// ---- Listes par type (garde tes imports existants) ----
 import DevisCompressionList from "@/components/admin/devis/DevisCompressionList";
 import DevisTractionList from "@/components/admin/devis/DevisTractionList";
 import DevisTorsionList from "@/components/admin/devis/DevisTorsionList";
 import DevisAutreList from "@/components/admin/devis/DevisAutreList";
 import DevisFillList from "@/components/admin/devis/DevisFillList";
 import DevisGrilleList from "@/components/admin/devis/DevisGrilleList";
-
-// ❌ نحّينا imports متاع الصور من public
-// ❌ ونحّينا import Image من "next/image"
+// Si tu as une liste globale, décommente cette ligne et utilise-la pour "all"
+// import DevisAllList from "@/components/admin/devis/DevisAllList";
 
 export default function AdminDevisSelector() {
   const t = useTranslations("auth.admin.devisAdmin");
-  const [type, setType] = useState("compression");
 
+  // ----- État UI -----
+  const [type, setType] = useState("all"); // "all" = Tous les types
+  const [query, setQuery] = useState("");
+
+  // ----- Libellés (fallback si la clé i18n n'existe pas) -----
   const tl = (k) =>
     t.has(`types.${k}`)
       ? t(`types.${k}`)
@@ -29,32 +32,44 @@ export default function AdminDevisSelector() {
           fill: "Fil dressé coupé",
           grille: "Grille métallique",
           autre: "Autre article",
+          all: "Tous les types",
         }[k];
 
-  // ✅ نستعمل مسارات نصّية من مجلد public
-  const TYPES = [
-    { key: "compression", img: "/devis/compression_logo.png" },
-    { key: "traction",    img: "/devis/ressort_traction_1.jpg" },
-    { key: "torsion",     img: "/devis/torsion_ressorts.png" },
-    { key: "fill",        img: "/devis/dresser.png" },
-    { key: "grille",      img: "/devis/grille.png" },
-    { key: "autre",       img: "/devis/autre.jpg" },
-  ];
+  // ----- Options du <select> -----
+  const TYPE_OPTIONS = useMemo(
+    () => [
+      { key: "all", label: tl("all") },
+      { key: "compression", label: tl("compression") },
+      { key: "torsion", label: tl("torsion") },
+      { key: "traction", label: tl("traction") },
+      { key: "fill", label: tl("fill") },
+      { key: "grille", label: tl("grille") },
+      { key: "autre", label: tl("autre") },
+    ],
+    // tl() est stable ici; si tu relies aux traductions dynamiques, enlève ce mémo.
+    []
+  );
 
+  // ----- Rendu de la liste selon "type" -----
   const renderPage = () => {
+    const passedProps = { type, query };
+
+    // Si tu as une page "tous les devis", remplace par: return <DevisAllList {...passedProps} />
+    if (type === "all") return <DevisCompressionList {...passedProps} />;
+
     switch (type) {
       case "compression":
-        return <DevisCompressionList />;
+        return <DevisCompressionList {...passedProps} />;
       case "traction":
-        return <DevisTractionList />;
+        return <DevisTractionList {...passedProps} />;
       case "torsion":
-        return <DevisTorsionList />;
+        return <DevisTorsionList {...passedProps} />;
       case "fill":
-        return <DevisFillList />;
+        return <DevisFillList {...passedProps} />;
       case "grille":
-        return <DevisGrilleList />;
+        return <DevisGrilleList {...passedProps} />;
       case "autre":
-        return <DevisAutreList />;
+        return <DevisAutreList {...passedProps} />;
       default:
         return null;
     }
@@ -63,42 +78,44 @@ export default function AdminDevisSelector() {
   return (
     <div className="p-6">
       <h1 className="mb-6 sm:mb-8 text-3xl font-extrabold tracking-tight text-[#002147] text-center">
-        {t("title")}
+        {t.has("title") ? t("title") : "Liste des devis"}
       </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {TYPES.map(({ key, img }) => {
-          const active = type === key;
-          const label = tl(key);
+      {/* Barre d’actions : Select + Recherche */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+        {/* Select types */}
+        <div className="relative w-full sm:w-[260px]">
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="w-full appearance-none rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
+            aria-label="Filtrer par type"
+          >
+            {TYPE_OPTIONS.map((opt) => (
+              <option key={opt.key} value={opt.key}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+            ▾
+          </span>
+        </div>
 
-          return (
-            <button
-              key={key}
-              onClick={() => setType(key)}
-              className={`rounded-xl border p-4 flex items-center gap-3 justify-start transition ${
-                active
-                  ? "border-yellow-500 bg-yellow-50 shadow"
-                  : "border-gray-200 bg-white hover:border-yellow-400"
-              }`}
-            >
-              {/* ✅ <img> بسيطة، بلا sharp ولا blur */}
-              <img
-                src={img}
-                alt={label}
-                className="w-10 h-10 object-cover overflow-hidden rounded-lg ring-1 ring-gray-200"
-                loading="lazy"
-                width={40}
-                height={40}
-              />
-              <span className="font-semibold text-[#0B1E3A] text-left">
-                {label}
-              </span>
-            </button>
-          );
-        })}
+        {/* Champ de recherche */}
+        <div className="relative flex-1">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Rechercher : devis, demande, client, type, date…"
+            className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-4 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
+            aria-label="Recherche"
+          />
+        </div>
       </div>
 
-      <div className="mt-8 bg-white rounded-lg shadow p-6">{renderPage()}</div>
+      {/* Contenu */}
+      <div className="bg-white rounded-lg shadow p-6">{renderPage()}</div>
     </div>
   );
 }
