@@ -9,53 +9,46 @@ import DevisCompressionList from "@/components/admin/devis/DevisCompressionList"
 import DevisTractionList from "@/components/admin/devis/DevisTractionList";
 import DevisTorsionList from "@/components/admin/devis/DevisTorsionList";
 import DevisAutreList from "@/components/admin/devis/DevisAutreList";
-import DevisFillList from "@/components/admin/devis/DevisFillList";
+import DevisFilList from "@/components/admin/devis/DevisFilList"; // ← rename Fill -> Fil
 import DevisGrilleList from "@/components/admin/devis/DevisGrilleList";
-import DemandeDevisList from "../../../../components/admin/devis/DemandeDevisList";
-// Si tu as une liste globale, décommente cette ligne et utilise-la pour "all"
-// import DevisAllList from "@/components/admin/devis/DevisAllList";
+import DemandeDevisList from "@/components/admin/demandes/DemandeDevisList"; // ← dossier 'demandes'
 
 export default function AdminDevisSelector() {
   const t = useTranslations("auth.admin.devisAdmin");
 
-  // ----- État UI -----
-  const [type, setType] = useState("all"); // "all" = Tous les types
+  const [type, setType] = useState("all");
   const [query, setQuery] = useState("");
 
-  // ----- Libellés (fallback si la clé i18n n'existe pas) -----
+  // Libellés (fallback)
   const tl = (k) =>
-    t.has(`types.${k}`)
+    t.has?.(`types.${k}`)
       ? t(`types.${k}`)
-      : {
+      : ({
           compression: "Compression",
           traction: "Traction",
           torsion: "Torsion",
-          fill: "Fil dressé coupé",
+          fil: "Fil dressé coupé",        // ← fil
           grille: "Grille métallique",
           autre: "Autre article",
           all: "Tous les types",
-        }[k];
+        }[k]);
 
-  // ----- Options du <select> -----
   const TYPE_OPTIONS = useMemo(
     () => [
       { key: "all", label: tl("all") },
       { key: "compression", label: tl("compression") },
-      { key: "torsion", label: tl("torsion") },
       { key: "traction", label: tl("traction") },
-      { key: "fill", label: tl("fill") },
+      { key: "torsion", label: tl("torsion") },
+      { key: "fil", label: tl("fil") },         // ← fil (pas fill)
       { key: "grille", label: tl("grille") },
       { key: "autre", label: tl("autre") },
     ],
-    // tl() est stable ici; si tu relies aux traductions dynamiques, enlève ce mémo.
-    []
+    [] // tl est stable ici
   );
 
-  // ----- Rendu de la liste selon "type" -----
   const renderPage = () => {
     const passedProps = { type, query };
 
-    // Si tu as une page "tous les devis", remplace par: return <DevisAllList {...passedProps} />
     if (type === "all") return <DemandeDevisList {...passedProps} />;
 
     switch (type) {
@@ -65,8 +58,8 @@ export default function AdminDevisSelector() {
         return <DevisTractionList {...passedProps} />;
       case "torsion":
         return <DevisTorsionList {...passedProps} />;
-      case "fill":
-        return <DevisFillList {...passedProps} />;
+      case "fil":                                    // ← fil
+        return <DevisFilList {...passedProps} />;
       case "grille":
         return <DevisGrilleList {...passedProps} />;
       case "autre":
@@ -79,7 +72,7 @@ export default function AdminDevisSelector() {
   return (
     <div className="p-6">
       <h1 className="mb-6 sm:mb-8 text-3xl font-extrabold tracking-tight text-[#002147] text-center">
-        {t.has("title") ? t("title") : "Liste des devis"}
+        {t.has?.("title") ? t("title") : "Liste des devis"}
       </h1>
 
       {/* Barre d’actions : Select + Recherche */}
