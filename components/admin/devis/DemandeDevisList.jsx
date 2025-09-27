@@ -114,24 +114,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
       {/* Header infos */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="text-sm text-gray-600">
-          Résultats: <span className="font-semibold">{total}</span>
-          {total > 0 ? ` • Page ${page}/${totalPages}` : null}
-        </div>
-
-        {/* Page size */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Par page:</span>
-          <select
-            value={limit}
-            onChange={(e) => setLimit(parseInt(e.target.value, 10))}
-            className="rounded-md border border-gray-300 bg-white py-1.5 px-2 text-sm shadow-sm focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
-          >
-            {[10, 20, 30, 50, 100].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
+          <h1>Demandes de devis</h1>
         </div>
       </div>
 
