@@ -270,6 +270,7 @@ export default function GrilleMetalliqueForm() {
           <Input name="pas2" label={t("pas2")} required />
           <Input name="D2" label={t("D2")} required />
           <Input name="D1" label={t("D1")} required />
+          <Input name="D3" label={t("D3")} required />
           <Input name="quantite" label={t("quantity")} type="number" min="1" required />
 
           <SelectBase name="matiere"  label={t("material")} options={materialOptions} placeholder={selectPlaceholder} required />

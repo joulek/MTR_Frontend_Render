@@ -1204,8 +1204,9 @@
       "nbTrans": "Nombre de tiges transversales",
       "pas1": "Espacement longitudinal (Pas 1)",
       "pas2": "Espacement transversal (Pas 2)",
-      "D2": "Diamètre du fil des tiges (D₂)",
-      "D1": "Diamètre du fil du cadre (D₁)",
+      "D2": "Diamètre du fil (D₂)",
+      "D1": "Diamètre du fil (D₁)",
+      "D3": "Diamètre du fil du cadre (D₃)",
       "quantity": "Quantité",
       "material": "Matière",
       "materialChecks": [
