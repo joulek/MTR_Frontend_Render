@@ -9,7 +9,7 @@ import DevisCompressionList from "@/components/admin/devis/DevisCompressionList"
 import DevisTractionList from "@/components/admin/devis/DevisTractionList";
 import DevisTorsionList from "@/components/admin/devis/DevisTorsionList";
 import DevisAutreList from "@/components/admin/devis/DevisAutreList";
-import DevisFilList from "@/components/admin/devis/DevisFilList"; // ← rename Fill -> Fil
+import DevisFilList from "@/components/admin/devis/DevisFillList"; // ← rename Fill -> Fil
 import DevisGrilleList from "@/components/admin/devis/DevisGrilleList";
 import DemandeDevisList from "@/components/admin/demandes/DemandeDevisList"; // ← dossier 'demandes'
 
