@@ -41,7 +41,7 @@ function useDebounced(value, delay = 350) {
   return v;
 }
 
-// 🔹 helper pour afficher nom+prénom depuis les nouvelles données
+// 🔹 label client
 function getClientLabel(r) {
   if (r?.clientName && r.clientName.trim()) return r.clientName.trim();
   const prenom = r?.client?.prenom || r?.client?.firstName || "";
@@ -52,15 +52,16 @@ function getClientLabel(r) {
   return "";
 }
 
-// 🔗 construire les liens côté front (évite localhost en prod)
+// 🔗 liens PDFs
 const ddvHref = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
 const devisHref = (r) => (r.devisNumero ? `${BACKEND}/files/devis/${r.devisNumero}.pdf` : null);
 
+// 🔗 lien fichier joint par index
+const attachmentHref = (r, idx) => `${API}/devis/${r.type}/${r._id}/documents/${idx}`;
+
 /* ---------------------------- Component ---------------------------- */
 export default function DemandeDevisList({ type = "all", query = "" }) {
-  // i18n namespaces (clés à créer sous auth.admin.demandsListPage)
   const t = useTranslations("auth.admin.demandsListPage");
-  // libellés type déjà existants sous auth.admin.devisAdmin.types
   const tTypes = useTranslations("auth.admin.devisAdmin.types");
 
   const [q, setQ] = useState(query);
@@ -72,10 +73,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(total / pageSize)),
-    [total, pageSize]
-  );
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(total / pageSize)), [total, pageSize]);
 
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -96,18 +94,15 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           type: type || "all",
           q: qDebounced || "",
           page: String(page),
-          limit: String(pageSize), // l’endpoint “compact” attend limit
+          limit: String(pageSize),
         });
 
         const res = await fetch(`${API}/devis/demandes/compact?` + params.toString(), {
           credentials: "include",
           cache: "no-store",
         });
-
         const data = await res.json().catch(() => null);
-        if (!res.ok || !data?.success) {
-          throw new Error(data?.message || `HTTP ${res.status}`);
-        }
+        if (!res.ok || !data?.success) throw new Error(data?.message || `HTTP ${res.status}`);
 
         setRows(Array.isArray(data.items) ? data.items : []);
         setTotal(Number(data.total) || 0);
@@ -126,12 +121,11 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   }, [load]);
 
   const typeLabel = (v) => {
-    // map explicite pour éviter MISSING_MESSAGE si valeur inattendue
     const map = {
       compression: tTypes("compression"),
       traction: tTypes("traction"),
       torsion: tTypes("torsion"),
-      fil: tTypes("fill"), // ⚠️ ta clé existante est "fill" pour "fil"
+      fil: tTypes("fill"),
       grille: tTypes("grille"),
       autre: tTypes("autre"),
     };
@@ -159,11 +153,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           </h1>
 
           <div className="relative w-full sm:w-[320px] lg:w-[420px]">
-            <FiSearch
-              aria-hidden
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={18}
-            />
+            <FiSearch aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               value={q}
               onChange={(e) => {
@@ -191,9 +181,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         </div>
 
         {error && (
-          <p className="mt-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-red-700">
-            {error}
-          </p>
+          <p className="mt-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-red-700">{error}</p>
         )}
       </div>
 
@@ -221,18 +209,16 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
-                      {/* 🔹 nouvelle colonne */}
                       <th className="p-2.5 text-left whitespace-nowrap">Fichiers joints</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((r) => {
                       const clientLabel = getClientLabel(r);
+                      const docs = Array.isArray(r.documents) ? r.documents : [];
+                      const hasDocs = docs.length > 0 || Number(r.attachments) > 0;
                       return (
-                        <tr
-                          key={r.demandeNumero ?? `${r.type}-${r._id}`}
-                          className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors"
-                        >
+                        <tr key={r.demandeNumero ?? `${r.type}-${r._id}`} className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors">
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
@@ -244,12 +230,9 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             <span className={typeBadgeClass(r.type)}>{typeLabel(r.type)}</span>
                           </td>
 
-                          {/* 🔹 Client (nom + prénom corrects) */}
+                          {/* Client */}
                           <td className="p-2.5 border-b border-gray-200">
-                            <span
-                              className="block truncate max-w-[18rem]"
-                              title={clientLabel || ""}
-                            >
+                            <span className="block truncate max-w-[18rem]" title={clientLabel || ""}>
                               {clientLabel || dash}
                             </span>
                           </td>
@@ -292,10 +275,43 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             )}
                           </td>
 
-                          {/* 🔹 Fichiers joints (compteur) */}
+                          {/* ✅ Fichiers joints : liste liens */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            {Number(r.attachments) > 0 ? (
-                              <span className="text-[#0B1E3A] font-medium">{r.attachments}</span>
+                            {hasDocs ? (
+                              <details className="group">
+                                <summary className="cursor-pointer select-none inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50">
+                                  {docs.length > 0 ? `${docs.length} fichier(s)` : `${r.attachments} fichier(s)`}
+                                </summary>
+                                <ul className="mt-2 ml-1 w-max max-w-[28rem] rounded-xl border border-slate-200 bg-white shadow-lg p-2 space-y-1">
+                                  {docs.length > 0
+                                    ? docs.map((d, i) => (
+                                        <li key={i}>
+                                          <a
+                                            href={attachmentHref(r, d.index ?? i)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block truncate px-2 py-1 text-sm hover:bg-slate-50"
+                                            title={d.filename || `Fichier ${i + 1}`}
+                                          >
+                                            {d.filename || `Fichier ${i + 1}`}
+                                          </a>
+                                        </li>
+                                      ))
+                                    : Array.from({ length: Number(r.attachments) || 0 }).map((_, i) => (
+                                        <li key={i}>
+                                          <a
+                                            href={attachmentHref(r, i)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block truncate px-2 py-1 text-sm hover:bg-slate-50"
+                                            title={`Fichier ${i + 1}`}
+                                          >
+                                            {`Fichier ${i + 1}`}
+                                          </a>
+                                        </li>
+                                      ))}
+                                </ul>
+                              </details>
                             ) : (
                               <span className="text-gray-400">{dash}</span>
                             )}
@@ -326,6 +342,8 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
             <div className="md:hidden divide-y divide-gray-200">
               {rows.map((r) => {
                 const clientLabel = getClientLabel(r);
+                const docs = Array.isArray(r.documents) ? r.documents : [];
+                const hasDocs = docs.length > 0 || Number(r.attachments) > 0;
                 return (
                   <div key={r.demandeNumero ?? `${r.type}-${r._id}`} className="py-3">
                     <div className="flex items-center justify-between">
@@ -364,10 +382,42 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                         <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.client")}</p>
                         <p className="truncate" title={clientLabel || ""}>{clientLabel || dash}</p>
                       </div>
-                      {/* 🔹 Fichiers joints (mobile) */}
+
+                      {/* ✅ Fichiers joints (mobile) */}
                       <div className="col-span-2">
                         <p className="text-[11px] font-semibold text-gray-500">Fichiers joints</p>
-                        <p className="truncate">{Number(r.attachments) > 0 ? r.attachments : dash}</p>
+                        {hasDocs ? (
+                          <ul className="mt-1 space-y-1">
+                            {docs.length > 0
+                              ? docs.map((d, i) => (
+                                  <li key={i}>
+                                    <a
+                                      href={attachmentHref(r, d.index ?? i)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="underline"
+                                      title={d.filename || `Fichier ${i + 1}`}
+                                    >
+                                      {d.filename || `Fichier ${i + 1}`}
+                                    </a>
+                                  </li>
+                                ))
+                              : Array.from({ length: Number(r.attachments) || 0 }).map((_, i) => (
+                                  <li key={i}>
+                                    <a
+                                      href={attachmentHref(r, i)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="underline"
+                                    >
+                                      {`Fichier ${i + 1}`}
+                                    </a>
+                                  </li>
+                                ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-400">{dash}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -394,14 +444,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 }
 
 DemandeDevisList.propTypes = {
-  type: PropTypes.oneOf([
-    "all",
-    "compression",
-    "traction",
-    "torsion",
-    "fil",
-    "grille",
-    "autre",
-  ]),
+  type: PropTypes.oneOf(["all", "compression", "traction", "torsion", "fil", "grille", "autre"]),
   query: PropTypes.string,
 };
