@@ -41,6 +41,17 @@ function useDebounced(value, delay = 350) {
   return v;
 }
 
+// 🔹 helper pour afficher nom+prénom depuis les nouvelles données
+function getClientLabel(r) {
+  if (r?.clientName && r.clientName.trim()) return r.clientName.trim();
+  const prenom = r?.client?.prenom || r?.client?.firstName || "";
+  const nom = r?.client?.nom || r?.client?.lastName || "";
+  const full = `${prenom} ${nom}`.trim();
+  if (full) return full;
+  if (typeof r?.client === "string" && r.client.trim()) return r.client.trim();
+  return "";
+}
+
 /* ---------------------------- Component ---------------------------- */
 export default function DemandeDevisList({ type = "all", query = "" }) {
   // i18n namespaces (clés à créer sous auth.admin.demandsListPage)
@@ -126,12 +137,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const typeBadgeClass = (v) =>
     cn(
       "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
-      v === "compression" ,
-      v === "traction" ,
-      v === "torsion" ,
-      v === "fil" ,
-      v === "grille",
-      (!v || v === "autre") 
+      v === "compression" && "bg-amber-50 text-amber-800 ring-1 ring-amber-200",
+      v === "traction" && "bg-blue-50 text-blue-800 ring-1 ring-blue-200",
+      v === "torsion" && "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200",
+      v === "fil" && "bg-fuchsia-50 text-fuchsia-800 ring-1 ring-fuchsia-200",
+      v === "grille" && "bg-cyan-50 text-cyan-800 ring-1 ring-cyan-200",
+      (!v || v === "autre") && "bg-slate-50 text-slate-800 ring-1 ring-slate-200"
     );
 
   return (
@@ -209,71 +220,78 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((r) => (
-                      <tr
-                        key={r.demandeNumero ?? `${r.type}-${r._id}`}
-                        className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors"
-                      >
-                        <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
-                            <span className="font-mono">{r.demandeNumero || dash}</span>
-                          </div>
-                        </td>
+                    {rows.map((r) => {
+                      const clientLabel = getClientLabel(r);
+                      return (
+                        <tr
+                          key={r.demandeNumero ?? `${r.type}-${r._id}`}
+                          className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors"
+                        >
+                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
+                              <span className="font-mono">{r.demandeNumero || dash}</span>
+                            </div>
+                          </td>
 
-                        <td className="p-2.5 border-b border-gray-200">
-                          <span className={typeBadgeClass(r.type)}>{typeLabel(r.type)}</span>
-                        </td>
+                          <td className="p-2.5 border-b border-gray-200">
+                            <span className={typeBadgeClass(r.type)}>{typeLabel(r.type)}</span>
+                          </td>
 
-                        <td className="p-2.5 border-b border-gray-200">
-                          <span className="block truncate max-w-[18rem]" title={r.client || ""}>
-                            {r.client || dash}
-                          </span>
-                        </td>
-
-                        <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                          {formatDate(r.date)}
-                        </td>
-
-                        {/* PDF DDV */}
-                        <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                          {r.ddvPdf ? (
-                            <a
-                              href={r.ddvPdf}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                              aria-label={t("actions.open")}
-                              title={t("actions.open")}
+                          {/* 🔹 Client (nom + prénom corrects) */}
+                          <td className="p-2.5 border-b border-gray-200">
+                            <span
+                              className="block truncate max-w-[18rem]"
+                              title={clientLabel || ""}
                             >
-                              <FiFileText size={16} />
-                              {t("actions.open")}
-                            </a>
-                          ) : (
-                            <span className="text-gray-400">{dash}</span>
-                          )}
-                        </td>
+                              {clientLabel || dash}
+                            </span>
+                          </td>
 
-                        {/* PDF (devis) */}
-                        <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                          {r.devisPdf ? (
-                            <a
-                              href={r.devisPdf}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                              aria-label={t("actions.open")}
-                              title={t("actions.open")}
-                            >
-                              <FiFileText size={16} />
-                              {t("actions.open")}
-                            </a>
-                          ) : (
-                            <span className="text-gray-400">{dash}</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                            {formatDate(r.date)}
+                          </td>
+
+                          {/* PDF DDV */}
+                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                            {r.ddvPdf ? (
+                              <a
+                                href={r.ddvPdf}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                                aria-label={t("actions.open")}
+                                title={t("actions.open")}
+                              >
+                                <FiFileText size={16} />
+                                {t("actions.open")}
+                              </a>
+                            ) : (
+                              <span className="text-gray-400">{dash}</span>
+                            )}
+                          </td>
+
+                          {/* PDF (devis) */}
+                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
+                            {r.devisPdf ? (
+                              <a
+                                href={r.devisPdf}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                                aria-label={t("actions.open")}
+                                title={t("actions.open")}
+                              >
+                                <FiFileText size={16} />
+                                {t("actions.open")}
+                              </a>
+                            ) : (
+                              <span className="text-gray-400">{dash}</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -295,47 +313,50 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 
             {/* LISTE < md */}
             <div className="md:hidden divide-y divide-gray-200">
-              {rows.map((r) => (
-                <div key={r.demandeNumero ?? `${r.type}-${r._id}`} className="py-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
-                      <span className="font-mono">{r.demandeNumero || dash}</span>
+              {rows.map((r) => {
+                const clientLabel = getClientLabel(r);
+                return (
+                  <div key={r.demandeNumero ?? `${r.type}-${r._id}`} className="py-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
+                        <span className="font-mono">{r.demandeNumero || dash}</span>
+                      </div>
+
+                      {(r.ddvPdf || r.devisPdf) ? (
+                        <a
+                          href={r.ddvPdf || r.devisPdf}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                          aria-label={t("actions.open")}
+                          title={t("actions.open")}
+                        >
+                          <FiFileText size={16} />
+                          {t("actions.open")}
+                        </a>
+                      ) : (
+                        <span className="text-gray-400 text-sm">{dash}</span>
+                      )}
                     </div>
 
-                    {(r.ddvPdf || r.devisPdf) ? (
-                      <a
-                        href={r.ddvPdf || r.devisPdf}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                        aria-label={t("actions.open")}
-                        title={t("actions.open")}
-                      >
-                        <FiFileText size={16} />
-                        {t("actions.open")}
-                      </a>
-                    ) : (
-                      <span className="text-gray-400 text-sm">{dash}</span>
-                    )}
-                  </div>
-
-                  <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.type")}</p>
-                      <p className="truncate capitalize">{typeLabel(r.type)}</p>
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.date")}</p>
-                      <p className="truncate">{formatDate(r.date)}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.client")}</p>
-                      <p className="truncate">{r.client || dash}</p>
+                    <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.type")}</p>
+                        <p className="truncate capitalize">{typeLabel(r.type)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.date")}</p>
+                        <p className="truncate">{formatDate(r.date)}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.client")}</p>
+                        <p className="truncate" title={clientLabel || ""}>{clientLabel || dash}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
 
               <Pagination
                 page={page}
