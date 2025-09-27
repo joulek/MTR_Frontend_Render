@@ -53,11 +53,11 @@ function getClientLabel(r) {
 }
 
 // 🔗 liens PDFs
-const ddvHref = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
+const ddvHref   = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
 const devisHref = (r) => (r.devisNumero ? `${BACKEND}/files/devis/${r.devisNumero}.pdf` : null);
 
-// 🔗 lien fichier joint par index
-const attachmentHref = (r, idx) => `${API}/devis/${r.type}/${r._id}/documents/${idx}`;
+// 🔗 lien fichier joint PAR INDEX  ✅ (route correcte: document (singulier))
+const attachmentHref = (r, idx) => `${BACKEND}/api/devis/${r.type}/${r._id}/document/${idx}`;
 
 /* ---------------------------- Component ---------------------------- */
 export default function DemandeDevisList({ type = "all", query = "" }) {
@@ -125,7 +125,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
       compression: tTypes("compression"),
       traction: tTypes("traction"),
       torsion: tTypes("torsion"),
-      fil: tTypes("fill"),
+      fil: tTypes("fill"), // clé i18n existante "fill" pour "fil"
       grille: tTypes("grille"),
       autre: tTypes("autre"),
     };
