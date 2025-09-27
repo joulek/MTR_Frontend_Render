@@ -4,25 +4,25 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
-// ---- Listes devis ----
+// ---- Listes par type (garde tes imports existants) ----
 import DevisCompressionList from "@/components/admin/devis/DevisCompressionList";
 import DevisTractionList from "@/components/admin/devis/DevisTractionList";
 import DevisTorsionList from "@/components/admin/devis/DevisTorsionList";
 import DevisAutreList from "@/components/admin/devis/DevisAutreList";
 import DevisFillList from "@/components/admin/devis/DevisFillList";
 import DevisGrilleList from "@/components/admin/devis/DevisGrilleList";
-// import DevisAllList from "@/components/admin/devis/DevisAllList"; // si tu en as une
-
-// ---- Nouvelle liste demandes ----
-import DemandeDevisList from "@/components/admin/devis/DemandeDevisList";
+import DemandeDevisList from "../../../../components/admin/devis/DemandeDevisList";
+// Si tu as une liste globale, décommente cette ligne et utilise-la pour "all"
+// import DevisAllList from "@/components/admin/devis/DevisAllList";
 
 export default function AdminDevisSelector() {
   const t = useTranslations("auth.admin.devisAdmin");
 
-  const [type, setType] = useState("all");
+  // ----- État UI -----
+  const [type, setType] = useState("all"); // "all" = Tous les types
   const [query, setQuery] = useState("");
-  const [mode, setMode] = useState("devis"); // "devis" | "demandes"
 
+  // ----- Libellés (fallback si la clé i18n n'existe pas) -----
   const tl = (k) =>
     t.has(`types.${k}`)
       ? t(`types.${k}`)
@@ -36,6 +36,7 @@ export default function AdminDevisSelector() {
           all: "Tous les types",
         }[k];
 
+  // ----- Options du <select> -----
   const TYPE_OPTIONS = useMemo(
     () => [
       { key: "all", label: tl("all") },
@@ -46,21 +47,16 @@ export default function AdminDevisSelector() {
       { key: "grille", label: tl("grille") },
       { key: "autre", label: tl("autre") },
     ],
+    // tl() est stable ici; si tu relies aux traductions dynamiques, enlève ce mémo.
     []
   );
 
+  // ----- Rendu de la liste selon "type" -----
   const renderPage = () => {
     const passedProps = { type, query };
 
-    if (mode === "demandes") {
-      return <DemandeDevisList {...passedProps} />;
-    }
-
-    // mode = devis
-    if (type === "all") {
-      return <DevisCompressionList {...passedProps} />;
-      // ou <DevisAllList {...passedProps} /> si tu as une liste globale
-    }
+    // Si tu as une page "tous les devis", remplace par: return <DevisAllList {...passedProps} />
+    if (type === "all") return <DemandeDevisList {...passedProps} />;
 
     switch (type) {
       case "compression":
@@ -83,35 +79,12 @@ export default function AdminDevisSelector() {
   return (
     <div className="p-6">
       <h1 className="mb-6 sm:mb-8 text-3xl font-extrabold tracking-tight text-[#002147] text-center">
-        {t.has("title") ? t("title") : "Administration devis / demandes"}
+        {t.has("title") ? t("title") : "Liste des devis"}
       </h1>
-
-      {/* Toggle entre Devis et Demandes */}
-      <div className="flex gap-3 mb-6 justify-center">
-        <button
-          onClick={() => setMode("devis")}
-          className={`px-4 py-2 rounded-lg font-semibold ${
-            mode === "devis"
-              ? "bg-yellow-500 text-white"
-              : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Devis
-        </button>
-        <button
-          onClick={() => setMode("demandes")}
-          className={`px-4 py-2 rounded-lg font-semibold ${
-            mode === "demandes"
-              ? "bg-yellow-500 text-white"
-              : "bg-gray-200 text-gray-700"
-          }`}
-        >
-          Demandes de devis
-        </button>
-      </div>
 
       {/* Barre d’actions : Select + Recherche */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6">
+        {/* Select types */}
         <div className="relative w-full sm:w-[260px]">
           <select
             value={type}
@@ -130,21 +103,19 @@ export default function AdminDevisSelector() {
           </span>
         </div>
 
+        {/* Champ de recherche */}
         <div className="relative flex-1">
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={
-              mode === "demandes"
-                ? "Rechercher : demande, client, type, date…"
-                : "Rechercher : devis, demande, client, type, date…"
-            }
+            placeholder="Rechercher : devis, demande, client, type, date…"
             className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-4 pr-4 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200"
             aria-label="Recherche"
           />
         </div>
       </div>
 
+      {/* Contenu */}
       <div className="bg-white rounded-lg shadow p-6">{renderPage()}</div>
     </div>
   );
