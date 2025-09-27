@@ -223,38 +223,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         </div>
       ) : null}
 
-      {/* Pagination */}
-      <div className="flex items-center justify-between gap-3">
-        <button
-          onClick={onPrev}
-          disabled={state.loading || page <= 1}
-          className={cn(
-            "rounded-md px-4 py-2 text-sm font-semibold",
-            page > 1 && !state.loading
-              ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed"
-          )}
-        >
-          Précédent
-        </button>
-
-        <div className="text-sm text-gray-600">
-          Page <span className="font-semibold">{page}</span> / {totalPages}
-        </div>
-
-        <button
-          onClick={onNext}
-          disabled={state.loading || page >= totalPages}
-          className={cn(
-            "rounded-md px-4 py-2 text-sm font-semibold",
-            page < totalPages && !state.loading
-              ? "bg-gray-200 text-gray-800 hover:bg-gray-300"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed"
-          )}
-        >
-          Suivant
-        </button>
-      </div>
+     
     </div>
   );
 }
