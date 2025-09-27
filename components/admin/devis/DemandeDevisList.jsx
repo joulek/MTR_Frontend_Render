@@ -55,7 +55,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   );
 
   useEffect(() => {
-    // si l'utilisateur change type ou query, نرجعو للصفحة 1
     setPage(1);
   }, [type, qDebounced]);
 
@@ -72,12 +71,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           limit: String(limit),
         });
 
-        const res = await fetch(
-          `${API}/devis/demandes/compact?` + params.toString(),
-          {
-            // credentials: "include",
-          }
-        );
+        const res = await fetch(`${API}/devis/demandes/compact?` + params.toString());
 
         if (!res.ok) {
           const txt = await res.text();
@@ -133,7 +127,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           </thead>
           <tbody className="divide-y divide-gray-100 text-sm">
             {state.loading && rows.length === 0 ? (
-              // Skeleton rows
               Array.from({ length: Math.min(5, limit) }).map((_, i) => (
                 <tr key={`sk-${i}`} className="animate-pulse">
                   <td className="px-4 py-3">
@@ -158,16 +151,13 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
               ))
             ) : rows.length === 0 ? (
               <tr>
-                <td
-                  colSpan={6}
-                  className="px-4 py-10 text-center text-gray-500"
-                >
+                <td colSpan={6} className="px-4 py-10 text-center text-gray-500">
                   Aucun résultat
                 </td>
               </tr>
             ) : (
               rows.map((r) => (
-                <tr key={r.demandeNumero} className="hover:bg-yellow-50/40">
+                <tr key={r.demandeNumero ?? `${r.type}-${r._id}`} className="hover:bg-yellow-50/40">
                   <td className="px-4 py-3 font-medium text-[#0B1E3A]">
                     {r.demandeNumero || "-"}
                   </td>
@@ -176,10 +166,8 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       className={cn(
                         "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
                         r.type === "compression" && "bg-blue-100 text-blue-800",
-                        r.type === "traction" &&
-                          "bg-emerald-100 text-emerald-800",
-                        r.type === "torsion" &&
-                          "bg-fuchsia-100 text-fuchsia-800",
+                        r.type === "traction" && "bg-emerald-100 text-emerald-800",
+                        r.type === "torsion" && "bg-fuchsia-100 text-fuchsia-800",
                         r.type === "fil" && "bg-amber-100 text-amber-800",
                         r.type === "grille" && "bg-cyan-100 text-cyan-800",
                         r.type === "autre" && "bg-gray-200 text-gray-800"
@@ -189,14 +177,21 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                     </span>
                   </td>
                   <td className="px-4 py-3">{r.client || "-"}</td>
-                  <td className="px-4 py-3 text-gray-600">
-                    {formatDate(r.date)}
-                  </td>
+                  <td className="px-4 py-3 text-gray-600">{formatDate(r.date)}</td>
                   <td className="px-4 py-3">
                     {r.devisNumero || <span className="text-gray-400">—</span>}
                   </td>
                   <td className="px-4 py-3">
-                    {r.devisPdf ? (
+                    {r.ddvPdf ? (
+                      <a
+                        href={r.ddvPdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-yellow-700 hover:text-yellow-900 underline underline-offset-2"
+                      >
+                        Ouvrir
+                      </a>
+                    ) : r.devisPdf ? (
                       <a
                         href={r.devisPdf}
                         target="_blank"
@@ -222,8 +217,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           {state.error}
         </div>
       ) : null}
-
-     
     </div>
   );
 }
