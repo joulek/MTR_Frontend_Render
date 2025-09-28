@@ -234,7 +234,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
                       {/* ✅ Une seule colonne pour les pièces jointes */}
-                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.attachments")}</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
                     </tr>
                   </thead>
                   <tbody>

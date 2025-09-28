@@ -89,7 +89,7 @@
           "call": {
             "title": "Appel direct",
             "line1": "+216 98 333 896",
-            "line2": "Lun–Ven, 8h–17h Sam : 8h – 14 h" ,
+            "line2": "Lun–Ven, 8h–17h Sam : 8h – 14 h",
             "cta": "Appeler",
             "href": "tel:+21600000000"
           },
@@ -230,7 +230,7 @@
         "about": "À propos",
         "helpdesk": "Help Desk",
         "presentation": "Présentation",
-         "contact": "Contact"
+        "contact": "Contact"
       },
       "nav": {
         "home": "Accueil",
@@ -737,8 +737,9 @@
       }
     },
     "admin": {
-    "demandsListPage": {
+      "demandsListPage": {
         "title": "Gestion des demandes devis",
+        "createDevis": "Créer Devis (Sélection)",
         "search": {
           "placeholder": "Rechercher : devis, demande, client, type, date…",
           "aria": "Rechercher une demande",
@@ -754,8 +755,12 @@
             "pdf": "Fichiers joints"
           }
         },
-        "actions": { "open": "Ouvrir" },
-        "messages": { "noData": "Aucune demande de devis" }
+        "actions": {
+          "open": "Ouvrir"
+        },
+        "messages": {
+          "noData": "Aucune demande de devis"
+        }
       },
       "devisAdmin": {
         "title": "Gestion des demandes devis",

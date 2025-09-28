@@ -408,6 +408,7 @@
     "admin": {
       "demandsListPage": {
         "title": "Quote requests management",
+        "createDevis": "Create Quote",
         "search": {
           "placeholder": "Search: quote, request, client, type, date…",
           "aria": "Search requests",
