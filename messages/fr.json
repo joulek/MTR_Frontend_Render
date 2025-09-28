@@ -242,7 +242,7 @@
       "client": {
         "claim": "Réclamation",
         "myServices": "Mes services",
-        "myQuotes": "Mes demandes devis",
+        "myQuotes": "Devis",
         "myClaims": "Mes réclamations",
         "askQuote": "Demander un devis"
       },

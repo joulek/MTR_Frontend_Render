@@ -857,7 +857,7 @@
       "services": {
         "menu": "My Services",
         "orders": "My Orders",
-        "quotes": "My Quote Requests",
+        "quotes": "Quotes",
         "claims": "My Claims"
       },
       "quoteRequest": "Request a Quote",
