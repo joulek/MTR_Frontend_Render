@@ -738,7 +738,7 @@
     },
     "admin": {
       "demandsListPage": {
-        "title": "Gestion des demandes devis",
+        "title": "Tous les demandes de devis",
         "createDevis": "Créer Devis (Sélection)",
         "search": {
           "placeholder": "Rechercher : devis, demande, client, type, date…",
