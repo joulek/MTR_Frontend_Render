@@ -51,7 +51,7 @@ function getClientLabel(r) {
 }
 
 // 🔗 liens PDFs
-const ddvHref   = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
+const ddvHref = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
 const devisHref = (r) => (r.devisNumero ? `${BACKEND}/files/devis/${r.devisNumero}.pdf` : null);
 
 // 🔗 lien fichier joint PAR INDEX
@@ -195,6 +195,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
               {t("createDevis", { default: "Créer devis" })}
             </button>
           </div>
+
         </div>
 
         {error && (
