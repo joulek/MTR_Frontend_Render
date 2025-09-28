@@ -407,9 +407,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <Link href={`/${locale}/client/mes-devis`} className={itemCls}>
           {t("client.myQuotes")}
         </Link>
-        <Link href={`/${locale}/client/mes-reclamations`} className={itemCls}>
-          {t("client.myClaims")}
-        </Link>
+      
         <Link href={`/${locale}/client/devis`} className={itemCls}>
           {t("client.askQuote")}
         </Link>
