@@ -160,15 +160,20 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
             {t("title")}
           </h1>
 
+          {/* Barre de recherche réduite (mêmes proportions que “Liste des devis”) */}
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
-            <div className="relative w-full sm:w-[320px] lg:w-[420px]">
-              <FiSearch aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <div className="relative w-full sm:w-[260px] md:w-[320px] lg:w-[360px]">
+              <FiSearch
+                aria-hidden
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 value={q}
                 onChange={(e) => { setQ(e.target.value); setPage(1); }}
                 placeholder={t("search.placeholder")}
                 aria-label={t("search.aria")}
-                className="w-full rounded-xl border border-gray-300 bg-white px-10 pr-9 py-2 text-sm text-[#0B1E3A] shadow focus:border-[#F7C600] focus:ring-2 focus:ring-[#F7C600]/30 outline-none transition"
+                className="w-full h-10 rounded-xl border border-gray-300 bg-white pl-10 pr-9 text-sm text-[#0B1E3A] shadow focus:border-[#F7C600] focus:ring-2 focus:ring-[#F7C600]/30 outline-none transition"
               />
               {q && (
                 <button
@@ -233,8 +238,9 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       <th className="p-2.5 text-left">{t("table.headers.client")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
-                      {/* ✅ Une seule colonne pour les pièces jointes */}
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
+                      {/* ✅ Une seule colonne pour les pièces jointes */}
+                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.attachments")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -311,7 +317,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             )}
                           </td>
 
-                          {/* ✅ Fichiers joints (une seule colonne) */}
+                          {/* ✅ Pièces jointes (1 = ouverture directe, >1 = menu) */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             {hasDocs ? (
                               count === 1 ? (
@@ -428,7 +434,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                         <p className="truncate" title={clientLabel || ""}>{clientLabel || dash}</p>
                       </div>
 
-                      {/* ✅ Fichiers joints (mobile, une seule section) */}
+                      {/* ✅ Pièces jointes (mobile, section unique) */}
                       <div className="col-span-2">
                         <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.attachments")}</p>
                         {hasDocs ? (
