@@ -187,7 +187,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
               onClick={openMultiFromSelection}
               className="inline-flex items-center justify-center rounded-xl bg-[#F7C600] text-[#0B1E3A] px-4 py-2 font-semibold shadow disabled:opacity-50"
             >
-              {t("actions.createDevis", { default: "Créer devis" })}
+              {t("createDevis", { default: "Créer devis" })}
             </button>
           </div>
         </div>
