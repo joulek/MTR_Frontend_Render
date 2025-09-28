@@ -3,7 +3,7 @@ import ClientProfileReadOnly from "./ClientProfileReadOnly";
 import { getTranslations } from "next-intl/server";
 import Script from "next/script";
 
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000").replace(/\/$/, "");
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ).replace(/\/$/, "");
 
 export async function generateMetadata(props) {
   // ✅ Next 15 : params est une Promise
