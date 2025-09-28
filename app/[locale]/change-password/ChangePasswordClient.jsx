@@ -7,7 +7,26 @@ import Image from "next/image";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import SiteHeader from "@/components/SiteHeader";
 
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
+/* ---------- Safe BACKEND (évite .replace sur undefined) ---------- */
+const RAW_BACKEND =
+  (process.env.NEXT_PUBLIC_BACKEND_URL && String(process.env.NEXT_PUBLIC_BACKEND_URL)) ||
+  "https://mtr-backend-render.onrender.com";
+const BACKEND = RAW_BACKEND.replace(/\/+$/, ""); // RAW_BACKEND est toujours une string ici
+
+/* ---------- Petit helper: rendre toute URL absolue et non-localhost ---------- */
+function absolutize(url) {
+  if (!url) return "";
+  try {
+    const u = new URL(url); // absolue ?
+    if (/^(localhost|127\.0\.0\.1)(:|$)/i.test(u.host)) {
+      return url.replace(/^https?:\/\/[^/]+/, BACKEND);
+    }
+    return url;
+  } catch {
+    // relative
+    return url.startsWith("/") ? BACKEND + url : `${BACKEND}/${url.replace(/^\/+/, "")}`;
+  }
+}
 
 export default function ChangePasswordClient() {
   const t = useTranslations("auth");
@@ -24,7 +43,9 @@ export default function ChangePasswordClient() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setOk(""); setErr(""); setLoading(true);
+    setOk("");
+    setErr("");
+    setLoading(true);
     try {
       const res = await fetch(`${BACKEND}/api/users/change-password`, {
         method: "POST",
@@ -35,7 +56,8 @@ export default function ChangePasswordClient() {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.message || t("errors.changePassword") || "Échec de la modification.");
       setOk(t("passwordChanged") || "Mot de passe modifié.");
-      setCurrentPassword(""); setNewPassword("");
+      setCurrentPassword("");
+      setNewPassword("");
       setTimeout(() => router.push(`/${locale}/login`), 1200);
     } catch (e) {
       setErr(e?.message || t("errors.network") || "Erreur réseau.");
@@ -52,7 +74,14 @@ export default function ChangePasswordClient() {
           <div className="w-[520px] max-w-[92vw] min-h-[440px] rounded-2xl shadow-2xl border border-[#ffb400]/50 bg-white p-8 relative">
             <div className="flex justify-center -mt-14 mb-4 pointer-events-none">
               <div className="bg-white rounded-full shadow-lg p-3 border border-[#ffb400]/60">
-                <Image src="/reset_password.png" alt="Modifier le mot de passe" width={80} height={80} className="object-contain" priority />
+                <Image
+                  src="/reset_password.png"
+                  alt="Modifier le mot de passe"
+                  width={80}
+                  height={80}
+                  className="object-contain"
+                  priority
+                />
               </div>
             </div>
 
@@ -78,7 +107,12 @@ export default function ChangePasswordClient() {
                     placeholder={t("placeholders.password") || "Votre mot de passe"}
                     autoComplete="current-password"
                   />
-                  <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#002147]" aria-label={showCurrent ? "Masquer" : "Afficher"}>
+                  <button
+                    type="button"
+                    onClick={() => setShowCurrent(!showCurrent)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#002147]"
+                    aria-label={showCurrent ? "Masquer" : "Afficher"}
+                  >
                     {showCurrent ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
@@ -98,7 +132,12 @@ export default function ChangePasswordClient() {
                     placeholder={t("placeholders.password") || "Choisissez un mot de passe"}
                     autoComplete="new-password"
                   />
-                  <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#002147]" aria-label={showNew ? "Masquer" : "Afficher"}>
+                  <button
+                    type="button"
+                    onClick={() => setShowNew(!showNew)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#002147]"
+                    aria-label={showNew ? "Masquer" : "Afficher"}
+                  >
                     {showNew ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
@@ -107,8 +146,13 @@ export default function ChangePasswordClient() {
               {ok && <p className="text-green-600 text-sm font-semibold">{ok}</p>}
               {err && <p className="text-red-600 text-sm font-semibold">{err}</p>}
 
-              <button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-[#002147] hover:bg-[#00366b] text-white font-bold disabled:opacity-60" style={{ fontFamily: "'Lora', serif" }}>
-                {loading ? (t("loading") || "Chargement…") : (t("confirmChange") || "Confirmer")}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full h-12 rounded-xl bg-[#002147] hover:bg-[#00366b] text-white font-bold disabled:opacity-60"
+                style={{ fontFamily: "'Lora', serif" }}
+              >
+                {loading ? t("loading") || "Chargement…" : t("confirmChange") || "Confirmer"}
               </button>
             </form>
           </div>
