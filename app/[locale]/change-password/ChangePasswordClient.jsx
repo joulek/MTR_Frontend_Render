@@ -7,24 +7,36 @@ import Image from "next/image";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import SiteHeader from "@/components/SiteHeader";
 
-/* ---------- Safe BACKEND (évite .replace sur undefined) ---------- */
-const RAW_BACKEND =
-  (process.env.NEXT_PUBLIC_BACKEND_URL && String(process.env.NEXT_PUBLIC_BACKEND_URL)) ||
-  "https://mtr-backend-render.onrender.com";
-const BACKEND = RAW_BACKEND.replace(/\/+$/, ""); // RAW_BACKEND est toujours une string ici
-
-/* ---------- Petit helper: rendre toute URL absolue et non-localhost ---------- */
+/* -------------------- Helpers sans .replace -------------------- */
+function stripEndSlashes(s) {
+  let x = String(s ?? "");
+  while (x.endsWith("/")) x = x.slice(0, -1);
+  return x;
+}
+// lazy getter: يتفادى التقييم أثناء bundling ويضمن string دايمًا
+function backend() {
+  const env = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const base = env ? String(env) : "https://mtr-backend-render.onrender.com";
+  return stripEndSlashes(base);
+}
+function lstripSlashes(s) {
+  let i = 0;
+  while (s[i] === "/") i++;
+  return s.slice(i);
+}
+/** يحوّل أي URL (relative/localhost) إلى URL مطلق على الدومين متاع الـ backend */
 function absolutize(url) {
   if (!url) return "";
   try {
-    const u = new URL(url); // absolue ?
-    if (/^(localhost|127\.0\.0\.1)(:|$)/i.test(u.host)) {
-      return url.replace(/^https?:\/\/[^/]+/, BACKEND);
+    const u = new URL(url);
+    // لو host محلي، نركّب URL على backend()
+    if (u.hostname === "localhost" || u.hostname === "127.0.0.1") {
+      return backend() + u.pathname + u.search + u.hash;
     }
-    return url;
+    return url; // already absolute + non-localhost
   } catch {
     // relative
-    return url.startsWith("/") ? BACKEND + url : `${BACKEND}/${url.replace(/^\/+/, "")}`;
+    return url.startsWith("/") ? backend() + url : backend() + "/" + lstripSlashes(url);
   }
 }
 
@@ -47,14 +59,16 @@ export default function ChangePasswordClient() {
     setErr("");
     setLoading(true);
     try {
-      const res = await fetch(`${BACKEND}/api/users/change-password`, {
+      const res = await fetch(`${backend()}/api/users/change-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.message || t("errors.changePassword") || "Échec de la modification.");
+      if (!res.ok) {
+        throw new Error(data?.message || t("errors.changePassword") || "Échec de la modification.");
+      }
       setOk(t("passwordChanged") || "Mot de passe modifié.");
       setCurrentPassword("");
       setNewPassword("");
@@ -85,7 +99,10 @@ export default function ChangePasswordClient() {
               </div>
             </div>
 
-            <h1 className="text-2xl font-extrabold text-[#002147] text-center" style={{ fontFamily: "'Lora', serif" }}>
+            <h1
+              className="text-2xl font-extrabold text-[#002147] text-center"
+              style={{ fontFamily: "'Lora', serif" }}
+            >
               {t("changePasswordTitle") || "Modifier mon mot de passe"}
             </h1>
             <p className="text-sm text-gray-600 mt-2 text-center">
