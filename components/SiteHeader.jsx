@@ -16,16 +16,7 @@ const inter = Inter({
 });
 
 /* ---------------------------- API backend ---------------------------- */
-function stripEndSlashes(s) {
-  let x = String(s ?? "");
-  while (x.endsWith("/")) x = x.slice(0, -1);
-  return x;
-}
-
-const BACKEND = stripEndSlashes(
-  process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com"
-);
-
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://mtr-backend-render.onrender.com").replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
 /* --------------------------- Helpers --------------------------- */
