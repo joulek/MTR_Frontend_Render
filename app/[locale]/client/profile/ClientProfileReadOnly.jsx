@@ -156,12 +156,7 @@ export default function ClientProfileReadOnly() {
                 hint={t("shortcuts.homeHint")}
                 onClick={() => router.push(`/${locale}/`)}
               />
-              <Row
-                icon={<MessageSquareWarning className="w-5 h-5 text-[#FDC500]" />}
-                label={t("shortcuts.claims", { defaultMessage: "Mes réclamations" })}
-                hint={t("shortcuts.claimsHint", { defaultMessage: "Soumettre et suivre vos réclamations" })}
-                onClick={() => router.push(`/${locale}/client/mes-reclamations`)}
-              />
+           
               <Row
                 icon={<HelpCircle className="w-5 h-5 text-[#FDC500]" />}
                 label={t("shortcuts.help")}

@@ -431,9 +431,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               <Link href={`/${locale}/client/mes-devis`} role="menuitem" className="block px-4 py-2 text-[16px] text-slate-700 hover:bg-slate-50">
                 {t("client.myQuotes")}
               </Link>
-              <Link href={`/${locale}/client/mes-reclamations`} role="menuitem" className="block px-4 py-2 text-[16px] text-slate-700 hover:bg-slate-50">
-                {t("client.myClaims")}
-              </Link>
+            
             </div>
           )}
         </div>
@@ -457,13 +455,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         >
           {t("client.myQuotes")}
         </Link>
-        <Link
-          href={`/${locale}/client/mes-reclamations`}
-          className="px-3 py-2 rounded hover:bg-slate-50 text-[16px]"
-          onClick={() => setOpen(false)}
-        >
-          {t("client.myClaims")}
-        </Link>
+        
       </div>
     </details>
   );
