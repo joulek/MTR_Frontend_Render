@@ -89,7 +89,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch { }
+    } catch {}
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -130,7 +130,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch { }
+            } catch {}
             setHintRole(json.role);
           }
         } else {
@@ -138,14 +138,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch { }
+          } catch {}
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch { }
+        } catch {}
       }
     })();
     return () => {
@@ -212,20 +212,18 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     };
   }, []);
 
-  /* scroll vers sections — utilise un hash pour fiabiliser la navigation */
+  /* scroll vers sections */
   const [open, setOpen] = useState(false);
   const goToSection = useCallback(
     async (id, closeMenu) => {
       const hashUrl = `${homeHref}#${id}`;
 
-      // Si on n'est PAS sur la home → on navigue vers /{locale}#{id} (le navigateur scrolle quand la page est prête)
       if (!homePaths.includes(pathname)) {
         router.push(hashUrl, { scroll: true });
         if (closeMenu) setOpen(false);
         return;
       }
 
-      // Si on est déjà sur la home → scroll direct si l’élément existe, sinon on met le hash (le navigateur gèrera)
       const el = typeof document !== "undefined" ? document.getElementById(id) : null;
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -244,7 +242,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch { }
+      } catch {}
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -333,10 +331,11 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
-                        ? "bg-[#F5B301] text-[#0B2239]"
-                        : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
+                        active
+                          ? "bg-[#F5B301] text-[#0B2239]"
+                          : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                      }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -520,18 +519,15 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   async function handleLogout() {
     try {
       await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch { } finally {
+    } catch {} finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch { }
+      } catch {}
       window.location.replace(`/${locale}`);
     }
   }
-
-
-
 
   /* ======================= RENDER ======================= */
   return (
@@ -599,17 +595,17 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       {/* ========= barre principale ========= */}
       <div className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-screen-2xl px-6">
-          {/* rangée relative pour pouvoir centrer/élever اللوجو */}
+          {/* rangée relative pour pouvoir centrer/élever le logo */}
           <div className="flex items-center justify-between h-20 md:h-24 relative">
-            {/* LOGO — centré و مرفوع شوية في الموبايل */}
+            {/* LOGO — centré en mobile, un peu à droite en desktop */}
             <Link
               href={homeHref}
               aria-label={t("logoAlt")}
               className="
- flex items-center justify-center
- absolute left-[90%] -translate-x-1/2 top-3   /* +2% vers la droite et top-2 = descendu */
- md:static md:translate-x-0 md:left-auto md:top-auto md:ml-8 /* desktop un peu plus à droite */
- "
+                flex items-center justify-center
+                absolute left-1/2 -translate-x-1/2 top-4
+                md:static md:translate-x-0 md:left-auto md:top-auto md:ml-8
+              "
             >
               <Image
                 src="/logo_MTR.png"
@@ -647,7 +643,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               {isLoggedClient && <ClientNavItemsDesktop />}
             </nav>
 
-            {/* actions droite + burger (burger فوق اللوجو) */}
+            {/* actions droite + burger */}
             <div className="flex items-center gap-3">
               {isLoggedClient ? (
                 <UserMenu />
