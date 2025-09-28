@@ -21,11 +21,9 @@ function stripEndSlashes(s) {
   while (x.endsWith("/")) x = x.slice(0, -1);
   return x;
 }
-
 const BACKEND = stripEndSlashes(
   process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com"
 );
-
 const API = `${BACKEND}/api`;
 
 /* --------------------------- Helpers --------------------------- */
@@ -98,7 +96,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch { }
+    } catch {}
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -127,11 +125,16 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       return null;
     }
   });
+
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        const r = await fetch(`${API}/users/me`, { credentials: "include", cache: "no-store" });
+        // important: no-store pour éviter le cache sur l’état d’auth
+        const r = await fetch(`${API}/users/me`, {
+          credentials: "include",
+          cache: "no-store",
+        });
         if (!alive) return;
         if (r.ok) {
           const json = await r.json();
@@ -139,7 +142,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch { }
+            } catch {}
             setHintRole(json.role);
           }
         } else {
@@ -147,19 +150,31 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch { }
+          } catch {}
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch { }
+        } catch {}
       }
     })();
     return () => {
       alive = false;
     };
+  }, []);
+
+  // Empêcher l'effet "page précédente affichée depuis le cache" après logout
+  useEffect(() => {
+    // Si la page revient via BFCache, on force un reload
+    const onPageShow = (e) => {
+      if (e.persisted) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener("pageshow", onPageShow);
+    return () => window.removeEventListener("pageshow", onPageShow);
   }, []);
 
   const isLoggedClient = mode === "client" || me?.role === "client";
@@ -251,7 +266,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch { }
+      } catch {}
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -340,10 +355,11 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
-                        ? "bg-[#F5B301] text-[#0B2239]"
-                        : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
+                        active
+                          ? "bg-[#F5B301] text-[#0B2239]"
+                          : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                      }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -416,7 +432,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <Link href={`/${locale}/client/mes-devis`} className={itemCls}>
           {t("client.myQuotes")}
         </Link>
-
         <Link href={`/${locale}/client/devis`} className={itemCls}>
           {t("client.askQuote")}
         </Link>
@@ -483,17 +498,26 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     );
   };
 
+  // ✅ Logout robuste : on invalide côté serveur + on vide le localStorage
+  // puis on redirige avec location.replace() vers /login pour empêcher le "Back" de rouvrir la page précédente.
   async function handleLogout() {
     try {
-      await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch { } finally {
+      await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include", cache: "no-store" });
+    } catch {}
+    try {
+      localStorage.removeItem("mtr_role");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("rememberMe");
+    } catch {}
+    // optionnel : nettoyer d'éventuels caches SW
+    if ("caches" in window) {
       try {
-        localStorage.removeItem("mtr_role");
-        localStorage.removeItem("userRole");
-        localStorage.removeItem("rememberMe");
-      } catch { }
-      window.location.replace(`/${locale}`);
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      } catch {}
     }
+    // 🔒 empêcher le retour sur une page protégée
+    window.location.replace(`/${locale}/login`);
   }
 
   /* ======================= RENDER ======================= */
@@ -583,8 +607,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 className="object-contain w-[110px] h-auto md:w-[140px]"
               />
             </Link>
-
-
 
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
