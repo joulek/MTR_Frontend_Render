@@ -18,9 +18,6 @@ const API = `${BACKEND}/api`;
 const WRAP = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
 const dash = "—";
 
-function cn(...cls) {
-  return cls.filter(Boolean).join(" ");
-}
 function formatDate(d) {
   try {
     const dt = new Date(d);
@@ -57,10 +54,9 @@ function getClientLabel(r) {
 const ddvHref   = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
 const devisHref = (r) => (r.devisNumero ? `${BACKEND}/files/devis/${r.devisNumero}.pdf` : null);
 
-// 🔗 lien fichier joint PAR INDEX  ✅ (route correcte: document (singulier))
+// 🔗 lien fichier joint PAR INDEX
 const attachmentHref = (r, idx) => `${BACKEND}/api/devis/${r.type}/${r._id}/document/${idx}`;
 
-/* ---------------------------- Component ---------------------------- */
 export default function DemandeDevisList({ type = "all", query = "" }) {
   const t = useTranslations("auth.admin.demandsListPage");
   const tTypes = useTranslations("auth.admin.devisAdmin.types");
@@ -74,30 +70,18 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
-  const totalPages = useMemo(() => Math.max(1, Math.ceil(total / pageSize)), [total, pageSize]);
 
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState("");
 
-  // ✅ sélection multiple + modal
+  // sélection multiple + modal
   const [selectedIds, setSelectedIds] = useState([]);
   const [multiOpen, setMultiOpen] = useState(false);
   const [multiDemands, setMultiDemands] = useState([]);
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
-  const showToast = useCallback((text, kind = "info") => {
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    setToast({ text, kind });
-    toastTimer.current = setTimeout(() => setToast(null), 3500);
-  }, []);
   useEffect(() => () => toastTimer.current && clearTimeout(toastTimer.current), []);
-
-  useEffect(() => {
-    setPage(1);
-    // تنظيف الاختيارات عند تغيير الفلتر/البحث
-    setSelectedIds([]);
-  }, [type, qDebounced]);
 
   const load = useCallback(
     async (silent = false) => {
@@ -132,56 +116,40 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
     [type, qDebounced, page, pageSize, rows.length]
   );
 
-  useEffect(() => {
-    load(rows.length > 0);
-  }, [load]);
+  useEffect(() => { setPage(1); setSelectedIds([]); }, [type, qDebounced]);
+  useEffect(() => { load(rows.length > 0); }, [load]);
 
   const typeLabel = (v) => {
     const map = {
       compression: tTypes("compression"),
       traction: tTypes("traction"),
       torsion: tTypes("torsion"),
-      fil: tTypes("fill"), // clé i18n existante "fill" pour "fil"
+      fil: tTypes("fill"),
       grille: tTypes("grille"),
       autre: tTypes("autre"),
     };
     return map[v] ?? (v || dash);
   };
 
-  const typeBadgeClass = (v) =>
-    cn(
-      "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
-      v === "compression" ,
-      v === "traction" ,
-      v === "torsion" ,
-      v === "fil",
-      v === "grille",
-      (!v || v === "autre")
-    );
+  const pageIds = useMemo(() => rows.map((r) => r._id), [rows]);
+  const allOnPageSelected = rows.length > 0 && rows.every((it) => selectedIds.includes(it._id));
 
-  // ✅ ouvrir modal à partir de la sélection
   function openMultiFromSelection() {
     const chosen = rows.filter((r) => selectedIds.includes(r._id));
     if (!chosen.length) return;
 
-    // تأكد كلّهم نفس الclient بالاسم المتوفّر من الـpipeline
     const baseClient = (getClientLabel(chosen[0]) || "").toLowerCase().trim();
     const okSameClient = chosen.every(
       (x) => (getClientLabel(x) || "").toLowerCase().trim() === baseClient
     );
     if (!okSameClient) {
-      showToast("Sélectionne des demandes appartenant au même client.", "warning");
+      setToast({ text: "Sélectionne des demandes appartenant au même client.", kind: "warning" });
+      toastTimer.current = setTimeout(() => setToast(null), 3500);
       return;
     }
-
     setMultiDemands(chosen);
     setMultiOpen(true);
   }
-
-  // ✅ ids متاع الصفحة الحالية (لـ Select All)
-  const pageIds = useMemo(() => rows.map((r) => r._id), [rows]);
-  const allOnPageSelected =
-    rows.length > 0 && rows.every((it) => selectedIds.includes(it._id));
 
   return (
     <div className="py-6 space-y-6">
@@ -192,16 +160,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
             {t("title")}
           </h1>
 
-          {/* Recherche + bouton créer devis */}
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-[320px] lg:w-[420px]">
               <FiSearch aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 value={q}
-                onChange={(e) => {
-                  setQ(e.target.value);
-                  setPage(1);
-                }}
+                onChange={(e) => { setQ(e.target.value); setPage(1); }}
                 placeholder={t("search.placeholder")}
                 aria-label={t("search.aria")}
                 className="w-full rounded-xl border border-gray-300 bg-white px-10 pr-9 py-2 text-sm text-[#0B1E3A] shadow focus:border-[#F7C600] focus:ring-2 focus:ring-[#F7C600]/30 outline-none transition"
@@ -209,10 +173,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
               {q && (
                 <button
                   type="button"
-                  onClick={() => {
-                    setQ("");
-                    setPage(1);
-                  }}
+                  onClick={() => { setQ(""); setPage(1); }}
                   aria-label={t("search.clear")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                 >
@@ -226,7 +187,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
               onClick={openMultiFromSelection}
               className="inline-flex items-center justify-center rounded-xl bg-[#F7C600] text-[#0B1E3A] px-4 py-2 font-semibold shadow disabled:opacity-50"
             >
-              Créer devis
+              {t("actions.createQuote", { default: "Créer devis" })}
             </button>
           </div>
         </div>
@@ -236,7 +197,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         )}
       </div>
 
-      {/* Table responsive */}
+      {/* Table / List */}
       <div className={WRAP}>
         {loading && rows.length === 0 ? (
           <div className="space-y-2 animate-pulse">
@@ -248,13 +209,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           <p className="text-gray-500">{t("messages.noData")}</p>
         ) : (
           <>
-            {/* TABLE >= md */}
+            {/* >= md */}
             <div className="hidden md:block">
               <div className="-mx-4 md:mx-0 overflow-x-auto">
                 <table className="min-w-[980px] w-full table-auto text-[13px] lg:text-sm border-separate border-spacing-0">
                   <thead>
                     <tr>
-                      {/* ✅ Select all */}
                       <th className="p-2.5 text-left w-12">
                         <input
                           type="checkbox"
@@ -268,34 +228,31 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                           }}
                         />
                       </th>
-
                       <th className="p-2.5 text-left">{t("table.headers.demande")}</th>
                       <th className="p-2.5 text-left">{t("table.headers.type")}</th>
                       <th className="p-2.5 text-left">{t("table.headers.client")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
-                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
-                      <th className="p-2.5 text-left whitespace-nowrap">Fichiers joints</th>
+                      {/* ✅ Une seule colonne pour les pièces jointes */}
+                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.attachments")}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((r) => {
                       const clientLabel = getClientLabel(r);
                       const docs = Array.isArray(r.documents) ? r.documents : [];
-                      const hasDocs = docs.length > 0 || Number(r.attachments) > 0;
+                      const count = docs.length > 0 ? docs.length : (Number(r.attachments) || 0);
+                      const hasDocs = count > 0;
 
                       return (
                         <tr key={r._id} className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors">
-                          {/* ✅ checkbox ligne */}
                           <td className="p-2.5 border-b border-gray-200 w-12">
                             <input
                               type="checkbox"
                               checked={selectedIds.includes(r._id)}
                               onChange={(e) =>
                                 setSelectedIds((prev) =>
-                                  e.target.checked
-                                    ? [...prev, r._id]
-                                    : prev.filter((id) => id !== r._id)
+                                  e.target.checked ? [...prev, r._id] : prev.filter((id) => id !== r._id)
                                 )
                               }
                             />
@@ -308,11 +265,8 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             </div>
                           </td>
 
-                          <td className="p-2.5 border-b border-gray-200">
-                            <span className={typeBadgeClass(r.type)}>{typeLabel(r.type)}</span>
-                          </td>
+                          <td className="p-2.5 border-b border-gray-200 capitalize">{typeLabel(r.type)}</td>
 
-                          {/* Client */}
                           <td className="p-2.5 border-b border-gray-200">
                             <span className="block truncate max-w-[18rem]" title={clientLabel || ""}>
                               {clientLabel || dash}
@@ -338,7 +292,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             </a>
                           </td>
 
-                          {/* PDF (devis) */}
+                          {/* PDF devis */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             {devisHref(r) ? (
                               <a
@@ -357,43 +311,43 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             )}
                           </td>
 
-                          {/* Fichiers joints */}
+                          {/* ✅ Fichiers joints (une seule colonne) */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             {hasDocs ? (
-                              <details className="group">
-                                <summary className="cursor-pointer select-none inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50">
-                                  {docs.length > 0 ? `${docs.length} fichier(s)` : `${r.attachments} fichier(s)`}
-                                </summary>
-                                <ul className="mt-2 ml-1 w-max max-w-[28rem] rounded-xl border border-slate-200 bg-white shadow-lg p-2 space-y-1">
-                                  {docs.length > 0
-                                    ? docs.map((d, i) => (
-                                        <li key={i}>
-                                          <a
-                                            href={attachmentHref(r, d.index ?? i)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="block truncate px-2 py-1 text-sm hover:bg-slate-50"
-                                            title={d.filename || `Fichier ${i + 1}`}
-                                          >
-                                            {d.filename || `Fichier ${i + 1}`}
-                                          </a>
-                                        </li>
-                                      ))
-                                    : Array.from({ length: Number(r.attachments) || 0 }).map((_, i) => (
-                                        <li key={i}>
-                                          <a
-                                            href={attachmentHref(r, i)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="block truncate px-2 py-1 text-sm hover:bg-slate-50"
-                                            title={`Fichier ${i + 1}`}
-                                          >
-                                            {`Fichier ${i + 1}`}
-                                          </a>
-                                        </li>
-                                      ))}
-                                </ul>
-                              </details>
+                              count === 1 ? (
+                                <a
+                                  href={attachmentHref(r, docs.length > 0 ? (docs[0].index ?? 0) : 0)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                                  aria-label={t("actions.open")}
+                                  title={t("actions.open")}
+                                >
+                                  <FiFileText size={16} />
+                                  {t("actions.open")}
+                                </a>
+                              ) : (
+                                <details className="group">
+                                  <summary className="cursor-pointer select-none inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50">
+                                    {count} {t("attachments.files", { default: "fichier(s)" })}
+                                  </summary>
+                                  <ul className="mt-2 ml-1 w-max max-w-[28rem] rounded-xl border border-slate-200 bg-white shadow-lg p-2 space-y-1">
+                                    {(docs.length > 0 ? docs : Array.from({ length: count }, (_, i) => ({ index: i }))).map((d, i) => (
+                                      <li key={i}>
+                                        <a
+                                          href={attachmentHref(r, d.index ?? i)}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="block truncate px-2 py-1 text-sm hover:bg-slate-50"
+                                          title={d.filename || `${t("attachments.file", { default: "Fichier" })} ${i + 1}`}
+                                        >
+                                          {d.filename || `${t("attachments.file", { default: "Fichier" })} ${i + 1}`}
+                                        </a>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </details>
+                              )
                             ) : (
                               <span className="text-gray-400">{dash}</span>
                             )}
@@ -411,36 +365,31 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                   pageSize={pageSize}
                   total={total}
                   onPageChange={(n) => setPage(Number(n))}
-                  onPageSizeChange={(s) => {
-                    setPageSize(Number(s));
-                    setPage(1);
-                  }}
+                  onPageSizeChange={(s) => { setPageSize(Number(s)); setPage(1); }}
                   pageSizeOptions={[5, 10, 20, 50]}
                 />
               </div>
             </div>
 
-            {/* LISTE < md */}
+            {/* < md */}
             <div className="md:hidden divide-y divide-gray-200">
               {rows.map((r) => {
                 const clientLabel = getClientLabel(r);
                 const docs = Array.isArray(r.documents) ? r.documents : [];
-                const hasDocs = docs.length > 0 || Number(r.attachments) > 0;
+                const count = docs.length > 0 ? docs.length : (Number(r.attachments) || 0);
+                const hasDocs = count > 0;
 
                 return (
                   <div key={r._id} className="py-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {/* ✅ checkbox mobile */}
                         <input
                           type="checkbox"
                           className="mt-0.5"
                           checked={selectedIds.includes(r._id)}
                           onChange={(e) =>
                             setSelectedIds((prev) =>
-                              e.target.checked
-                                ? [...prev, r._id]
-                                : prev.filter((id) => id !== r._id)
+                              e.target.checked ? [...prev, r._id] : prev.filter((id) => id !== r._id)
                             )
                           }
                         />
@@ -479,38 +428,39 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                         <p className="truncate" title={clientLabel || ""}>{clientLabel || dash}</p>
                       </div>
 
-                      {/* Fichiers joints (mobile) */}
+                      {/* ✅ Fichiers joints (mobile, une seule section) */}
                       <div className="col-span-2">
-                        <p className="text-[11px] font-semibold text-gray-500">Fichiers joints</p>
+                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.attachments")}</p>
                         {hasDocs ? (
-                          <ul className="mt-1 space-y-1">
-                            {docs.length > 0
-                              ? docs.map((d, i) => (
-                                  <li key={i}>
-                                    <a
-                                      href={attachmentHref(r, d.index ?? i)}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="underline"
-                                      title={d.filename || `Fichier ${i + 1}`}
-                                    >
-                                      {d.filename || `Fichier ${i + 1}`}
-                                    </a>
-                                  </li>
-                                ))
-                              : Array.from({ length: Number(r.attachments) || 0 }).map((_, i) => (
-                                  <li key={i}>
-                                    <a
-                                      href={attachmentHref(r, i)}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="underline"
-                                    >
-                                      {`Fichier ${i + 1}`}
-                                    </a>
-                                  </li>
-                                ))}
-                          </ul>
+                          count === 1 ? (
+                            <a
+                              href={attachmentHref(r, docs.length > 0 ? (docs[0].index ?? 0) : 0)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50"
+                              aria-label={t("actions.open")}
+                              title={t("actions.open")}
+                            >
+                              <FiFileText size={16} />
+                              {t("actions.open")}
+                            </a>
+                          ) : (
+                            <ul className="mt-1 space-y-1">
+                              {(docs.length > 0 ? docs : Array.from({ length: count }, (_, i) => ({ index: i }))).map((d, i) => (
+                                <li key={i}>
+                                  <a
+                                    href={attachmentHref(r, d.index ?? i)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline"
+                                    title={d.filename || `${t("attachments.file", { default: "Fichier" })} ${i + 1}`}
+                                  >
+                                    {d.filename || `${t("attachments.file", { default: "Fichier" })} ${i + 1}`}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )
                         ) : (
                           <p className="text-gray-400">{dash}</p>
                         )}
@@ -525,10 +475,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                 pageSize={pageSize}
                 total={total}
                 onPageChange={(n) => setPage(Number(n))}
-                onPageSizeChange={(s) => {
-                  setPageSize(Number(s));
-                  setPage(1);
-                }}
+                onPageSizeChange={(s) => { setPageSize(Number(s)); setPage(1); }}
                 pageSizeOptions={[5, 10, 20, 50]}
               />
             </div>
@@ -536,7 +483,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         )}
       </div>
 
-      {/* ✅ Multi-devis modal */}
+      {/* Modal multi-devis */}
       <MultiDevisModal
         open={multiOpen}
         onClose={() => setMultiOpen(false)}
@@ -546,20 +493,16 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           setSelectedIds([]);
           load(false);
         }}
-        // نسمح بكل الأنواع بما أن الصفحة فيها mix
         demandKinds={["compression", "traction", "torsion", "fil", "grille", "autre"]}
         articleKinds={["compression", "traction", "torsion", "fil", "grille", "autre"]}
       />
 
-      {/* Toast بسيط */}
+      {/* Toast simple */}
       {toast && (
         <div className="fixed z-50 top-4 right-4 rounded-xl border px-4 py-2 shadow-lg bg-blue-50 border-blue-200 text-blue-800">
           <div className="flex items-center gap-3">
             <span className="text-sm">{toast.text}</span>
-            <button
-              onClick={() => setToast(null)}
-              className="ml-1 inline-flex rounded-md border px-2 py-0.5 text-xs"
-            >
+            <button onClick={() => setToast(null)} className="ml-1 inline-flex rounded-md border px-2 py-0.5 text-xs">
               OK
             </button>
           </div>
