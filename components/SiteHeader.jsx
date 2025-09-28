@@ -407,7 +407,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <Link href={`/${locale}/client/mes-devis`} className={itemCls}>
           {t("client.myQuotes")}
         </Link>
-      
+
         <Link href={`/${locale}/client/devis`} className={itemCls}>
           {t("client.askQuote")}
         </Link>
@@ -561,7 +561,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               aria-label={t("logoAlt")}
               className="
     flex items-center justify-center
-    absolute left-1/2 -translate-x-1/2 top-0
+    absolute left-1/2 -translate-x-1/2 -top-2
     md:static md:translate-x-0 md:left-auto md:top-auto md:ml-8
   "
             >
