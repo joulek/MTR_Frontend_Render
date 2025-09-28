@@ -607,7 +607,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               aria-label={t("logoAlt")}
               className="
  flex items-center justify-center
- absolute left-[60%] -translate-x-1/2 -top-1    /* décale ~2% vers la droite en mobile */
+ absolute left-[70%] -translate-x-1/2 -top-1    /* décale ~2% vers la droite en mobile */
  md:static md:translate-x-0 md:left-auto md:top-auto md:ml-6 /* pousse un peu à droite en desktop */
  "
             >
