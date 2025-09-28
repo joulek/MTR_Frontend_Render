@@ -89,7 +89,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch {}
+    } catch { }
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -130,7 +130,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch {}
+            } catch { }
             setHintRole(json.role);
           }
         } else {
@@ -138,14 +138,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch {}
+          } catch { }
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch {}
+        } catch { }
       }
     })();
     return () => {
@@ -242,7 +242,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch {}
+      } catch { }
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -331,11 +331,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
-                        active
-                          ? "bg-[#F5B301] text-[#0B2239]"
-                          : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                      }`}
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
+                        ? "bg-[#F5B301] text-[#0B2239]"
+                        : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                        }`}
                     >
                       {label}
                       {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
@@ -408,6 +407,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <Link href={`/${locale}/client/mes-devis`} className={itemCls}>
           {t("client.myQuotes")}
         </Link>
+      
         <Link href={`/${locale}/client/devis`} className={itemCls}>
           {t("client.askQuote")}
         </Link>
@@ -477,12 +477,12 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   async function handleLogout() {
     try {
       await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch {} finally {
+    } catch { } finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch {}
+      } catch { }
       window.location.replace(`/${locale}`);
     }
   }
@@ -501,7 +501,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
               <span className="hidden sm:inline opacity-40">|</span>
 
-              {/* HELP DESK */}
+              {/* HELP DESK: lien sans tiret */}
               <Link href={`/${locale}/help-desk`} className="opacity-90 transition hover:text-[#F5B301]">
                 {t("topbar.helpdesk")}
               </Link>
@@ -553,24 +553,17 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       {/* ========= barre principale ========= */}
       <div className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-screen-2xl px-6">
-          {/* rangée relative pour positions absolues en mobile */}
+          {/* rangée relative pour pouvoir centrer/élever le logo */}
           <div className="flex items-center justify-between h-20 md:h-24 relative">
-            {/* (MOBILE) 3 points à GAUCHE quand client connecté */}
-            {isLoggedClient && (
-              <div className="absolute left-2 top-2 md:hidden">
-                <UserMenu />
-              </div>
-            )}
-
-            {/* LOGO — centré en mobile, un peu plus bas (top-2) */}
+            {/* LOGO — centré en mobile, un peu à droite en desktop */}
             <Link
               href={homeHref}
               aria-label={t("logoAlt")}
               className="
-                flex items-center justify-center
-                absolute left-1/2 -translate-x-1/2 top-2
-                md:static md:translate-x-0 md:left-auto md:top-auto md:ml-8
-              "
+    flex items-center justify-center
+    absolute left-1/2 -translate-x-1/2 top-0
+    md:static md:translate-x-0 md:left-auto md:top-auto md:ml-8
+  "
             >
               <Image
                 src="/logo_MTR.png"
@@ -581,6 +574,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 className="object-contain w-[110px] h-auto md:w-[140px]"
               />
             </Link>
+
+
 
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
@@ -608,13 +603,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               {isLoggedClient && <ClientNavItemsDesktop />}
             </nav>
 
-            {/* actions (à droite) + burger */}
+            {/* actions droite + burger */}
             <div className="flex items-center gap-3">
               {isLoggedClient ? (
-                // En mobile le UserMenu est déjà à gauche, on l'affiche seulement en desktop ici
-                <div className="hidden md:block">
-                  <UserMenu />
-                </div>
+                <UserMenu />
               ) : (
                 <>
                   <Link
@@ -632,7 +624,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 </>
               )}
 
-              {/* Burger — reste à DROITE en mobile */}
               <button
                 onClick={() => setOpen((s) => !s)}
                 aria-label={t("actions.openMenu")}
