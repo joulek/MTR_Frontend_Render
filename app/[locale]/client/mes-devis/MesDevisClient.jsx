@@ -6,13 +6,31 @@ import { FiSearch, FiXCircle, FiFileText } from "react-icons/fi";
 import Pagination from "@/components/Pagination";
 import SiteFooter from "@/components/SiteFooter";
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com";
+const BACKEND =
+  (process.env.NEXT_PUBLIC_BACKEND_URL && String(process.env.NEXT_PUBLIC_BACKEND_URL)) ||
+  "https://mtr-backend-render.onrender.com";
 
 /* -------------------- helpers -------------------- */
 function getCookie(name) {
   if (typeof document === "undefined") return "";
   const v = document.cookie.split("; ").find((c) => c.startsWith(name + "="));
   return v ? decodeURIComponent(v.split("=")[1]) : "";
+}
+
+/* ✅ Ajout MINIMAL : normaliser toute URL (évite localhost/relative en prod) */
+function absolutize(url) {
+  if (!url) return "";
+  try {
+    const u = new URL(url); // déjà absolue
+    if (/^(localhost|127\.0\.0\.1)(:|$)/i.test(u.host)) {
+      // remplace host par BACKEND
+      return url.replace(/^https?:\/\/[^/]+/, BACKEND);
+    }
+    return url;
+  } catch {
+    // url relative → préfixer BACKEND proprement
+    return url.startsWith("/") ? BACKEND.replace(/\/+$/, "") + url : BACKEND.replace(/\/+$/, "") + "/" + url;
+  }
 }
 
 const ORDERED_KEY = "mtr:client:ordered";
@@ -80,7 +98,7 @@ export default function MesDevisClient() {
       setError("");
       const params = new URLSearchParams({ page: "1", pageSize: "1000" });
 
-      const res = await fetch(`${BACKEND}/api/mes-devis?` + params.toString(), {
+      const res = await fetch(`${BACKEND.replace(/\/+$/, "")}/api/mes-devis?` + params.toString(), {
         credentials: "include",
       });
       const data = await res.json().catch(() => null);
@@ -113,13 +131,14 @@ export default function MesDevisClient() {
           const numero = encodeURIComponent(it?.ref || it?.numero || "");
           try {
             const r = await fetch(
-              `${BACKEND}/api/devis/client/by-demande/${demandeId}?numero=${numero}`,
+              `${BACKEND.replace(/\/+$/, "")}/api/devis/client/by-demande/${demandeId}?numero=${numero}`,
               { credentials: "include" }
             );
             if (r.status === 403 || r.status === 404) return null;
             const j = await r.json().catch(() => null);
             if (j?.success && j?.exists && j?.pdf) {
-              return [demandeId, { numero: j.devis?.numero, pdf: j.pdf }];
+              // j.pdf peut venir en absolu (ok) ou relatif → on l’absolutise préventivement
+              return [demandeId, { numero: j.devis?.numero, pdf: absolutize(j.pdf) }];
             }
             return null;
           } catch {
@@ -168,7 +187,7 @@ export default function MesDevisClient() {
         const merged = {};
         for (const group of chunks) {
           const qs = group.map(encodeURIComponent).join(",");
-          const res = await fetch(`${BACKEND}/api/order/client/status?ids=${qs}`, {
+          const res = await fetch(`${BACKEND.replace(/\/+$/, "")}/api/order/client/status?ids=${qs}`, {
             credentials: "include",
             headers,
             signal: controller.signal,
@@ -211,9 +230,11 @@ export default function MesDevisClient() {
     }
   };
 
+  /* ✅ NE CHANGE QUE ÇA : on absolutise ici une seule fois */
   const openUrlInNewTab = async (url) => {
     try {
-      const res = await fetch(url, { credentials: "include" });
+      const finalUrl = absolutize(url);
+      const res = await fetch(finalUrl, { credentials: "include" });
       if (!res.ok) {
         setError(t("errors.fileNotFound"));
         return;
@@ -229,7 +250,7 @@ export default function MesDevisClient() {
 
   const openDdvPdf = (it) => {
     const slug = String(it.type || "").toLowerCase();
-    const url = it.pdfUrl || `${BACKEND}/api/mes-devis/${slug}/${it._id}/pdf`;
+    const url = it.pdfUrl || `${BACKEND.replace(/\/+$/, "")}/api/mes-devis/${slug}/${it._id}/pdf`;
     openUrlInNewTab(url);
   };
 
@@ -241,7 +262,7 @@ export default function MesDevisClient() {
   const openDoc = (it, file, index) => {
     if (file?.url) return openUrlInNewTab(file.url);
     const slug = String(it.type || "").toLowerCase();
-    const url = `${BACKEND}/api/mes-devis/${slug}/${it._id}/document/${index}`;
+    const url = `${BACKEND.replace(/\/+$/, "")}/api/mes-devis/${slug}/${it._id}/document/${index}`;
     openUrlInNewTab(url);
   };
 
@@ -262,7 +283,7 @@ export default function MesDevisClient() {
       const headers = { "Content-Type": "application/json" };
       if (token) headers.Authorization = `Bearer ${token}`;
 
-      const res = await fetch(`${BACKEND}/api/order/client/commander`, {
+      const res = await fetch(`${BACKEND.replace(/\/+$/, "")}/api/order/client/commander`, {
         method: "POST",
         credentials: "include",
         headers,
