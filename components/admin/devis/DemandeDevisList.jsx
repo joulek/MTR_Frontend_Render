@@ -151,12 +151,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const typeBadgeClass = (v) =>
     cn(
       "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
-      v === "compression" && "bg-amber-50 text-amber-800 ring-1 ring-amber-200",
-      v === "traction" && "bg-blue-50 text-blue-800 ring-1 ring-blue-200",
-      v === "torsion" && "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200",
-      v === "fil" && "bg-fuchsia-50 text-fuchsia-800 ring-1 ring-fuchsia-200",
-      v === "grille" && "bg-cyan-50 text-cyan-800 ring-1 ring-cyan-200",
-      (!v || v === "autre") && "bg-slate-50 text-slate-800 ring-1 ring-slate-200"
+      v === "compression" ,
+      v === "traction" ,
+      v === "torsion" ,
+      v === "fil",
+      v === "grille",
+      (!v || v === "autre")
     );
 
   // ✅ ouvrir modal à partir de la sélection

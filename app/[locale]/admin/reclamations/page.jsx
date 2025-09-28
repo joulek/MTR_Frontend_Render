@@ -5,9 +5,11 @@ import { useTranslations } from "next-intl";
 import Pagination from "@/components/Pagination";
 import { FiXCircle, FiFileText } from "react-icons/fi";
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com";
+const BACKEND =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://mtr-backend-render.onrender.com";
 
-/* ------ Date helpers robustes ------ */
+/* ------ Helpers de date ------ */
 const toDate = (v) => {
   if (!v && v !== 0) return null;
   if (typeof v === "number") {
@@ -31,12 +33,12 @@ const fmtDateTime = (v) => {
 export default function AdminReclamationsPage() {
   const t = useTranslations("auth.reclamationsAdmin");
 
-  // Données de page (déjà paginées par le backend)
+  // Données paginées
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Recherche (debounced)
+  // Recherche (debounce)
   const [q, setQ] = useState("");
   const [qDeb, setQDeb] = useState("");
   useEffect(() => {
@@ -44,14 +46,14 @@ export default function AdminReclamationsPage() {
     return () => clearTimeout(id);
   }, [q]);
 
-  // Pagination (client -> serveur)
+  // Pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // UI état d’ouverture PDF
+  // État ouverture PDF
   const [openingId, setOpeningId] = useState(null);
 
-  // Chargement depuis l’API (paginée + filtrée)
+  // Chargement API
   useEffect(() => {
     (async () => {
       try {
@@ -61,10 +63,14 @@ export default function AdminReclamationsPage() {
           pageSize: String(pageSize),
           q: qDeb,
         }).toString();
-        const res = await fetch(`${BACKEND}/api/reclamations/admin?${params}`, {
-          credentials: "include",
-          cache: "no-store",
-        });
+
+        const res = await fetch(
+          `${BACKEND}/api/reclamations/admin?${params}`,
+          {
+            credentials: "include",
+            cache: "no-store",
+          }
+        );
         const data = await res.json().catch(() => null);
         if (!res.ok || !data?.success) {
           throw new Error(data?.message || `HTTP ${res.status}`);
@@ -81,7 +87,7 @@ export default function AdminReclamationsPage() {
     })();
   }, [page, pageSize, qDeb]);
 
-  // Reset à la page 1 quand la recherche change
+  // Reset page à 1 quand la recherche change
   useEffect(() => {
     setPage(1);
   }, [qDeb]);
@@ -89,9 +95,10 @@ export default function AdminReclamationsPage() {
   async function viewPdfById(id) {
     try {
       setOpeningId(id);
-      const res = await fetch(`${BACKEND}/api/reclamations/admin/${id}/pdf`, {
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${BACKEND}/api/reclamations/admin/${id}/pdf`,
+        { credentials: "include" }
+      );
       if (!res.ok) {
         alert(t("errors.attachmentUnavailable"));
         return;
@@ -136,11 +143,17 @@ export default function AdminReclamationsPage() {
           {/* loupe */}
           <svg
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
           >
             <path
               d="M21 21l-3.8-3.8M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"
-              stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
             />
           </svg>
 
@@ -168,7 +181,7 @@ export default function AdminReclamationsPage() {
         </div>
       </div>
 
-      {/* Etat de chargement / vide */}
+      {/* Contenu */}
       {loading ? (
         <div className="mt-6 text-center text-gray-500">{t("loading")}</div>
       ) : total === 0 ? (
@@ -176,47 +189,77 @@ export default function AdminReclamationsPage() {
       ) : (
         <>
           {/* ===== Mobile (<md): cartes ===== */}
-          <div className="mt-6 grid grid-cols-1 gap-4 md:hidden">
+          <div className="mt-6 space-y-4 md:hidden">
             {rows.map((r) => (
-              <div key={r._id} className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4 flex flex-col gap-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="text-right">
-                    <p className="text-[11px] uppercase tracking-wide text-slate-500">{t("table.number")}</p>
-                    <p className="font-medium tabular-nums">{r.numero || "—"}</p>
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-block h-2.5 w-2.5 rounded-full bg-yellow-400 shrink-0" />
-                      <p className="text-[#0B1E3A] font-semibold truncate">{r.client || "—"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 text-sm">
+              <article
+                key={r._id}
+                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+              >
+                {/* En-tête : N° à gauche, client à droite */}
+                <header className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-slate-500">{t("table.typeDoc")}</p>
-                    <p className="capitalize">{r.typeDoc?.replace("_", " ") || "—"}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-slate-500">
+                      {t("table.number")}
+                    </p>
+                    <p className="font-semibold tabular-nums text-slate-900">
+                      {r.numero || "—"}
+                    </p>
+                  </div>
+
+                  <div className="min-w-0 flex items-center gap-2">
+                    <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-yellow-400" />
+                    <p className="truncate font-semibold text-[#0B1E3A]">
+                      {r.client || "—"}
+                    </p>
+                  </div>
+                </header>
+
+                {/* Infos : Type doc + Date */}
+                <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <dt className="text-[11px] uppercase tracking-wide text-slate-500">
+                      {t("table.typeDoc")}
+                    </dt>
+                    <dd className="capitalize text-slate-800">
+                      {r.typeDoc?.replace("_", " ") || "—"}
+                    </dd>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-slate-500">{t("table.date")}</p>
-                    <p>{fmtDateTime(r.date || r.createdAt || r.updatedAt || r?.demandePdf?.generatedAt)}</p>
+                    <dt className="text-[11px] uppercase tracking-wide text-slate-500">
+                      {t("table.date")}
+                    </dt>
+                    <dd className="text-slate-800">
+                      {fmtDateTime(
+                        r.date ||
+                          r.createdAt ||
+                          r.updatedAt ||
+                          r?.demandePdf?.generatedAt
+                      )}
+                    </dd>
                   </div>
-                </div>
+                </dl>
 
-                <div className="flex flex-wrap items-center gap-2 pt-1">
+                {/* Actions : PDF + pièces jointes */}
+                <div className="mt-3 flex flex-col gap-2">
                   {r.pdf ? (
                     <button
                       onClick={() => viewPdfById(r._id)}
                       disabled={openingId === r._id}
-                      className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm
-                                  ${openingId === r._id ? "cursor-wait animate-pulse" : "hover:bg-slate-50"} text-[#0B1E3A]`}
-                      aria-label={t("actions.openPdf")} title={t("actions.openPdf")}
+                      className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] ${
+                        openingId === r._id
+                          ? "cursor-wait animate-pulse"
+                          : "hover:bg-slate-50"
+                      }`}
+                      aria-label={t("actions.openPdf")}
+                      title={t("actions.openPdf")}
                     >
                       <FiFileText size={16} />
-                      {openingId === r._id ? t("actions.openingPdf") : t("actions.openPdf")}
+                      {openingId === r._id
+                        ? t("actions.openingPdf")
+                        : t("actions.openPdf")}
                     </button>
                   ) : (
-                    <span className="inline-flex items-center rounded-full bg-gray-200 text-gray-600 px-3 py-1 text-xs">
+                    <span className="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-gray-600">
                       {t("pdf.none")}
                     </span>
                   )}
@@ -227,7 +270,7 @@ export default function AdminReclamationsPage() {
                         <button
                           key={idx}
                           onClick={() => viewDocByIndex(r._id, idx)}
-                          className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                          className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50"
                           title={p?.mimetype || ""}
                         >
                           <FiFileText size={16} />
@@ -236,44 +279,86 @@ export default function AdminReclamationsPage() {
                       ))}
                     </div>
                   ) : (
-                    <span className="text-xs text-gray-600">{t("attachments.none")}</span>
+                    <span className="text-xs text-gray-600">
+                      {t("attachments.none")}
+                    </span>
                   )}
                 </div>
-              </div>
+              </article>
             ))}
           </div>
 
           {/* ===== Desktop (≥md): tableau ===== */}
-          <div className="mt-6 rounded-2xl border border-gray-200 overflow-hidden shadow-sm bg-white hidden md:block">
+          <div className="mt-6 hidden md:block rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
             <div className="w-full overflow-x-auto">
               <table className="min-w-[820px] w-full text-sm">
                 <thead className="bg-white">
                   <tr>
-                    <th className="p-4 text-left"><div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">{t("table.number")}</div></th>
-                    <th className="p-4 text-left"><div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">{t("table.client")}</div></th>
-                    <th className="p-4 text-left"><div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">{t("table.typeDoc")}</div></th>
-                    <th className="p-4 text-left"><div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">{t("table.date")}</div></th>
-                    <th className="p-4 text-left"><div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">{t("table.pdf")}</div></th>
-                    <th className="p-4 text-left"><div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">{t("table.attachments")}</div></th>
+                    <th className="p-4 text-left">
+                      <div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+                        {t("table.number")}
+                      </div>
+                    </th>
+                    <th className="p-4 text-left">
+                      <div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+                        {t("table.client")}
+                      </div>
+                    </th>
+                    <th className="p-4 text-left">
+                      <div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+                        {t("table.typeDoc")}
+                      </div>
+                    </th>
+                    <th className="p-4 text-left">
+                      <div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+                        {t("table.date")}
+                      </div>
+                    </th>
+                    <th className="p-4 text-left">
+                      <div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+                        {t("table.pdf")}
+                      </div>
+                    </th>
+                    <th className="p-4 text-left">
+                      <div className="text-[12px] font-semibold uppercase tracking-wide text-slate-500">
+                        {t("table.attachments")}
+                      </div>
+                    </th>
                   </tr>
                   <tr>
-                    <td colSpan={7}><div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" /></td>
+                    <td colSpan={7}>
+                      <div className="h-px w-full bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                    </td>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-gray-100">
                   {rows.map((r, i) => (
-                    <tr key={r._id} className={i % 2 ? "bg-white" : "bg-gray-50/40"}>
-                      <td className="px-4 py-3 tabular-nums">{r.numero || "—"}</td>
+                    <tr
+                      key={r._id}
+                      className={i % 2 ? "bg-white" : "bg-gray-50/40"}
+                    >
+                      <td className="px-4 py-3 tabular-nums">
+                        {r.numero || "—"}
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span className="inline-block h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                          <span className="text-[#0B1E3A] font-medium break-words">{r.client || "—"}</span>
+                          <span className="text-[#0B1E3A] font-medium break-words">
+                            {r.client || "—"}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 capitalize">{r.typeDoc?.replace("_", " ") || "—"}</td>
+                      <td className="px-4 py-3 capitalize">
+                        {r.typeDoc?.replace("_", " ") || "—"}
+                      </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        {fmtDateTime(r.date || r.createdAt || r.updatedAt || r?.demandePdf?.generatedAt)}
+                        {fmtDateTime(
+                          r.date ||
+                            r.createdAt ||
+                            r.updatedAt ||
+                            r?.demandePdf?.generatedAt
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         {r.pdf ? (
@@ -281,12 +366,17 @@ export default function AdminReclamationsPage() {
                             onClick={() => viewPdfById(r._id)}
                             disabled={openingId === r._id}
                             className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] ${
-                              openingId === r._id ? "cursor-wait animate-pulse" : "hover:bg-slate-50"
+                              openingId === r._id
+                                ? "cursor-wait animate-pulse"
+                                : "hover:bg-slate-50"
                             }`}
-                            aria-label={t("actions.openPdf")} title={t("actions.openPdf")}
+                            aria-label={t("actions.openPdf")}
+                            title={t("actions.openPdf")}
                           >
                             <FiFileText size={16} />
-                            {openingId === r._id ? t("actions.opening") : t("actions.open")}
+                            {openingId === r._id
+                              ? t("actions.opening")
+                              : t("actions.open")}
                           </button>
                         ) : (
                           <span className="inline-flex items-center rounded-full bg-gray-200 text-gray-600 px-2.5 py-1 text-xs">
@@ -295,7 +385,8 @@ export default function AdminReclamationsPage() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        {Array.isArray(r.piecesJointes) && r.piecesJointes.length > 0 ? (
+                        {Array.isArray(r.piecesJointes) &&
+                        r.piecesJointes.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
                             {r.piecesJointes.map((p, idx) => (
                               <button
@@ -330,7 +421,10 @@ export default function AdminReclamationsPage() {
             pageSize={pageSize}
             total={total}
             onPageChange={setPage}
-            onPageSizeChange={(sz) => { setPageSize(sz); setPage(1); }}
+            onPageSizeChange={(sz) => {
+              setPageSize(sz);
+              setPage(1);
+            }}
             pageSizeOptions={[5, 10, 20, 50]}
           />
         </div>
