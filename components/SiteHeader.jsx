@@ -438,19 +438,35 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <Link href={`/${locale}/client/devis`} className={itemCls}>
           {t("client.askQuote")}
         </Link>
+
+        {/* NEW: Réclamer */}
+        <Link href={`/${locale}/client/reclamation`} className={itemCls}>
+          {t("client.claim")}
+        </Link>
       </>
     );
   };
 
   /* --------- NAV items pour client (MOBILE) --------- */
   const ClientNavItemsMobile = () => (
-    <Link
-      href={`/${locale}/client/mes-devis`}
-      onClick={() => setOpen(false)}
-      className="rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
-    >
-      {t("client.myQuotes")}
-    </Link>
+    <>
+      <Link
+        href={`/${locale}/client/mes-devis`}
+        onClick={() => setOpen(false)}
+        className="rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
+      >
+        {t("client.myQuotes")}
+      </Link>
+
+      {/* NEW (mobile): Réclamer */}
+      <Link
+        href={`/${locale}/client/reclamation`}
+        onClick={() => setOpen(false)}
+        className="rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
+      >
+        {t("client.claim")}
+      </Link>
+    </>
   );
 
   /* --------- Menu utilisateur --------- */
@@ -618,10 +634,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               href={homeHref}
               aria-label={t("logoAlt")}
               className="
-    flex items-center justify-center
-    absolute left-1/2 -translate-x-1/2 -top-1
-    md:static md:translate-x-0 md:left-auto md:top-auto md:ml-6
-  "
+                flex items-center justify-center
+                absolute left-1/2 -translate-x-1/2 -top-1
+                md:static md:translate-x-0 md:left-auto md:top-auto md:ml-6
+              "
             >
               <Image
                 src="/logo.png"
