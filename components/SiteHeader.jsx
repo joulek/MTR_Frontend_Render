@@ -517,70 +517,33 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     );
   };
 
-// Dans SiteHeader.jsx - Remplacer la fonction handleLogout existante
-
-async function handleLogout() {
-  try {
-    // 1) Effacer TOUS les cookies via l'API front
-    await fetch("/api/logout", {
-      method: "POST",
-      credentials: "include",
-      cache: "no-store",
-    });
-
-    // 2) Informer le backend de fermer la session
+  async function handleLogout() {
     try {
-      await fetch(`${API}/auth/logout`, {
+      // 1) Effacer les cookies posés sur le DOMAINE FRONT
+      await fetch("/api/logout", {
         method: "POST",
         credentials: "include",
         cache: "no-store",
       });
-    } catch (err) {
-      console.error("Erreur logout backend:", err);
+
+      // 2) (facultatif) prévenir le backend de fermer sa session
+      try {
+        await fetch(`${API}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch {}
+    } finally {
+      try {
+        localStorage.removeItem("mtr_role");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("rememberMe");
+      } catch {}
+      // rechargement propre
+      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}`);
     }
-
-    // 3) Nettoyer localStorage
-    try {
-      localStorage.removeItem("mtr_role");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("rememberMe");
-      localStorage.removeItem("token");
-      localStorage.removeItem("authToken");
-      // Nettoyer tout le localStorage lié à l'auth
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('mtr_') || key.includes('auth') || key.includes('token')) {
-          localStorage.removeItem(key);
-        }
-      });
-    } catch (err) {
-      console.error("Erreur localStorage:", err);
-    }
-
-    // 4) Nettoyer sessionStorage aussi
-    try {
-      sessionStorage.clear();
-    } catch (err) {
-      console.error("Erreur sessionStorage:", err);
-    }
-
-    // 5) Réinitialiser l'état local
-    setMe(null);
-    setHintRole(null);
-
-    // 6) Redirection FORCÉE vers login (pas d'historique)
-    const loginUrl = `/${typeof locale === "string" ? locale : "fr"}/login`;
-    
-    // Empêcher le retour arrière en remplaçant l'historique
-    window.history.replaceState(null, '', loginUrl);
-    window.location.replace(loginUrl);
-    
-  } catch (error) {
-    console.error("Erreur lors de la déconnexion:", error);
-    // Même en cas d'erreur, forcer la redirection
-    const loginUrl = `/${typeof locale === "string" ? locale : "fr"}/login`;
-    window.location.replace(loginUrl);
   }
-}
+
   /* ======================= RENDER ======================= */
   return (
     <header className={`${inter.className} sticky top-0 z-40`}>

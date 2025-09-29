@@ -1,68 +1,43 @@
 // app/api/logout/route.js
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-export async function POST(request) {
-  try {
-    const response = NextResponse.json(
-      { success: true, message: 'Déconnexion réussie' },
-      { status: 200 }
-    );
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-    // Liste de tous les cookies possibles à supprimer
-    const cookiesToDelete = [
-      'token',
-      'authToken',
-      'role',
-      'connect.sid',
-      'session',
-      'auth',
-      'user'
-    ];
-
-    // Supprimer tous les cookies d'authentification
-    cookiesToDelete.forEach(cookieName => {
-      // Supprimer avec différentes configurations pour être sûr
-      response.cookies.delete(cookieName);
-      
-      // Supprimer avec path /
-      response.cookies.set(cookieName, '', {
-        maxAge: 0,
-        path: '/',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-      });
-
-      // Supprimer avec path /api
-      response.cookies.set(cookieName, '', {
-        maxAge: 0,
-        path: '/api',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
-      });
-    });
-
-    // Ajouter des headers pour empêcher le cache
-    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    response.headers.set('Pragma', 'no-cache');
-    response.headers.set('Expires', '0');
-    response.headers.set('Surrogate-Control', 'no-store');
-
-    return response;
-  } catch (error) {
-    console.error('Erreur logout API:', error);
-    return NextResponse.json(
-      { success: false, error: 'Erreur lors de la déconnexion' },
-      { status: 500 }
-    );
-  }
+// Les attributs DOIVENT matcher ceux utilisés au login côté backend
+function expiredCookieOpts() {
+  const isProd = process.env.NODE_ENV === "production";
+  return {
+    path: "/",
+    secure: isProd ? true : false,
+    sameSite: isProd ? "none" : "lax",
+    maxAge: 0,
+    expires: new Date(0),
+    // Si tu utilises un domain au login (COOKIE_DOMAIN), dé-commente:
+    // domain: process.env.COOKIE_DOMAIN,
+  };
 }
 
-// Méthode GET pour éviter les erreurs si appelée par erreur
-export async function GET() {
-  return NextResponse.json(
-    { error: 'Méthode non autorisée. Utilisez POST.' },
-    { status: 405 }
-  );
+export async function POST() {
+  const res = NextResponse.json({ success: true });
+
+  const gone = expiredCookieOpts();
+
+  // token était httpOnly:true au login → efface en httpOnly:true
+  res.cookies.set("token", "", { ...gone, httpOnly: true });
+  // role / rememberMe côté UI → httpOnly:false
+  res.cookies.set("role", "", { ...gone, httpOnly: false });
+  res.cookies.set("rememberMe", "", { ...gone, httpOnly: false });
+
+  return res;
+}
+
+// (optionnel) si /api/logout est appelé cross-origin
+export async function OPTIONS() {
+  const res = new NextResponse(null, { status: 204 });
+  res.headers.set("Access-Control-Allow-Origin", process.env.NEXT_PUBLIC_APP_ORIGIN ?? "*");
+  res.headers.set("Access-Control-Allow-Credentials", "true");
+  res.headers.set("Access-Control-Allow-Methods", "POST,OPTIONS");
+  res.headers.set("Access-Control-Allow-Headers", "content-type");
+  return res;
 }
