@@ -165,8 +165,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     };
   }, []);
 
-  // ✅ ne déduis pas du prop "mode"
-  const isLoggedClient = me?.role === "client";
+  const isLoggedClient = mode === "client" || me?.role === "client";
   const homeHref = `/${locale}`;
 
   /* catégories */
@@ -520,26 +519,34 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
   async function handleLogout() {
     try {
-      await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch {}
+      // 1) Effacer les cookies posés sur le DOMAINE FRONT
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+        cache: "no-store",
+      });
 
-    try {
-      localStorage.removeItem("mtr_role");
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("rememberMe");
-    } catch {}
-
-    // Purger l'état header immédiatement
-    setMe(null);
-
-    // 🔄 remplacer l'URL (pas de “Back” vers la page protégée)
-    const target = `/${typeof locale === "string" ? locale : "fr"}/login`;
-    window.location.replace(target);
+      // 2) (facultatif) prévenir le backend de fermer sa session
+      try {
+        await fetch(`${API}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch {}
+    } finally {
+      try {
+        localStorage.removeItem("mtr_role");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("rememberMe");
+      } catch {}
+      // rechargement propre
+      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}`);
+    }
   }
 
   /* ======================= RENDER ======================= */
   return (
-    <header key={me?._id || "anon"} className={`${inter.className} sticky top-0 z-40`}>
+    <header className={`${inter.className} sticky top-0 z-40`}>
       {/* ========= top bar ========= */}
       <div className="bg-[#0B2239] text-white">
         <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">
@@ -593,7 +600,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               <div className="flex items-center gap-1 sm:gap-2">
                 <button
                   onClick={() => switchLang("fr")}
-                  className={`${locale === "fr" ? "ring-2 ring-[#F5B301] rounded-full" : ""} px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
+                  className={`${
+                    locale === "fr" ? "ring-2 ring-[#F5B301] rounded-full" : ""
+                  } px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
                   title={t("aria.langFR")}
                   aria-pressed={locale === "fr"}
                 >
@@ -601,7 +610,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 </button>
                 <button
                   onClick={() => switchLang("en")}
-                  className={`${locale === "en" ? "ring-2 ring-[#F5B301] rounded-full" : ""} px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
+                  className={`${
+                    locale === "en" ? "ring-2 ring-[#F5B301] rounded-full" : ""
+                  } px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
                   title={t("aria.langEN")}
                   aria-pressed={locale === "en"}
                 >
@@ -678,7 +689,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   </button>
                 </>
               ) : (
-                !loadingCats && <ProductsMenu cats={categories} locale={locale} />
+                !loadingCats && (
+                  <ProductsMenu cats={categories} locale={locale} />
+                )
               )}
 
               {isLoggedClient && <ClientNavItemsDesktop />}
