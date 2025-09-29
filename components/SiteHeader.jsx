@@ -115,6 +115,12 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+   useEffect(() => {
+    const block = () => window.history.pushState(null, "", window.location.href);
+    block();
+    window.addEventListener("popstate", block);
+    return () => window.removeEventListener("popstate", block);
+  }, []);
 
   const isHome = homePaths.includes(pathname);
 
@@ -517,22 +523,25 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     );
   };
 
-  async function handleLogout() {
-      // 2) (facultatif) prévenir le backend de fermer sa session
-      try {
-        await fetch(`${API}/auth/logout`, {
-          method: "POST",
-          credentials: "include",
-        });
-      } catch {}
-      try {
-        localStorage.removeItem("mtr_role");
-        localStorage.removeItem("userRole");
-        localStorage.removeItem("rememberMe");
-      } catch {}
-      // rechargement propre
-      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}`);
-    }
+ async function handleLogout() {
+  try {
+    await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
+  } catch {}
+
+  try {
+    localStorage.removeItem("mtr_role");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("rememberMe");
+  } catch {}
+
+  // Purger l'état header immédiatement
+  setMe(null);
+
+  // 🔄 remplacer l'URL (pas de “Back” vers la page protégée)
+  const target = `/${typeof locale === "string" ? locale : "fr"}/login`;
+  window.location.replace(target);
+}
+
 
   /* ======================= RENDER ======================= */
   return (
