@@ -89,7 +89,7 @@ export default function LoginPage() {
             {/* overlay aux couleurs du site */}
             {/* bloc centré */}
             <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center">
-              {/* ✅ Logo corrigé : position centré, responsive, sans marges négatives */}
+              {/* ✅ Logo corrigé : grand + textes remontés */}
               <Image
                 src="/logo.png"
                 alt="MTR — Manufacture Tunisienne des Ressorts"
@@ -99,19 +99,22 @@ export default function LoginPage() {
                 priority
               />
 
-              <h2
-                className="mt-[-10px] max-w-md text-3xl font-extrabold leading-tight text-[#ffb400] md:text-4xl"
-                style={{ fontFamily: "'Lora', serif" }}
-              >
-                {t("joinClientSpace")}
-              </h2>
-
-              <p
-                className="mt-1 max-w-md text-sm font-bold text-[#002147]/80 md:text-base"
-                style={{ fontFamily: "'Lora', serif" }}
-              >
-                {t("promoText")}
-              </p>
+              <div className="-mt-12">
+                {" "}
+                {/* 🔥 déplace tout le bloc texte vers le haut */}
+                <h2
+                  className="mt-2 max-w-md text-3xl font-extrabold leading-tight text-[#ffb400] md:text-4xl"
+                  style={{ fontFamily: "'Lora', serif" }}
+                >
+                  {t("joinClientSpace")}
+                </h2>
+                <p
+                  className="mt-1 max-w-md text-sm font-bold text-[#002147]/80 md:text-base"
+                  style={{ fontFamily: "'Lora', serif" }}
+                >
+                  {t("promoText")}
+                </p>
+              </div>
             </div>
           </div>
 
