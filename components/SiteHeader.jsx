@@ -327,7 +327,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       >
         <button
           type="button"
-          className="group relative px-3 py-2 text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+          className="group relative px-2.5 py-1.5 text-[15px] font-bold text-[#0B2239] hover:text-[#F5B301]"
           aria-haspopup="true"
           aria-expanded={menuOpen ? "true" : "false"}
         >
@@ -355,7 +355,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
+                      className={`flex items-center justify-between rounded-md px-3.5 py-2.5 text-[15px] transition ${
                         active
                           ? "bg-[#F5B301] text-[#0B2239]"
                           : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
@@ -380,7 +380,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                       <li key={catId(child)}>
                         <Link
                           href={makeCatHref(child, locale)}
-                          className="block rounded-md px-4 py-2 text-[15px] text-[#0B2239] hover:bg-slate-50"
+                          className="block rounded-md px-4 py-2 text-[14px] text-[#0B2239] hover:bg-slate-50"
                         >
                           {pickName(child, locale)}
                         </Link>
@@ -407,7 +407,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                           <li key={p?._id || p?.id || pickProdName(p, locale)}>
                             <Link
                               href={makeProductHref(p, locale)}
-                              className="block rounded-md px-4 py-2 text-[15px] text-[#0B2239] hover:bg-slate-50"
+                              className="block rounded-md px-4 py-2 text-[14px] text-[#0B2239] hover:bg-slate-50"
                             >
                               {pickProdName(p, locale)}
                             </Link>
@@ -428,7 +428,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   /* --------- NAV items pour client (DESKTOP) --------- */
   const ClientNavItemsDesktop = () => {
     const itemCls =
-      "px-3 py-2 text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]";
+      "px-2.5 py-1.5 text-[14px] md:text-[15px] font-bold text-[#0B2239] hover:text-[#F5B301]";
     return (
       <>
         <Link href={`/${locale}/client/mes-devis`} className={itemCls}>
@@ -447,7 +447,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     <Link
       href={`/${locale}/client/mes-devis`}
       onClick={() => setOpen(false)}
-      className="rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+      className="rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
     >
       {t("client.myQuotes")}
     </Link>
@@ -470,7 +470,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           type="button"
           onClick={() => setUOpen((s) => !s)}
           aria-label={t("userMenu.aria")}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] hover:bg-slate-50"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] hover:bg-slate-50"
         >
           <MoreVertical className="h-5 w-5" />
         </button>
@@ -534,7 +534,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       {/* ========= top bar ========= */}
       <div className="bg-[#0B2239] text-white">
         <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 h-auto min-h-[40px] py-1 text-[12px] sm:text-[14px]">
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 h-auto min-h-[32px] py-0.5 text-[11px] sm:text-[13px]">
             <nav className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <button
                 type="button"
@@ -612,24 +612,24 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       <div className="border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto max-w-screen-2xl px-6">
           {/* rangée relative pour pouvoir centrer/élever le logo */}
-          <div className="flex items-center justify-between h-20 md:h-24 relative">
+          <div className="flex items-center justify-between h-16 md:h-20 relative">
             {/* LOGO — centré en mobile, un peu à droite en desktop */}
             <Link
               href={homeHref}
               aria-label={t("logoAlt")}
               className="
     flex items-center justify-center
-    absolute left-1/2 -translate-x-1/2 -top-2
-    md:static md:translate-x-0 md:left-auto md:top-auto md:ml-8
+    absolute left-1/2 -translate-x-1/2 -top-1
+    md:static md:translate-x-0 md:left-auto md:top-auto md:ml-6
   "
             >
               <Image
                 src="/logo.png"
                 alt={t("logoAlt")}
-                width={130}
-                height={90}
+                width={120}
+                height={80}
                 priority
-                className="object-contain w-[110px] h-auto md:w-[140px]"
+                className="object-contain w-[96px] h-auto md:w-[120px]"
               />
             </Link>
 
@@ -637,7 +637,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
             <nav className="hidden items-center gap-1 md:flex">
               <Link
                 href={homeHref}
-                className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+                className="px-2.5 py-1.5 text-[14px] md:text-[15px] font-bold text-[#0B2239] hover:text-[#F5B301]"
               >
                 {t("nav.home")}
               </Link>
@@ -647,7 +647,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("presentation")}
-                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+                    className="px-2.5 py-1.5 text-[14px] md:text-[15px] font-bold text-[#0B2239] hover:text-[#F5B301]"
                     role="link"
                   >
                     {t("nav.company")}
@@ -658,7 +658,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("contact")}
-                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+                    className="px-2.5 py-1.5 text-[14px] md:text-[15px] font-bold text-[#0B2239] hover:text-[#F5B301]"
                     role="link"
                   >
                     {t("nav.contact")}
@@ -666,7 +666,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("localisation")}
-                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+                    className="px-2.5 py-1.5 text-[14px] md:text-[15px] font-bold text-[#0B2239] hover:text-[#F5B301]"
                     role="link"
                   >
                     {t("nav.location")}
@@ -689,13 +689,13 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 <>
                   <Link
                     href={`/${locale}/login`}
-                    className="hidden md:inline-block rounded-full bg-[#F5B301] px-4 py-2 text-[15px] md:text-[16px] font-semibold text-[#0B2239] shadow hover:brightness-95"
+                    className="hidden md:inline-block rounded-full bg-[#F5B301] px-3.5 py-1.5 text-[14px] md:text-[15px] font-semibold text-[#0B2239] shadow hover:brightness-95"
                   >
                     {t("actions.login")}
                   </Link>
                   <Link
                     href={`/${locale}/devis`}
-                    className="hidden md:inline-block rounded-full bg-[#F5B301] px-4 py-2 text-[15px] md:text-[16px] font-semibold text-[#0B2239] shadow hover:brightness-95"
+                    className="hidden md:inline-block rounded-full bg-[#F5B301] px-3.5 py-1.5 text-[14px] md:text-[15px] font-semibold text-[#0B2239] shadow hover:brightness-95"
                   >
                     {t("actions.askQuote")}
                   </Link>
@@ -705,7 +705,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               <button
                 onClick={() => setOpen((s) => !s)}
                 aria-label={t("actions.openMenu")}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden z-20"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 text-[#0B2239] md:hidden z-20"
               >
                 ☰
               </button>
@@ -719,7 +719,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
             <div className="mx-auto max-w-screen-2xl px-4 py-3 flex flex-col gap-1">
               <Link
                 href={homeHref}
-                className="rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                className="rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
                 onClick={() => setOpen(false)}
               >
                 {t("nav.home")}
@@ -730,7 +730,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("presentation", true)}
-                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
                     role="link"
                   >
                     {t("nav.company")}
@@ -738,7 +738,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("specialites", true)}
-                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
                     role="link"
                   >
                     {t("nav.products")}
@@ -746,7 +746,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("contact", true)}
-                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
                     role="link"
                   >
                     {t("nav.contact")}
@@ -754,7 +754,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <button
                     type="button"
                     onClick={() => goToSection("localisation", true)}
-                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
                     role="link"
                   >
                     {t("nav.location")}
@@ -768,7 +768,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <Link
                     href={`/${locale}/client/devis`}
                     onClick={() => setOpen(false)}
-                    className="mt-2 rounded-xl bg-[#F5B301] px-4 py-2 text-center text-[15px] font-semibold text-[#0B2239] shadow hover:brightness-95"
+                    className="mt-2 rounded-xl bg-[#F5B301] px-4 py-2 text-center text-[14px] font-semibold text-[#0B2239] shadow hover:brightness-95"
                   >
                     {t("client.askQuote")}
                   </Link>
@@ -778,14 +778,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   <Link
                     href={`/${locale}/devis`}
                     onClick={() => setOpen(false)}
-                    className="rounded-xl bg-[#F5B301] px-4 py-2 text-center text-[15px] font-semibold text-[#0B2239] shadow hover:brightness-95"
+                    className="rounded-xl bg-[#F5B301] px-4 py-2 text-center text-[14px] font-semibold text-[#0B2239] shadow hover:brightness-95"
                   >
                     {t("actions.askQuote")}
                   </Link>
                   <Link
                     href={`/${locale}/login`}
                     onClick={() => setOpen(false)}
-                    className="mt-2 rounded-xl bg-[#F5B301] px-4 py-2 text-center text-[15px] font-semibold text-[#0B2239] shadow hover:brightness-95"
+                    className="mt-2 rounded-xl bg-[#F5B301] px-4 py-2 text-center text-[14px] font-semibold text-[#0B2239] shadow hover:brightness-95"
                   >
                     {t("actions.login")}
                   </Link>

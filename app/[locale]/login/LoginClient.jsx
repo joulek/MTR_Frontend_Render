@@ -93,7 +93,7 @@ export default function LoginPage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center">
               {/* ✅ Logo corrigé : position centré, responsive, sans marges négatives */}
               <Image
-                src="/logo_MTR.png"
+                src="/logo.png"
                 alt="MTR — Manufacture Tunisienne des Ressorts"
                 width={270} // ~ largeur par défaut desktop
                 height={90}
