@@ -95,8 +95,8 @@ export default function LoginPage() {
               <Image
                 src="/logo.png"
                 alt="MTR — Manufacture Tunisienne des Ressorts"
-                width={270} // ~ largeur par défaut desktop
-                height={90}
+                width={300} // ~ largeur par défaut desktop
+                height={100}
                 className="drop-shadow-xl w-[200px] md:w-[240px] lg:w-[260px] h-auto"
                 priority
               />
