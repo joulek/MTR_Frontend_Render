@@ -3,7 +3,18 @@ import { NextResponse } from "next/server";
 
 export async function POST() {
   const resp = NextResponse.json({ success: true, message: "Déconnexion réussie" });
-  resp.cookies.set("token", "", { path: "/", maxAge: 0 });
-  resp.cookies.set("role", "", { path: "/", maxAge: 0 });
+
+  const expired = {
+    path: "/",
+    expires: new Date(0),
+    maxAge: 0,
+    // utile si les cookies ont été posés en SameSite=None; Secure
+    sameSite: "none",
+    secure: true,
+  };
+
+  resp.cookies.set("token", "", { ...expired, httpOnly: true });
+  resp.cookies.set("role",  "", expired);
+
   return resp;
 }

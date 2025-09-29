@@ -16,14 +16,19 @@ const inter = Inter({
 });
 
 /* ---------------------------- API backend ---------------------------- */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://mtr-backend-render.onrender.com").replace(/\/$/, "");
+const BACKEND = (
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "http://mtr-backend-render.onrender.com"
+).replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
 /* --------------------------- Helpers --------------------------- */
 function pickName(cat, locale) {
   return (
     (cat?.translations &&
-      (cat.translations[locale] || cat.translations.fr || cat.translations.en)) ||
+      (cat.translations[locale] ||
+        cat.translations.fr ||
+        cat.translations.en)) ||
     cat?.label ||
     ""
   );
@@ -89,16 +94,20 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch { }
+    } catch {}
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
-    if (!localStorage.getItem("mtr_locale") && (pathLocale === "fr" || pathLocale === "en")) {
+    if (
+      !localStorage.getItem("mtr_locale") &&
+      (pathLocale === "fr" || pathLocale === "en")
+    ) {
       desired = pathLocale;
     }
 
     setLocale(desired);
-    if (typeof document !== "undefined") document.documentElement.lang = desired;
+    if (typeof document !== "undefined")
+      document.documentElement.lang = desired;
 
     const current = pathLocale;
     if (current !== desired) {
@@ -122,7 +131,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     let alive = true;
     (async () => {
       try {
-        const r = await fetch(`${API}/users/me`, { credentials: "include", cache: "no-store" });
+        const r = await fetch(`${API}/users/me`, {
+          credentials: "include",
+          cache: "no-store",
+        });
         if (!alive) return;
         if (r.ok) {
           const json = await r.json();
@@ -130,7 +142,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch { }
+            } catch {}
             setHintRole(json.role);
           }
         } else {
@@ -138,14 +150,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch { }
+          } catch {}
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch { }
+        } catch {}
       }
     })();
     return () => {
@@ -195,10 +207,17 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     (async () => {
       try {
         setLoadingProducts(true);
-        const res = await fetch(`${API}/produits`, { cache: "no-store", signal: controller.signal });
+        const res = await fetch(`${API}/produits`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const list = Array.isArray(data?.products) ? data.products : Array.isArray(data) ? data : [];
+        const list = Array.isArray(data?.products)
+          ? data.products
+          : Array.isArray(data)
+          ? data
+          : [];
         if (alive) setProducts(list);
       } catch {
         if (alive) setProducts([]);
@@ -224,7 +243,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         return;
       }
 
-      const el = typeof document !== "undefined" ? document.getElementById(id) : null;
+      const el =
+        typeof document !== "undefined" ? document.getElementById(id) : null;
       if (el) {
         el.scrollIntoView({ behavior: "smooth", block: "start" });
       } else if (typeof window !== "undefined") {
@@ -242,7 +262,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch { }
+      } catch {}
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -271,7 +291,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
     const prodsByCat = new Map();
     const prodCatId = (p) =>
-      String(p?.category?._id || p?.category || p?.categoryId || p?.category_id || "");
+      String(
+        p?.category?._id || p?.category || p?.categoryId || p?.category_id || ""
+      );
     (products || []).forEach((p) => {
       const cid = prodCatId(p);
       if (!cid) return;
@@ -284,7 +306,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       if (!parentId) return false;
       const hasChildren = (childrenMap.get(parentId)?.length || 0) > 0;
       const uniq = new Set(
-        (prodsByCat.get(parentId) || []).map((p) => p?._id || p?.id || pickProdName(p, locale))
+        (prodsByCat.get(parentId) || []).map(
+          (p) => p?._id || p?.id || pickProdName(p, locale)
+        )
       );
       const hasProds = uniq.size >= 2;
       return hasChildren || hasProds;
@@ -331,13 +355,16 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${active
-                        ? "bg-[#F5B301] text-[#0B2239]"
-                        : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                        }`}
+                      className={`flex items-center justify-between rounded-md px-4 py-3 text-[16px] transition ${
+                        active
+                          ? "bg-[#F5B301] text-[#0B2239]"
+                          : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
+                      }`}
                     >
                       {label}
-                      {willHaveRight ? <span className="ml-3 text-xs opacity-70">›</span> : null}
+                      {willHaveRight ? (
+                        <span className="ml-3 text-xs opacity-70">›</span>
+                      ) : null}
                     </Link>
                   </li>
                 );
@@ -476,14 +503,28 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
   async function handleLogout() {
     try {
-      await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
-    } catch { } finally {
+      // 1) Effacer les cookies posés sur le DOMAINE FRONT
+      await fetch("/api/logout", {
+        method: "POST",
+        credentials: "include",
+        cache: "no-store",
+      });
+
+      // 2) (facultatif) prévenir le backend de fermer sa session
+      try {
+        await fetch(`${API}/auth/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+      } catch {}
+    } finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch { }
-      window.location.replace(`/${locale}`);
+      } catch {}
+      // rechargement propre
+      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}`);
     }
   }
 
@@ -495,20 +536,33 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 h-auto min-h-[40px] py-1 text-[12px] sm:text-[14px]">
             <nav className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <button type="button" onClick={() => goToSection("apropos")} className="opacity-90 transition hover:text-[#F5B301]" role="link">
+              <button
+                type="button"
+                onClick={() => goToSection("apropos")}
+                className="opacity-90 transition hover:text-[#F5B301]"
+                role="link"
+              >
                 {t("topbar.about")}
               </button>
 
               <span className="hidden sm:inline opacity-40">|</span>
 
               {/* HELP DESK: lien sans tiret */}
-              <Link href={`/${locale}/help-desk`} className="opacity-90 transition hover:text-[#F5B301]">
+              <Link
+                href={`/${locale}/help-desk`}
+                className="opacity-90 transition hover:text-[#F5B301]"
+              >
                 {t("topbar.helpdesk")}
               </Link>
 
               <span className="hidden sm:inline opacity-40">|</span>
 
-              <button type="button" onClick={() => goToSection("presentation")} className="opacity-90 transition hover:text-[#F5B301]" role="link">
+              <button
+                type="button"
+                onClick={() => goToSection("presentation")}
+                className="opacity-90 transition hover:text-[#F5B301]"
+                role="link"
+              >
                 {t("topbar.presentation")}
               </button>
             </nav>
@@ -530,7 +584,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               <div className="flex items-center gap-1 sm:gap-2">
                 <button
                   onClick={() => switchLang("fr")}
-                  className={`${locale === "fr" ? "ring-2 ring-[#F5B301] rounded-full" : ""} px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
+                  className={`${
+                    locale === "fr" ? "ring-2 ring-[#F5B301] rounded-full" : ""
+                  } px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
                   title={t("aria.langFR")}
                   aria-pressed={locale === "fr"}
                 >
@@ -538,7 +594,9 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 </button>
                 <button
                   onClick={() => switchLang("en")}
-                  className={`${locale === "en" ? "ring-2 ring-[#F5B301] rounded-full" : ""} px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
+                  className={`${
+                    locale === "en" ? "ring-2 ring-[#F5B301] rounded-full" : ""
+                  } px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
                   title={t("aria.langEN")}
                   aria-pressed={locale === "en"}
                 >
@@ -575,29 +633,49 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               />
             </Link>
 
-
-
             {/* nav desktop */}
             <nav className="hidden items-center gap-1 md:flex">
-              <Link href={homeHref} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]">
+              <Link
+                href={homeHref}
+                className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+              >
                 {t("nav.home")}
               </Link>
 
-              {(!isLoggedClient || isHome) ? (
+              {!isLoggedClient || isHome ? (
                 <>
-                  <button type="button" onClick={() => goToSection("presentation")} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]" role="link">
+                  <button
+                    type="button"
+                    onClick={() => goToSection("presentation")}
+                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+                    role="link"
+                  >
                     {t("nav.company")}
                   </button>
-                  {!loadingCats && <ProductsMenu cats={categories} locale={locale} />}
-                  <button type="button" onClick={() => goToSection("contact")} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]" role="link">
+                  {!loadingCats && (
+                    <ProductsMenu cats={categories} locale={locale} />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => goToSection("contact")}
+                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+                    role="link"
+                  >
                     {t("nav.contact")}
                   </button>
-                  <button type="button" onClick={() => goToSection("localisation")} className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]" role="link">
+                  <button
+                    type="button"
+                    onClick={() => goToSection("localisation")}
+                    className="px-3 py-2 text-[15px] md:text-[16px] font-bold text-[#0B2239] hover:text-[#F5B301]"
+                    role="link"
+                  >
                     {t("nav.location")}
                   </button>
                 </>
               ) : (
-                !loadingCats && <ProductsMenu cats={categories} locale={locale} />
+                !loadingCats && (
+                  <ProductsMenu cats={categories} locale={locale} />
+                )
               )}
 
               {isLoggedClient && <ClientNavItemsDesktop />}
@@ -639,22 +717,46 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         {open && (
           <div className="md:hidden border-top border-slate-200 bg-white">
             <div className="mx-auto max-w-screen-2xl px-4 py-3 flex flex-col gap-1">
-              <Link href={homeHref} className="rounded px-3 py-2 hover:bg-slate-50 text-[15px]" onClick={() => setOpen(false)}>
+              <Link
+                href={homeHref}
+                className="rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                onClick={() => setOpen(false)}
+              >
                 {t("nav.home")}
               </Link>
 
               {(!isLoggedClient || isHome) && (
                 <>
-                  <button type="button" onClick={() => goToSection("presentation", true)} className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]" role="link">
+                  <button
+                    type="button"
+                    onClick={() => goToSection("presentation", true)}
+                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                    role="link"
+                  >
                     {t("nav.company")}
                   </button>
-                  <button type="button" onClick={() => goToSection("specialites", true)} className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]" role="link">
+                  <button
+                    type="button"
+                    onClick={() => goToSection("specialites", true)}
+                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                    role="link"
+                  >
                     {t("nav.products")}
                   </button>
-                  <button type="button" onClick={() => goToSection("contact", true)} className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]" role="link">
+                  <button
+                    type="button"
+                    onClick={() => goToSection("contact", true)}
+                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                    role="link"
+                  >
                     {t("nav.contact")}
                   </button>
-                  <button type="button" onClick={() => goToSection("localisation", true)} className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]" role="link">
+                  <button
+                    type="button"
+                    onClick={() => goToSection("localisation", true)}
+                    className="text-left rounded px-3 py-2 hover:bg-slate-50 text-[15px]"
+                    role="link"
+                  >
                     {t("nav.location")}
                   </button>
                 </>
