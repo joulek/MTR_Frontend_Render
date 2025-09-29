@@ -100,14 +100,14 @@ export default function LoginPage() {
               />
 
               <h2
-                className="mt-5 max-w-md text-3xl font-extrabold leading-tight text-[#ffb400] md:text-4xl"
+                className="mt-1 max-w-md text-3xl font-extrabold leading-tight text-[#ffb400] md:text-4xl"
                 style={{ fontFamily: "'Lora', serif" }}
               >
                 {t("joinClientSpace")}
               </h2>
 
               <p
-                className="mt-3 max-w-md text-sm font-bold  text-[#002147]/80 md:text-base"
+                className="mt-2 max-w-md text-sm font-bold  text-[#002147]/80 md:text-base"
                 style={{ fontFamily: "'Lora', serif" }}
               >
                 {t("promoText")}
