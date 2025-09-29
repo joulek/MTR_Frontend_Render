@@ -56,10 +56,8 @@ export default function LoginPage() {
 
         // Rediriger selon le rôle
         if (role === "admin") router.push(`/${locale}/admin`);
-        else if (role === "client")
-          router.push(
-            `/${locale}/client/devis`
-          ); // Redirection vers la page de devis pour un client
+        else if (role === "client") router.push(`/${locale}/client/devis`);
+        // Redirection vers la page de devis pour un client
         else router.push(`/${locale}/home`);
       }
     } catch {
@@ -95,9 +93,9 @@ export default function LoginPage() {
               <Image
                 src="/logo.png"
                 alt="MTR — Manufacture Tunisienne des Ressorts"
-                width={500} // ~ largeur par défaut desktop
-                height={400}
-                className="drop-shadow-xl w-[200px] md:w-[240px] lg:w-[260px] h-auto"
+                width={600}
+                height={500}
+                className="drop-shadow-xl w-[300px] md:w-[360px] lg:w-[420px] h-auto"
                 priority
               />
 
