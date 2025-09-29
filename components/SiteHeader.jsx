@@ -518,14 +518,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   };
 
   async function handleLogout() {
-    try {
-      // 1) Effacer les cookies posés sur le DOMAINE FRONT
-      await fetch("/api/logout", {
-        method: "POST",
-        credentials: "include",
-        cache: "no-store",
-      });
-
       // 2) (facultatif) prévenir le backend de fermer sa session
       try {
         await fetch(`${API}/auth/logout`, {
@@ -533,7 +525,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           credentials: "include",
         });
       } catch {}
-    } finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
@@ -542,7 +533,6 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       // rechargement propre
       window.location.replace(`/${typeof locale === "string" ? locale : "fr"}`);
     }
-  }
 
   /* ======================= RENDER ======================= */
   return (
