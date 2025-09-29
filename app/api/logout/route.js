@@ -4,22 +4,18 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// Les attributs DOIVENT matcher ceux utilisés au login côté backend
 function expiredCookieOpts() {
   const isProd = process.env.NODE_ENV === "production";
-
-  // Doivent MATCHER ceux utilisés au login (authController.baseCookieOpts)
-  const base = {
+  return {
     path: "/",
-    httpOnly: true,             // token était httpOnly:true
     secure: isProd ? true : false,
     sameSite: isProd ? "none" : "lax",
-    // IMPORTANT: si tu utilises un DOMAIN au login (COOKIE_DOMAIN),
-    // dé-commente la ligne suivante pour l'avoir identique ici:
-    // domain: process.env.COOKIE_DOMAIN,
     maxAge: 0,
     expires: new Date(0),
+    // Si tu utilises un domain au login (COOKIE_DOMAIN), dé-commente:
+    // domain: process.env.COOKIE_DOMAIN,
   };
-  return base;
 }
 
 export async function POST() {
@@ -27,19 +23,16 @@ export async function POST() {
 
   const gone = expiredCookieOpts();
 
-  // Efface le token (httpOnly)
+  // token était httpOnly:true au login → efface en httpOnly:true
   res.cookies.set("token", "", { ...gone, httpOnly: true });
-
-  // Efface le rôle (non httpOnly côté login)
+  // role / rememberMe côté UI → httpOnly:false
   res.cookies.set("role", "", { ...gone, httpOnly: false });
-
-  // Si tu avais posé rememberMe
   res.cookies.set("rememberMe", "", { ...gone, httpOnly: false });
 
   return res;
 }
 
-// CORS optionnel si tu appelles /api/logout cross-origin
+// (optionnel) si /api/logout est appelé cross-origin
 export async function OPTIONS() {
   const res = new NextResponse(null, { status: 204 });
   res.headers.set("Access-Control-Allow-Origin", process.env.NEXT_PUBLIC_APP_ORIGIN ?? "*");
