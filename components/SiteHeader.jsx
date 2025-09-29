@@ -440,7 +440,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         </Link>
 
         {/* NEW: Réclamer */}
-        <Link href={`/${locale}/client/reclamation`} className={itemCls}>
+        <Link href={`/${locale}/client/reclamations`} className={itemCls}>
           {t("client.claim")}
         </Link>
       </>
