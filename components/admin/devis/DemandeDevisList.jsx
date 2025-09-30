@@ -435,7 +435,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 
                       {/* ✅ Pièces jointes (mobile, section unique) */}
                       <div className="col-span-2">
-                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.attachments")}</p>
+                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.pdf")}</p>
                         {hasDocs ? (
                           count === 1 ? (
                             <a
