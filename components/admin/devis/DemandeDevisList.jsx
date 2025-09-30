@@ -18,6 +18,15 @@ const API = `${BACKEND}/api`;
 const WRAP = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
 const dash = "—";
 
+// Normalise pour recherche : lower + suppression d'accents + trim
+function norm(x) {
+  return String(x ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .trim();
+}
+
 function formatDate(d) {
   try {
     const dt = new Date(d);
@@ -30,6 +39,7 @@ function formatDate(d) {
     return dash;
   }
 }
+
 function useDebounced(value, delay = 350) {
   const [v, setV] = useState(value);
   useEffect(() => {
@@ -64,12 +74,16 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const [q, setQ] = useState(query);
   const qDebounced = useDebounced(q, 400);
 
-  // pagination
+  // pagination (contrôle UI)
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // données (mode normal: rows/total depuis serveur ; mode local: allRowsLocal filtrées)
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
+
+  // stockage brut pour filtrage local quand q != ""
+  const [allRowsLocal, setAllRowsLocal] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -83,18 +97,60 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const toastTimer = useRef(null);
   useEffect(() => () => toastTimer.current && clearTimeout(toastTimer.current), []);
 
+  const localMode = qDebounced.trim().length > 0;
+
+  const typeLabel = useCallback(
+    (v) => {
+      const map = {
+        compression: tTypes("compression"),
+        traction: tTypes("traction"),
+        torsion: tTypes("torsion"),
+        fil: tTypes("fill"),
+        grille: tTypes("grille"),
+        autre: tTypes("autre"),
+      };
+      return map[v] ?? (v || dash);
+    },
+    [tTypes]
+  );
+
+  // Construit une "ligne indexable" pour la recherche locale
+  const makeSearchHaystack = useCallback(
+    (r) => {
+      const demande = r.demandeNumero || r._id || "";
+      const typeTxt = typeLabel(r.type);
+      const client = getClientLabel(r);
+      const dateTxt = formatDate(r.date);
+
+      // on inclut aussi les valeurs brutes pour couvrir plus de cas
+      const rawDate = r?.date ? new Date(r.date).toISOString() : "";
+      const rawType = r?.type || "";
+
+      return norm(
+        [demande, typeTxt, rawType, client, dateTxt, rawDate]
+          .filter(Boolean)
+          .join(" | ")
+      );
+    },
+    [typeLabel]
+  );
+
   const load = useCallback(
     async (silent = false) => {
       try {
         setError("");
         if (silent) setSyncing(true);
-        else if (rows.length === 0) setLoading(true);
+        else setLoading(true);
+
+        // En mode local, on tire un gros lot (ex. 2000) page=1, et on filtre en front
+        const effectivePage = localMode ? 1 : page;
+        const effectiveLimit = localMode ? 2000 : pageSize;
 
         const params = new URLSearchParams({
           type: type || "all",
-          q: qDebounced || "",
-          page: String(page),
-          limit: String(pageSize),
+          q: localMode ? "" : (qDebounced || ""), // ne pas filtrer côté serveur en mode local
+          page: String(effectivePage),
+          limit: String(effectiveLimit),
         });
 
         const res = await fetch(`${API}/devis/demandes/compact?` + params.toString(), {
@@ -104,8 +160,17 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         const data = await res.json().catch(() => null);
         if (!res.ok || !data?.success) throw new Error(data?.message || `HTTP ${res.status}`);
 
-        setRows(Array.isArray(data.items) ? data.items : []);
-        setTotal(Number(data.total) || 0);
+        if (localMode) {
+          // on garde tout en mémoire pour filtrer/paginer en front
+          const items = Array.isArray(data.items) ? data.items : [];
+          setAllRowsLocal(items);
+          setRows(items); // valeur brute (sera re-slicée plus bas)
+          setTotal(items.length); // total avant filtre (réel on le mettra après filtre dans computed)
+        } else {
+          setAllRowsLocal([]); // pas utilisé
+          setRows(Array.isArray(data.items) ? data.items : []);
+          setTotal(Number(data.total) || 0);
+        }
       } catch (err) {
         setError(err?.message || "Error");
       } finally {
@@ -113,29 +178,47 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         else setLoading(false);
       }
     },
-    [type, qDebounced, page, pageSize, rows.length]
+    [type, qDebounced, page, pageSize, localMode]
   );
 
-  useEffect(() => { setPage(1); setSelectedIds([]); }, [type, qDebounced]);
-  useEffect(() => { load(rows.length > 0); }, [load]);
+  // reset pagination & sélection quand type / recherche changent
+  useEffect(() => {
+    setPage(1);
+    setSelectedIds([]);
+  }, [type, qDebounced]);
 
-  const typeLabel = (v) => {
-    const map = {
-      compression: tTypes("compression"),
-      traction: tTypes("traction"),
-      torsion: tTypes("torsion"),
-      fil: tTypes("fill"),
-      grille: tTypes("grille"),
-      autre: tTypes("autre"),
-    };
-    return map[v] ?? (v || dash);
-  };
+  useEffect(() => {
+    // si on a déjà des rows (ex: pagination), on montre spinner light
+    load(rows.length > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [load]);
 
-  const pageIds = useMemo(() => rows.map((r) => r._id), [rows]);
-  const allOnPageSelected = rows.length > 0 && rows.every((it) => selectedIds.includes(it._id));
+  // Filtrage/pagination locale (quand qDebounced != "")
+  const filteredLocal = useMemo(() => {
+    if (!localMode) return { list: rows, total: total };
+
+    const needle = norm(qDebounced);
+    const filtered = (allRowsLocal || []).filter((r) => {
+      const hay = makeSearchHaystack(r);
+      return hay.includes(needle);
+    });
+
+    const totalLocal = filtered.length;
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const sliced = filtered.slice(start, end);
+
+    return { list: sliced, total: totalLocal };
+  }, [localMode, rows, total, allRowsLocal, qDebounced, page, pageSize, makeSearchHaystack]);
+
+  const rowsToRender = localMode ? filteredLocal.list : rows;
+  const totalToRender = localMode ? filteredLocal.total : total;
+
+  const pageIds = useMemo(() => rowsToRender.map((r) => r._id), [rowsToRender]);
+  const allOnPageSelected = rowsToRender.length > 0 && rowsToRender.every((it) => selectedIds.includes(it._id));
 
   function openMultiFromSelection() {
-    const chosen = rows.filter((r) => selectedIds.includes(r._id));
+    const chosen = rowsToRender.filter((r) => selectedIds.includes(r._id));
     if (!chosen.length) return;
 
     const baseClient = (getClientLabel(chosen[0]) || "").toLowerCase().trim();
@@ -160,7 +243,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
             {t("title")}
           </h1>
 
-          {/* Barre de recherche réduite (mêmes proportions que “Liste des devis”) */}
+          {/* Barre de recherche */}
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-[260px] md:w-[320px] lg:w-[360px]">
               <FiSearch
@@ -205,13 +288,13 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 
       {/* Table / List */}
       <div className={WRAP}>
-        {loading && rows.length === 0 ? (
+        {loading && rowsToRender.length === 0 ? (
           <div className="space-y-2 animate-pulse">
             <div className="h-10 bg-gray-100 rounded" />
             <div className="h-10 bg-gray-100 rounded" />
             <div className="h-10 bg-gray-100 rounded" />
           </div>
-        ) : total === 0 ? (
+        ) : totalToRender === 0 ? (
           <p className="text-gray-500">{t("messages.noData")}</p>
         ) : (
           <>
@@ -240,10 +323,11 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">{t("attachments.title", { default: "Pièces jointes" })}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {rows.map((r) => {
+                    {rowsToRender.map((r) => {
                       const clientLabel = getClientLabel(r);
                       const docs = Array.isArray(r.documents) ? r.documents : [];
                       const count = docs.length > 0 ? docs.length : (Number(r.attachments) || 0);
@@ -316,7 +400,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             )}
                           </td>
 
-                          {/* ✅ Pièces jointes (1 = ouverture directe, >1 = menu) */}
+                          {/* ✅ Pièces jointes */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             {hasDocs ? (
                               count === 1 ? (
@@ -368,17 +452,18 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                 <Pagination
                   page={page}
                   pageSize={pageSize}
-                  total={total}
+                  total={totalToRender}
                   onPageChange={(n) => setPage(Number(n))}
                   onPageSizeChange={(s) => { setPageSize(Number(s)); setPage(1); }}
                   pageSizeOptions={[5, 10, 20, 50]}
                 />
+                {syncing && <p className="mt-2 text-xs text-gray-400">Mise à jour…</p>}
               </div>
             </div>
 
             {/* < md */}
             <div className="md:hidden divide-y divide-gray-200">
-              {rows.map((r) => {
+              {rowsToRender.map((r) => {
                 const clientLabel = getClientLabel(r);
                 const docs = Array.isArray(r.documents) ? r.documents : [];
                 const count = docs.length > 0 ? docs.length : (Number(r.attachments) || 0);
@@ -478,11 +563,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
               <Pagination
                 page={page}
                 pageSize={pageSize}
-                total={total}
+                total={totalToRender}
                 onPageChange={(n) => setPage(Number(n))}
                 onPageSizeChange={(s) => { setPageSize(Number(s)); setPage(1); }}
                 pageSizeOptions={[5, 10, 20, 50]}
               />
+              {syncing && <p className="mt-2 text-xs text-gray-400">Mise à jour…</p>}
             </div>
           </>
         )}
