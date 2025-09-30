@@ -94,7 +94,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
     try {
       const saved = localStorage.getItem("mtr_locale");
       if (saved === "en" || saved === "fr") desired = saved;
-    } catch {}
+    } catch { }
 
     const m = PATH_LOCALE_RE.exec(pathname);
     const pathLocale = m?.[1] || null;
@@ -142,7 +142,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           if (json?.role) {
             try {
               localStorage.setItem("mtr_role", json.role);
-            } catch {}
+            } catch { }
             setHintRole(json.role);
           }
         } else {
@@ -150,14 +150,14 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           setHintRole(null);
           try {
             localStorage.removeItem("mtr_role");
-          } catch {}
+          } catch { }
         }
       } catch {
         setMe(null);
         setHintRole(null);
         try {
           localStorage.removeItem("mtr_role");
-        } catch {}
+        } catch { }
       }
     })();
     return () => {
@@ -216,8 +216,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         const list = Array.isArray(data?.products)
           ? data.products
           : Array.isArray(data)
-          ? data
-          : [];
+            ? data
+            : [];
         if (alive) setProducts(list);
       } catch {
         if (alive) setProducts([]);
@@ -262,7 +262,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
       setLocale(next);
       try {
         localStorage.setItem("mtr_locale", next);
-      } catch {}
+      } catch { }
       if (typeof document !== "undefined") document.documentElement.lang = next;
       const nextPath = swapLocaleInPath(pathname, next);
       router.push(nextPath, { scroll: false });
@@ -355,11 +355,10 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                     <Link
                       href={makeCatHref(parent, locale)}
                       onMouseEnter={() => setHoveredParent(id)}
-                      className={`flex items-center justify-between rounded-md px-3.5 py-2.5 text-[15px] transition ${
-                        active
+                      className={`flex items-center justify-between rounded-md px-3.5 py-2.5 text-[15px] transition ${active
                           ? "bg-[#F5B301] text-[#0B2239]"
                           : "text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
-                      }`}
+                        }`}
                     >
                       {label}
                       {willHaveRight ? (
@@ -532,15 +531,28 @@ export default function SiteHeader({ mode = "public", onLogout }) {
           method: "POST",
           credentials: "include",
         });
-      } catch {}
+      } catch { }
     } finally {
       try {
         localStorage.removeItem("mtr_role");
         localStorage.removeItem("userRole");
         localStorage.removeItem("rememberMe");
-      } catch {}
-      // rechargement propre
-      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}`);
+      } catch { }
+
+      // ✅ CORRECTION: Rediriger vers la page d'accueil AVANT le rechargement
+      const homePage = `/${typeof locale === "string" ? locale : "fr"}`;
+
+      // Si on est déjà sur une page protégée, rediriger d'abord
+      if (pathname.includes('/client/')) {
+        router.push(homePage);
+        // Petit délai pour permettre la navigation avant le rechargement
+        setTimeout(() => {
+          window.location.href = homePage;
+        }, 100);
+      } else {
+        // Si on est sur une page publique, juste recharger
+        window.location.href = homePage;
+      }
     }
   }
 
@@ -600,9 +612,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
               <div className="flex items-center gap-1 sm:gap-2">
                 <button
                   onClick={() => switchLang("fr")}
-                  className={`${
-                    locale === "fr" ? "ring-2 ring-[#F5B301] rounded-full" : ""
-                  } px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
+                  className={`${locale === "fr" ? "ring-2 ring-[#F5B301] rounded-full" : ""
+                    } px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
                   title={t("aria.langFR")}
                   aria-pressed={locale === "fr"}
                 >
@@ -610,9 +621,8 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                 </button>
                 <button
                   onClick={() => switchLang("en")}
-                  className={`${
-                    locale === "en" ? "ring-2 ring-[#F5B301] rounded-full" : ""
-                  } px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
+                  className={`${locale === "en" ? "ring-2 ring-[#F5B301] rounded-full" : ""
+                    } px-2 py-1 bg-transparent border-0 text-[13px] sm:text-[14px] font-semibold`}
                   title={t("aria.langEN")}
                   aria-pressed={locale === "en"}
                 >
