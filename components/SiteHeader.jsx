@@ -540,7 +540,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         localStorage.removeItem("rememberMe");
       } catch {}
       // rechargement propre
-      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}`);
+      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}/login`);
     }
   }
 
