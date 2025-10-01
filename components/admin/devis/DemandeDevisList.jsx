@@ -16,10 +16,9 @@ const BACKEND = (
 const API = `${BACKEND}/api`;
 
 /* ---------------------------- Utils ---------------------------- */
-const WRAP = "mx-auto w/full max-w-7xl px-4 sm:px-6 lg:px-8".replace("/","/");
+const WRAP = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8";
 const dash = "—";
 
-// Normalise pour recherche : lower + suppression d'accents + trim
 function norm(x) {
   return String(x ?? "")
     .toLowerCase()
@@ -50,9 +49,10 @@ function useDebounced(value, delay = 350) {
   return v;
 }
 
-// 🔗 liens PDFs — maintenant fournis tout prêts par l'API flat
-const ddvHref = (r) => r?.ddvPdf || null;                 // /api/devis/:type/:id/pdf (ou null)
-const devisHref = (r) => r?.devisPdf || null;              // /files/devis/DVxxxx.pdf
+/* --------- liens (viennent prêts من الAPI) --------- */
+const ddvHref = (r) => r?.ddvPdf || null; // /api/devis/:type/:id/pdf أو null
+const attachmentHref = (r, idx) =>
+  r?.type && r?._id ? `${BACKEND}/api/devis/${r.type}/${r._id}/document/${idx}` : null;
 
 export default function DemandeDevisList({ type = "all", query = "" }) {
   const t = useTranslations("auth.admin.demandsListPage");
@@ -61,11 +61,9 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const [q, setQ] = useState(query);
   const qDebounced = useDebounced(q, 400);
 
-  // pagination (contrôle UI)
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // données
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
 
@@ -73,7 +71,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState("");
 
-  // sélection multiple + modal
+  // sélection multiple + modal (نخليوها كما هي)
   const [selectedIds, setSelectedIds] = useState([]);
   const [multiOpen, setMultiOpen] = useState(false);
   const [multiDemands, setMultiDemands] = useState([]);
@@ -96,18 +94,21 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
     [tTypes]
   );
 
-  // Construit une "ligne indexable" pour la recherche locale (flat)
+  // haystack للبحث
   const makeSearchHaystack = useCallback(
-    (r) => {
-      const demande = r.demandeNumero || r._id || "";
-      const typeTxt = typeLabel(r.type);
-      const client = String(r.client || "");
-      const dateTxt = formatDate(r.date);
-      const rawDate = r?.date ? new Date(r.date).toISOString() : "";
-      const rawType = r?.type || "";
-      return norm([demande, typeTxt, rawType, client, dateTxt, rawDate].filter(Boolean).join(" | "));
-    },
-    [typeLabel]
+    (r) =>
+      norm(
+        [
+          r.demandeNumero, // DDV...
+          r.type,
+          r.client,
+          formatDate(r.date),
+          r?.date ? new Date(r.date).toISOString() : "",
+        ]
+          .filter(Boolean)
+          .join(" | ")
+      ),
+    []
   );
 
   const load = useCallback(
@@ -124,7 +125,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           limit: String(pageSize),
         });
 
-        // ⬇️ نستعمل الendpoint المسطّح
+        // ⬇️ endpoint المسطّح الصحيح
         const res = await fetch(`${API}/devis/devis/list?` + params.toString(), {
           credentials: "include",
           cache: "no-store",
@@ -133,11 +134,8 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         if (!res.ok || !data?.success) throw new Error(data?.message || `HTTP ${res.status}`);
 
         const items = Array.isArray(data.items) ? data.items : [];
-        // بحث محلي سريع (نفس الريكويست يرجّع subset حسب q/filters من الباك، ونعمل تأكيد هنا)
         const needle = norm(qDebounced);
-        const filtered = needle
-          ? items.filter((r) => makeSearchHaystack(r).includes(needle))
-          : items;
+        const filtered = needle ? items.filter((r) => makeSearchHaystack(r).includes(needle)) : items;
 
         setRows(filtered);
         setTotal(Number(data.total) || filtered.length);
@@ -151,7 +149,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
     [type, qDebounced, page, pageSize, makeSearchHaystack]
   );
 
-  // reset pagination & sélection quand type / recherche changent
   useEffect(() => {
     setPage(1);
     setSelectedIds([]);
@@ -166,14 +163,17 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const totalToRender = total;
 
   const pageIds = useMemo(() => rowsToRender.map((r) => r._id), [rowsToRender]);
-  const allOnPageSelected = rowsToRender.length > 0 && rowsToRender.every((it) => selectedIds.includes(it._id));
+  const allOnPageSelected =
+    rowsToRender.length > 0 && rowsToRender.every((it) => selectedIds.includes(it._id));
 
   function openMultiFromSelection() {
     const chosen = rowsToRender.filter((r) => selectedIds.includes(r._id));
     if (!chosen.length) return;
 
     const baseClient = String(chosen[0]?.client || "").toLowerCase().trim();
-    const okSameClient = chosen.every((x) => String(x?.client || "").toLowerCase().trim() === baseClient);
+    const okSameClient = chosen.every(
+      (x) => String(x?.client || "").toLowerCase().trim() === baseClient
+    );
     if (!okSameClient) {
       setToast({ text: "Sélectionne des demandes appartenant au même client.", kind: "warning" });
       toastTimer.current = setTimeout(() => setToast(null), 3500);
@@ -195,10 +195,17 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           {/* Barre de recherche */}
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-[260px] md:w-[320px] lg:w-[360px]">
-              <FiSearch aria-hidden className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              <FiSearch
+                aria-hidden
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                size={18}
+              />
               <input
                 value={q}
-                onChange={(e) => { setQ(e.target.value); setPage(1); }}
+                onChange={(e) => {
+                  setQ(e.target.value);
+                  setPage(1);
+                }}
                 placeholder={t("search.placeholder")}
                 aria-label={t("search.aria")}
                 className="w-full h-10 rounded-xl border border-gray-300 bg-white pl-10 pr-9 text-sm text-[#0B1E3A] shadow focus:border-[#F7C600] focus:ring-2 focus:ring-[#F7C600]/30 outline-none transition"
@@ -206,7 +213,10 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
               {q && (
                 <button
                   type="button"
-                  onClick={() => { setQ(""); setPage(1); }}
+                  onClick={() => {
+                    setQ("");
+                    setPage(1);
+                  }}
                   aria-label={t("search.clear")}
                   className="absolute right-2 top-1/2 -translate-y-1/2 inline-flex h-6 w-6 items-center justify-center rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
                 >
@@ -226,7 +236,9 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         </div>
 
         {error && (
-          <p className="mt-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-red-700">{error}</p>
+          <p className="mt-3 rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-red-700">
+            {error}
+          </p>
         )}
       </div>
 
@@ -272,7 +284,9 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                   <tbody>
                     {rowsToRender.map((r) => {
                       const clientLabel = String(r.client || "");
-                      const hasDocs = Number(r.attachments) > 0;
+                      const docs = Array.isArray(r.documents) ? r.documents : [];
+                      const count = docs.length > 0 ? docs.length : Number(r.attachments) || 0;
+                      const hasDocs = count > 0;
 
                       return (
                         <tr key={`${r._id}-${r.demandeNumero}`} className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors">
@@ -288,7 +302,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             />
                           </td>
 
-                          {/* Demande (une seule par ligne) */}
+                          {/* Demande (DDV…) */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
@@ -329,19 +343,43 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             )}
                           </td>
 
-                          {/* PDF devis (DV...) / Pièces jointes */}
+                          {/* Fichiers joints (documents) */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            {devisHref(r) ? (
-                              <a
-                                href={devisHref(r)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                                title={hasDocs ? `${r.attachments} fichier(s)` : undefined}
-                              >
-                                <FiFileText size={16} />
-                                {t("actions.open")}
-                              </a>
+                            {hasDocs ? (
+                              count === 1 ? (
+                                <a
+                                  href={attachmentHref(r, docs.length > 0 ? (docs[0].index ?? 0) : 0)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                                >
+                                  <FiFileText size={16} /> {t("actions.open")}
+                                </a>
+                              ) : (
+                                <details className="group">
+                                  <summary className="cursor-pointer select-none inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50">
+                                    {count} {t("attachments.files", { default: "fichier(s)" })}
+                                  </summary>
+                                  <ul className="mt-2 ml-1 w-max max-w-[28rem] rounded-xl border border-slate-200 bg-white shadow-lg p-2 space-y-1">
+                                    {(docs.length > 0
+                                      ? docs
+                                      : Array.from({ length: count }, (_, i) => ({ index: i }))
+                                    ).map((d, i) => (
+                                      <li key={i}>
+                                        <a
+                                          href={attachmentHref(r, d.index ?? i)}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="block truncate px-2 py-1 text-sm hover:bg-slate-50"
+                                          title={d.filename || `Fichier ${i + 1}`}
+                                        >
+                                          {d.filename || `Fichier ${i + 1}`}
+                                        </a>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </details>
+                              )
                             ) : (
                               <span className="text-gray-400">{dash}</span>
                             )}
@@ -359,7 +397,10 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                   pageSize={pageSize}
                   total={totalToRender}
                   onPageChange={(n) => setPage(Number(n))}
-                  onPageSizeChange={(s) => { setPageSize(Number(s)); setPage(1); }}
+                  onPageSizeChange={(s) => {
+                    setPageSize(Number(s));
+                    setPage(1);
+                  }}
                   pageSizeOptions={[5, 10, 20, 50]}
                 />
                 {syncing && <p className="mt-2 text-xs text-gray-400">Mise à jour…</p>}
@@ -370,7 +411,9 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
             <div className="md:hidden divide-y divide-gray-200">
               {rowsToRender.map((r) => {
                 const clientLabel = String(r.client || "");
-                const hasDocs = Number(r.attachments) > 0;
+                const docs = Array.isArray(r.documents) ? r.documents : [];
+                const count = docs.length > 0 ? docs.length : Number(r.attachments) || 0;
+                const hasDocs = count > 0;
 
                 return (
                   <div key={`${r._id}-${r.demandeNumero}`} className="py-3">
@@ -390,13 +433,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                         <span className="font-mono">{r.demandeNumero || dash}</span>
                       </div>
 
-                      {ddvHref(r) || devisHref(r) ? (
+                      {ddvHref(r) ? (
                         <a
-                          href={ddvHref(r) || devisHref(r)}
+                          href={ddvHref(r)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                          title={hasDocs ? `${r.attachments} fichier(s)` : undefined}
                         >
                           <FiFileText size={16} />
                           {t("actions.open")}
@@ -408,16 +450,60 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 
                     <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.type")}</p>
+                        <p className="text-[11px] font-semibold text-gray-500">
+                          {t("table.headers.type")}
+                        </p>
                         <p className="truncate capitalize">{typeLabel(r.type)}</p>
                       </div>
                       <div>
-                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.date")}</p>
+                        <p className="text-[11px] font-semibold text-gray-500">
+                          {t("table.headers.date")}
+                        </p>
                         <p className="truncate">{formatDate(r.date)}</p>
                       </div>
                       <div className="col-span-2">
-                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.client")}</p>
-                        <p className="truncate" title={clientLabel}>{clientLabel || dash}</p>
+                        <p className="text-[11px] font-semibold text-gray-500">
+                          {t("table.headers.client")}
+                        </p>
+                        <p className="truncate" title={clientLabel}>
+                          {clientLabel || dash}
+                        </p>
+                      </div>
+
+                      {/* Attachments (optional on mobile) */}
+                      <div className="col-span-2">
+                        {hasDocs ? (
+                          count === 1 ? (
+                            <a
+                              href={attachmentHref(r, docs.length > 0 ? (docs[0].index ?? 0) : 0)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50"
+                            >
+                              <FiFileText size={16} />
+                              {t("actions.open")}
+                            </a>
+                          ) : (
+                            <ul className="mt-1 space-y-1">
+                              {(docs.length > 0
+                                ? docs
+                                : Array.from({ length: count }, (_, i) => ({ index: i }))
+                              ).map((d, i) => (
+                                <li key={i}>
+                                  <a
+                                    href={attachmentHref(r, d.index ?? i)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="underline"
+                                    title={d.filename || `Fichier ${i + 1}`}
+                                  >
+                                    {d.filename || `Fichier ${i + 1}`}
+                                  </a>
+                                </li>
+                              ))}
+                            </ul>
+                          )
+                        ) : null}
                       </div>
                     </div>
                   </div>
@@ -429,7 +515,10 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                 pageSize={pageSize}
                 total={totalToRender}
                 onPageChange={(n) => setPage(Number(n))}
-                onPageSizeChange={(s) => { setPageSize(Number(s)); setPage(1); }}
+                onPageSizeChange={(s) => {
+                  setPageSize(Number(s));
+                  setPage(1);
+                }}
                 pageSizeOptions={[5, 10, 20, 50]}
               />
               {syncing && <p className="mt-2 text-xs text-gray-400">Mise à jour…</p>}
@@ -452,7 +541,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         articleKinds={["compression", "traction", "torsion", "fil", "grille", "autre"]}
       />
 
-      {/* Toast simple */}
+      {/* Toast */}
       {toast && (
         <div className="fixed z-50 top-4 right-4 rounded-xl border px-4 py-2 shadow-lg bg-blue-50 border-blue-200 text-blue-800">
           <div className="flex items-center gap-3">
