@@ -670,6 +670,16 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   >
                     {t("client.askQuote")}
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      (onLogout || handleLogout)();
+                    }}
+                    className="mt-2 rounded-xl bg-red-600/90 px-4 py-2 text-center text-[15px] font-semibold text-white shadow hover:brightness-95"
+                  >
+                    {t("userMenu.logout")}
+                  </button>
                 </>
               ) : (
                 <>
