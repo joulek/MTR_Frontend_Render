@@ -92,27 +92,20 @@ export default function AdminReclamationsPage() {
     setPage(1);
   }, [qDeb]);
 
-  async function viewPdfById(id) {
-    try {
-      setOpeningId(id);
-      const res = await fetch(
-        `${BACKEND}/api/reclamations/admin/${id}/pdf`,
-        { credentials: "include" }
-      );
-      if (!res.ok) {
-        alert(t("errors.attachmentUnavailable"));
-        return;
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank", "noopener,noreferrer");
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    } catch {
-      alert(t("errors.openPdf"));
-    } finally {
-      setOpeningId(null);
-    }
+ async function viewPdfById(id) {
+  try {
+    setOpeningId(id);
+
+    // on ouvre directement l’URL backend (le serveur envoie déjà Content-Disposition avec le bon filename)
+    window.open(`${BACKEND}/api/reclamations/admin/${id}/pdf`, "_blank", "noopener,noreferrer");
+
+  } catch {
+    alert(t("errors.openPdf"));
+  } finally {
+    setOpeningId(null);
   }
+}
+
 
   async function viewDocByIndex(id, index) {
     try {
