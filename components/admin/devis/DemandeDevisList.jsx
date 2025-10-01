@@ -49,23 +49,19 @@ function useDebounced(value, delay = 350) {
   return v;
 }
 
-// 🔹 label client
+// 🔹 label client (le backend renvoie déjà `client` en string)
 function getClientLabel(r) {
+  if (typeof r?.client === "string" && r.client.trim()) return r.client.trim();
   if (r?.clientName && r.clientName.trim()) return r.clientName.trim();
   const prenom = r?.client?.prenom || r?.client?.firstName || "";
   const nom = r?.client?.nom || r?.client?.lastName || "";
   const full = `${prenom} ${nom}`.trim();
   if (full) return full;
-  if (typeof r?.client === "string" && r.client.trim()) return r.client.trim();
   return "";
 }
 
-// 🔗 liens PDFs
-const ddvHref = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
-const devisHref = (r) => (r.devisNumero ? `${BACKEND}/files/devis/${r.devisNumero}.pdf` : null);
-
-// 🔗 lien fichier joint PAR INDEX
-const attachmentHref = (r, idx) => `${BACKEND}/api/devis/${r.type}/${r._id}/document/${idx}`;
+// 🔗 lien PDF devis (fourni par l'API compact)
+const devisHref = (r) => r?.devisPdf || null;
 
 export default function DemandeDevisList({ type = "all", query = "" }) {
   const t = useTranslations("auth.admin.demandsListPage");
@@ -90,7 +86,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const [error, setError] = useState("");
 
   // sélection multiple + modal
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]); // -> stocke des devisNumero
   const [multiOpen, setMultiOpen] = useState(false);
   const [multiDemands, setMultiDemands] = useState([]);
   const [toast, setToast] = useState(null);
@@ -117,17 +113,25 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   // Construit une "ligne indexable" pour la recherche locale
   const makeSearchHaystack = useCallback(
     (r) => {
-      const demande = r.demandeNumero || r._id || "";
-      const typeTxt = typeLabel(r.type);
+      // nouvelles sources de recherche
+      const demandeNums =
+        Array.isArray(r.demandeNumeros) && r.demandeNumeros.length
+          ? r.demandeNumeros.join(", ")
+          : (Array.isArray(r.demandes) ? r.demandes.map(d => d?.numero).filter(Boolean).join(", ") : "");
+
+      const typeList =
+        Array.isArray(r.types) && r.types.length
+          ? r.types
+          : (Array.isArray(r.demandes) ? r.demandes.map(d => d?.type).filter(Boolean) : []);
+
+      const typesTxt = typeList.map(typeLabel).filter(Boolean).join(", ");
+
       const client = getClientLabel(r);
       const dateTxt = formatDate(r.date);
-
-      // on inclut aussi les valeurs brutes pour couvrir plus de cas
       const rawDate = r?.date ? new Date(r.date).toISOString() : "";
-      const rawType = r?.type || "";
 
       return norm(
-        [demande, typeTxt, rawType, client, dateTxt, rawDate]
+        [r.devisNumero, demandeNums, typesTxt, client, dateTxt, rawDate]
           .filter(Boolean)
           .join(" | ")
       );
@@ -153,6 +157,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           limit: String(effectiveLimit),
         });
 
+        // Chemin REST d'après ton code existant
         const res = await fetch(`${API}/devis/devis/list?` + params.toString(), {
           credentials: "include",
           cache: "no-store",
@@ -161,13 +166,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
         if (!res.ok || !data?.success) throw new Error(data?.message || `HTTP ${res.status}`);
 
         if (localMode) {
-          // on garde tout en mémoire pour filtrer/paginer en front
           const items = Array.isArray(data.items) ? data.items : [];
           setAllRowsLocal(items);
-          setRows(items); // valeur brute (sera re-slicée plus bas)
-          setTotal(items.length); // total avant filtre (réel on le mettra après filtre dans computed)
+          setRows(items);
+          setTotal(items.length);
         } else {
-          setAllRowsLocal([]); // pas utilisé
+          setAllRowsLocal([]);
           setRows(Array.isArray(data.items) ? data.items : []);
           setTotal(Number(data.total) || 0);
         }
@@ -188,7 +192,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   }, [type, qDebounced]);
 
   useEffect(() => {
-    // si on a déjà des rows (ex: pagination), on montre spinner light
     load(rows.length > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [load]);
@@ -214,11 +217,12 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
   const rowsToRender = localMode ? filteredLocal.list : rows;
   const totalToRender = localMode ? filteredLocal.total : total;
 
-  const pageIds = useMemo(() => rowsToRender.map((r) => r._id), [rowsToRender]);
-  const allOnPageSelected = rowsToRender.length > 0 && rowsToRender.every((it) => selectedIds.includes(it._id));
+  // 👉 sélection basée sur devisNumero
+  const pageIds = useMemo(() => rowsToRender.map((r) => r.devisNumero), [rowsToRender]);
+  const allOnPageSelected = rowsToRender.length > 0 && rowsToRender.every((it) => selectedIds.includes(it.devisNumero));
 
   function openMultiFromSelection() {
-    const chosen = rowsToRender.filter((r) => selectedIds.includes(r._id));
+    const chosen = rowsToRender.filter((r) => selectedIds.includes(r.devisNumero));
     if (!chosen.length) return;
 
     const baseClient = (getClientLabel(chosen[0]) || "").toLowerCase().trim();
@@ -321,39 +325,39 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       <th className="p-2.5 text-left">{t("table.headers.type")}</th>
                       <th className="p-2.5 text-left">{t("table.headers.client")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
-                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
+                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.attachments") ?? "Fichiers joints"}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rowsToRender.map((r) => {
                       const clientLabel = getClientLabel(r);
-                      const docs = Array.isArray(r.documents) ? r.documents : [];
-                      const count = docs.length > 0 ? docs.length : (Number(r.attachments) || 0);
-                      const hasDocs = count > 0;
 
                       return (
-                        <tr key={r._id} className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors">
+                        <tr key={r.devisNumero} className="odd:bg-slate-50/40 hover:bg-[#0B1E3A]/[0.04] transition-colors">
                           <td className="p-2.5 border-b border-gray-200 w-12">
                             <input
                               type="checkbox"
-                              checked={selectedIds.includes(r._id)}
+                              checked={selectedIds.includes(r.devisNumero)}
                               onChange={(e) =>
                                 setSelectedIds((prev) =>
-                                  e.target.checked ? [...prev, r._id] : prev.filter((id) => id !== r._id)
+                                  e.target.checked
+                                    ? [...prev, r.devisNumero]
+                                    : prev.filter((id) => id !== r.devisNumero)
                                 )
                               }
                             />
                           </td>
+
                           {/* Demandes (plusieurs possibles) */}
-                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
+                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap align-top">
+                            <div className="flex items-start gap-2">
+                              <span className="mt-1 h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
                               {Array.isArray(r.demandes) && r.demandes.length > 0 ? (
                                 <div className="flex flex-col">
                                   {r.demandes.map((d, i) => (
                                     <span key={i} className="font-mono">
-                                      {d.numero || dash}
+                                      {d?.numero || dash}
                                     </span>
                                   ))}
                                 </div>
@@ -364,18 +368,17 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                           </td>
 
                           {/* Types correspondants */}
-                          <td className="p-2.5 border-b border-gray-200 capitalize">
+                          <td className="p-2.5 border-b border-gray-200 capitalize align-top">
                             {Array.isArray(r.demandes) && r.demandes.length > 0 ? (
                               <div className="flex flex-col">
                                 {r.demandes.map((d, i) => (
-                                  <span key={i}>{typeLabel(d.type) || dash}</span>
+                                  <span key={i}>{typeLabel(d?.type) || dash}</span>
                                 ))}
                               </div>
                             ) : (
                               <span>{dash}</span>
                             )}
                           </td>
-
 
                           <td className="p-2.5 border-b border-gray-200">
                             <span className="block truncate max-w-[18rem]" title={clientLabel || ""}>
@@ -385,21 +388,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
 
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             {formatDate(r.date)}
-                          </td>
-
-                          {/* PDF DDV */}
-                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            <a
-                              href={ddvHref(r)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                              aria-label={t("actions.open")}
-                              title={t("actions.open")}
-                            >
-                              <FiFileText size={16} />
-                              {t("actions.open")}
-                            </a>
                           </td>
 
                           {/* PDF devis */}
@@ -421,46 +409,9 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             )}
                           </td>
 
-                          {/* ✅ Pièces jointes */}
+                          {/* Fichiers joints : non fournis par l'API compact -> affiche "—" */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            {hasDocs ? (
-                              count === 1 ? (
-                                <a
-                                  href={attachmentHref(r, docs.length > 0 ? (docs[0].index ?? 0) : 0)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                                  aria-label={t("actions.open")}
-                                  title={t("actions.open")}
-                                >
-                                  <FiFileText size={16} />
-                                  {t("actions.open")}
-                                </a>
-                              ) : (
-                                <details className="group">
-                                  <summary className="cursor-pointer select-none inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50">
-                                    {count} {t("attachments.files", { default: "fichier(s)" })}
-                                  </summary>
-                                  <ul className="mt-2 ml-1 w-max max-w-[28rem] rounded-xl border border-slate-200 bg-white shadow-lg p-2 space-y-1">
-                                    {(docs.length > 0 ? docs : Array.from({ length: count }, (_, i) => ({ index: i }))).map((d, i) => (
-                                      <li key={i}>
-                                        <a
-                                          href={attachmentHref(r, d.index ?? i)}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="block truncate px-2 py-1 text-sm hover:bg-slate-50"
-                                          title={d.filename || `${t("attachments.file", { default: "Fichier" })} ${i + 1}`}
-                                        >
-                                          {d.filename || `${t("attachments.file", { default: "Fichier" })} ${i + 1}`}
-                                        </a>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </details>
-                              )
-                            ) : (
-                              <span className="text-gray-400">{dash}</span>
-                            )}
+                            <span className="text-gray-400">{dash}</span>
                           </td>
                         </tr>
                       );
@@ -486,31 +437,28 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
             <div className="md:hidden divide-y divide-gray-200">
               {rowsToRender.map((r) => {
                 const clientLabel = getClientLabel(r);
-                const docs = Array.isArray(r.documents) ? r.documents : [];
-                const count = docs.length > 0 ? docs.length : (Number(r.attachments) || 0);
-                const hasDocs = count > 0;
 
                 return (
-                  <div key={r._id} className="py-3">
+                  <div key={r.devisNumero} className="py-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <input
                           type="checkbox"
                           className="mt-0.5"
-                          checked={selectedIds.includes(r._id)}
+                          checked={selectedIds.includes(r.devisNumero)}
                           onChange={(e) =>
                             setSelectedIds((prev) =>
-                              e.target.checked ? [...prev, r._id] : prev.filter((id) => id !== r._id)
+                              e.target.checked ? [...prev, r.devisNumero] : prev.filter((id) => id !== r.devisNumero)
                             )
                           }
                         />
                         <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
-                        <span className="font-mono">{r.demandeNumero || dash}</span>
+                        <span className="font-mono">{r.devisNumero || dash}</span>
                       </div>
 
-                      {(ddvHref(r) || devisHref(r)) ? (
+                      {devisHref(r) ? (
                         <a
-                          href={ddvHref(r) || devisHref(r)}
+                          href={devisHref(r)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
@@ -526,55 +474,38 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                     </div>
 
                     <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.type")}</p>
-                        <p className="truncate capitalize">{typeLabel(r.type)}</p>
+                      {/* Demandes / Types */}
+                      <div className="col-span-2">
+                        <p className="text-[11px] font-semibold text-gray-500">
+                          {t("table.headers.demande")} / {t("table.headers.type")}
+                        </p>
+                        {Array.isArray(r.demandes) && r.demandes.length > 0 ? (
+                          <ul className="mt-1 space-y-0.5">
+                            {r.demandes.map((d, i) => (
+                              <li key={i} className="truncate">
+                                <span className="font-mono">{d?.numero || dash}</span>{" "}
+                                <span className="text-gray-500">— {typeLabel(d?.type) || dash}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-400">{dash}</p>
+                        )}
                       </div>
+
                       <div>
                         <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.date")}</p>
                         <p className="truncate">{formatDate(r.date)}</p>
                       </div>
-                      <div className="col-span-2">
+                      <div>
                         <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.client")}</p>
                         <p className="truncate" title={clientLabel || ""}>{clientLabel || dash}</p>
                       </div>
 
-                      {/* ✅ Pièces jointes (mobile, section unique) */}
+                      {/* Pièces jointes */}
                       <div className="col-span-2">
-                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.pdf")}</p>
-                        {hasDocs ? (
-                          count === 1 ? (
-                            <a
-                              href={attachmentHref(r, docs.length > 0 ? (docs[0].index ?? 0) : 0)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] hover:bg-slate-50"
-                              aria-label={t("actions.open")}
-                              title={t("actions.open")}
-                            >
-                              <FiFileText size={16} />
-                              {t("actions.open")}
-                            </a>
-                          ) : (
-                            <ul className="mt-1 space-y-1">
-                              {(docs.length > 0 ? docs : Array.from({ length: count }, (_, i) => ({ index: i }))).map((d, i) => (
-                                <li key={i}>
-                                  <a
-                                    href={attachmentHref(r, d.index ?? i)}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="underline"
-                                    title={d.filename || `${t("attachments.file", { default: "Fichier" })} ${i + 1}`}
-                                  >
-                                    {d.filename || `${t("attachments.file", { default: "Fichier" })} ${i + 1}`}
-                                  </a>
-                                </li>
-                              ))}
-                            </ul>
-                          )
-                        ) : (
-                          <p className="text-gray-400">{dash}</p>
-                        )}
+                        <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.attachments") ?? "Fichiers joints"}</p>
+                        <p className="text-gray-400">{dash}</p>
                       </div>
                     </div>
                   </div>

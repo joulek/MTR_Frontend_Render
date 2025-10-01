@@ -868,15 +868,15 @@
           "description": "View your quote requests, open PDFs, and confirm your orders in your client area.",
           "ogAlt": "Preview of the My quotes page – MTR Industry"
         },
-        "title": "My Quote Requests",
+        "title": "My Quotes",
         "subtitle": "All requests you have submitted, newest first.",
         "searchPlaceholder": "Search by quote no., type…",
         "clear": "Clear",
         "loading": "Loading…",
         "noData": "No requests found.",
         "table": {
-          "number": "Quote request N°",
-          "type": "Quote request type",
+          "number": "Quote N°",
+          "type": "Type",
           "files": "Attachments",
           "createdAt": "Sent at",
           "order": "Order",

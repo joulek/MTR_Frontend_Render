@@ -690,15 +690,15 @@
           "description": "Consultez vos demandes de devis, ouvrez les PDF et confirmez vos commandes dans votre espace client.",
           "ogAlt": "Aperçu de la page Mes devis – MTR Manufacture Tunisienne des Ressorts"
         },
-        "title": "Mes demandes de devis",
+        "title": "Mes devis",
         "subtitle": "Toutes vos demandes envoyées, triées du plus récent au plus ancien.",
         "searchPlaceholder": "Rechercher par n° de devis, type…",
         "clear": "Effacer",
         "loading": "Chargement…",
         "noData": "Aucune demande trouvée.",
         "table": {
-          "number": "N° demande devis",
-          "type": "Type demande devis",
+          "number": "N° devis",
+          "type": "Type ",
           "files": "Fichiers joints",
           "createdAt": "Date d’envoi",
           "order": "Commande",
