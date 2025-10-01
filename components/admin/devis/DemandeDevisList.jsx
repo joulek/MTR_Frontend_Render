@@ -329,7 +329,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.date")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdfDdv")}</th>
                       <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.pdf")}</th>
-                      <th className="p-2.5 text-left whitespace-nowrap">{t("table.headers.attachments", { default: "Pièces jointes" })}</th>
                     </tr>
                   </thead>
                   <tbody>
