@@ -320,11 +320,8 @@ export default function AdminDevisTorsionPage() {
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             {hasPdf ? (
                               <button
-                                onClick={() =>
-                                  viewPdfById(d._id, d.numero, "torsion")
-                                }
-                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                              >
+
+                                 onClick={() => viewPdfById(d._id, d.numero)}>
                                 <FiFileText size={16} />
                                 {t("open")}
                               </button>
@@ -509,13 +506,14 @@ export default function AdminDevisTorsionPage() {
   );
 }
 // ✅ Ouvre le PDF avec un "filename" pour titrer l’onglet
-function viewPdfById(id, numero, type = "torsion") {
-  const file = encodeURIComponent(`devis-${type}-${numero || id}.pdf`);
-  window.open(
-    `${BACKEND}/api/devis/${type}/${id}/pdf/${file}`,
-    "_blank",
-    "noopener,noreferrer"
-  );
+// FRONT (garde l'URL existante)
+function viewPdfById(id, numero) {
+  // l’URL reste la même (route existante)
+  const url = `${BACKEND}/api/devis/torsion/${id}/pdf`;
+
+  // ouvre puis met le titre de l’onglet
+  const w = window.open(url, "_blank", "noopener,noreferrer");
+  if (w) { try { w.document.title = `Devis torsion – ${numero || id}`; } catch {} }
 }
 
 // (inchangé) pièces jointes
