@@ -598,7 +598,7 @@ export default function HomeClient() {
                   <div>
                     <p className="text-sm text-slate-500">{t("contact.tel")}</p>
                     <p className="font-semibold text-[#0B2239]">+216 98 333 883</p>
-                    <p className="font-semibold text-[#0B2239]">+216 98 33 18 96</p>
+                    <p className="font-semibold text-[#0B2239]">+216 98 331 896</p>
                     <a
                       href="tel:+21698333883"
                       className="mt-3 inline-block rounded-full border border-[#F5B301] px-4 py-2 text-sm font-semibold text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
