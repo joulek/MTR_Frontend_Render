@@ -460,7 +460,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
       {/* NEW (mobile): Réclamer */}
       <Link
-        href={`/${locale}/client/reclamation`}
+        href={`/${locale}/client/reclamations`}
         onClick={() => setOpen(false)}
         className="rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
       >
