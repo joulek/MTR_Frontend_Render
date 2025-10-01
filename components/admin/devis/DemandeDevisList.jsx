@@ -345,15 +345,37 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                               }
                             />
                           </td>
-
+                          {/* Demandes (plusieurs possibles) */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
-                              <span className="font-mono">{r.demandeNumero || dash}</span>
+                              {Array.isArray(r.demandes) && r.demandes.length > 0 ? (
+                                <div className="flex flex-col">
+                                  {r.demandes.map((d, i) => (
+                                    <span key={i} className="font-mono">
+                                      {d.numero || dash}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="font-mono">{dash}</span>
+                              )}
                             </div>
                           </td>
 
-                          <td className="p-2.5 border-b border-gray-200 capitalize">{typeLabel(r.type)}</td>
+                          {/* Types correspondants */}
+                          <td className="p-2.5 border-b border-gray-200 capitalize">
+                            {Array.isArray(r.demandes) && r.demandes.length > 0 ? (
+                              <div className="flex flex-col">
+                                {r.demandes.map((d, i) => (
+                                  <span key={i}>{typeLabel(d.type) || dash}</span>
+                                ))}
+                              </div>
+                            ) : (
+                              <span>{dash}</span>
+                            )}
+                          </td>
+
 
                           <td className="p-2.5 border-b border-gray-200">
                             <span className="block truncate max-w-[18rem]" title={clientLabel || ""}>
