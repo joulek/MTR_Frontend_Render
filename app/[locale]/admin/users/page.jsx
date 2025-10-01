@@ -8,19 +8,24 @@ import Pagination from "@/components/Pagination";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ;
 
-function fmtDate(d: any) {
+function fmtDate(d) {
   try {
     const dt = new Date(d);
-    return `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    return (
+      <>
+        {dt.toLocaleDateString()}{" "}
+        {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+      </>
+    );
   } catch {
-    return "—";
+    return <>—</>;
   }
 }
 
 export default function AdminUsersPage() {
   const t = useTranslations("auth.usersAdmin");
 
-  const [rows, setRows] = useState<any[]>([]);
+  const [rows, setRows] = useState([]);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -35,7 +40,7 @@ export default function AdminUsersPage() {
   const pathname = usePathname();
   const locale = (pathname.split("/")[1] || "fr") || "fr";
 
-  const roleLabel = (r: string) => (r === "admin" ? t("roles.admin") : t("roles.client"));
+  const roleLabel = (r) => (r === "admin" ? <>{t("roles.admin")}</> : <>{t("roles.client")}</>);
 
   async function load() {
     try {
@@ -54,7 +59,7 @@ export default function AdminUsersPage() {
       const users = Array.isArray(data) ? data : (data.users || data.data || []);
       setRows(Array.isArray(users) ? users : []);
       setPage(1);
-    } catch (e: any) {
+    } catch (e) {
       setErr(e?.message || t("errors.network"));
       setRows([]);
     } finally {
@@ -68,7 +73,7 @@ export default function AdminUsersPage() {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     if (!needle) return rows;
-    const contains = (v: any) => String(v ?? "").toLowerCase().includes(needle);
+    const contains = (v) => String(v ?? "").toLowerCase().includes(needle);
     return rows.filter((u) => {
       const name = `${u?.prenom || ""} ${u?.nom || ""}`;
       return (
@@ -288,12 +293,12 @@ export default function AdminUsersPage() {
 /* -------------------- Modals -------------------- */
 
 /* ======= MODAL DÉTAILS (icon + coins OK) ======= */
-function DetailsModal({ user, onClose }: { user: any; onClose: () => void }) {
+function DetailsModal({ user, onClose }) {
   const t = useTranslations("auth.usersAdmin");
 
   // Fermer avec ESC
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
+    const onKey = (e) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
@@ -381,7 +386,7 @@ function DetailsModal({ user, onClose }: { user: any; onClose: () => void }) {
 }
 
 /* Champ stylé (label + carte) */
-function FieldCard({ label, value, className = "", copy = false }: { label: string; value: any; className?: string; copy?: boolean; }) {
+function FieldCard({ label, value, className = "", copy = false }) {
   const t = useTranslations("auth.usersAdmin");
   return (
     <div className={className}>
@@ -404,26 +409,26 @@ function FieldCard({ label, value, className = "", copy = false }: { label: stri
 }
 
 /* ======= MODAL D'AJOUT (icon + coins OK) ======= */
-function InviteUserModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void; }) {
+function InviteUserModal({ onClose, onCreated }) {
   const t = useTranslations("auth.usersAdmin");
-  const [type, setType] = useState<"" | "personnel" | "societe">("");
+  const [type, setType] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
 
   // Fermer avec ESC
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
+  async function submit(e) {
     e.preventDefault();
     setErr("");
     setLoading(true);
     const fd = new FormData(e.currentTarget);
 
-    const payload: any = {
+    const payload = {
       nom: String(fd.get("nom") || ""),
       prenom: String(fd.get("prenom") || ""),
       email: String(fd.get("email") || ""),
@@ -456,7 +461,7 @@ function InviteUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.success) throw new Error(data?.message || `HTTP ${res.status}`);
       onCreated();
-    } catch (e: any) {
+    } catch (e) {
       setErr(e?.message || t("errors.send"));
     } finally {
       setLoading(false);
@@ -573,7 +578,7 @@ function InviteUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
   );
 }
 
-function Input({ label, className = "", ...props }: any) {
+function Input({ label, className = "", ...props }) {
   return (
     <label className={`flex flex-col ${className}`}>
       <span className="text-gray-500 text-xs font-semibold mb-1">{label}</span>
