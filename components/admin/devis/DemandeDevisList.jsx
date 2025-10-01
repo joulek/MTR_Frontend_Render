@@ -62,9 +62,12 @@ function getClientLabel(r) {
 }
 
 // 🔗 liens PDFs
-const ddvHref = (r) => `${API}/devis/${r.type}/${r._id}/pdf`;
+// liens PDFs (أكثر أمان)
+const ddvHref = (r) =>
+  r?.type && r?._id ? `${API}/devis/${r.type}/${r._id}/pdf` : null;
+
 const devisHref = (r) =>
-  r.devisNumero ? `${BACKEND}/files/devis/${r.devisNumero}.pdf` : null;
+  r?.devisNumero ? `${BACKEND}/files/devis/${r.devisNumero}.pdf` : null;
 
 // 🔗 lien fichier joint PAR INDEX
 const attachmentHref = (r, idx) =>
@@ -420,7 +423,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                           {/* Types correspondants */}
                           <td className="p-2.5 border-b border-gray-200 capitalize">
                             {Array.isArray(r.demandes) &&
-                            r.demandes.length > 0 ? (
+                            r.demandes.some((d) => d?.type) ? (
                               <div className="flex flex-col">
                                 {r.demandes.map((d, i) => (
                                   <span key={i}>
@@ -428,6 +431,14 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                                   </span>
                                 ))}
                               </div>
+                            ) : r.types && r.types.length > 0 ? (
+                              <div className="flex flex-col">
+                                {r.types.map((t, i) => (
+                                  <span key={i}>{typeLabel(t) || dash}</span>
+                                ))}
+                              </div>
+                            ) : r.type ? (
+                              <span>{typeLabel(r.type)}</span>
                             ) : (
                               <span>{dash}</span>
                             )}
