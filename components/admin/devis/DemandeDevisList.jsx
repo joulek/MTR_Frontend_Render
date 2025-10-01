@@ -153,7 +153,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           limit: String(effectiveLimit),
         });
 
-        const res = await fetch(`${API}/devis/list?` + params.toString(), {
+        const res = await fetch(`${API}/devis/demandes/compact?` + params.toString(), {
           credentials: "include",
           cache: "no-store",
         });
