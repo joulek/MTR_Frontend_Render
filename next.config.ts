@@ -8,6 +8,7 @@ const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-rend
 const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
+    domains: ["mtr-backend-render.onrender.com"],
     remotePatterns: [
       { protocol: "https", hostname: "mtr-backend-render.onrender.com", pathname: "/uploads/**" },
     ],
