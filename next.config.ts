@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
     remotePatterns: [
-      { protocol: "https", hostname: "https://mtr-backend-render.onrender.com", pathname: "/uploads/**" },
+      { protocol: "https", hostname: "mtr-backend-render.onrender.com", pathname: "/uploads/**" },
     ],
   },
   async rewrites() {
