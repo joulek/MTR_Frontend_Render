@@ -358,7 +358,16 @@ export default function HomeClient() {
                   {categories.map((c) => {
                     const title = pickName(c, locale);
                     const raw = c?.image?.url || "";
-                    const imgUrl = raw.startsWith("http") ? raw : `${BACKEND}${raw.startsWith("/") ? "" : "/"}${raw}`;
+                    // Normaliser pour forcer l'hôte BACKEND en HTTPS et éviter mixed-content
+                    let path = raw;
+                    if (/^https?:\/\//i.test(path)) {
+                      try { const u = new URL(path); path = u.pathname || "/"; } catch {}
+                    }
+                    if (!path.startsWith("/")) path = "/" + path;
+                    if (!/^\/uploads\//i.test(path)) {
+                      path = "/uploads/" + path.replace(/^\/+/, "");
+                    }
+                    const imgUrl = `${BACKEND}${path}`;
                     const alt = c?.image?.[`alt_${locale}`] || c?.image?.alt_fr || title;
                     const slug = (c?.slug && c.slug.trim()) || slugify(title); // ✅ slug backend prioritaire, sinon propre
                     const href = `/${locale}/produits/${slug}`;
