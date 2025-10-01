@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+
+import { useState, useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import Image from "next/image";
 
@@ -24,14 +25,17 @@ export default function DevisPage() {
   const t = useTranslations("auth.devis");
   const locale = useLocale();
 
-  const TYPES = [
-    { key: "compression", label: t("types.compression") || "", img: compressionImg },
-    { key: "traction", label: t("types.traction") || "", img: tractionImg },
-    { key: "torsion", label: t("types.torsion") || "", img: torsionImg },
-    { key: "fil", label: t("types.fil") || "", img: fillImg },
-    { key: "grille", label: t("types.grille") || "", img: grillImg },
-    { key: "autre", label: t("types.autre") || "", img: autreImg },
-  ];
+  const TYPES = useMemo(
+    () => [
+      { key: "compression", label: t("types.compression") || "Compression", img: compressionImg },
+      { key: "traction", label: t("types.traction") || "Traction", img: tractionImg },
+      { key: "torsion", label: t("types.torsion") || "Torsion", img: torsionImg },
+      { key: "fil", label: t("types.fil") || "Fil dressé", img: fillImg },
+      { key: "grille", label: t("types.grille") || "Grille métallique", img: grillImg },
+      { key: "autre", label: t("types.autre") || "Autre", img: autreImg },
+    ],
+    [t]
+  );
 
   const renderForm = () => {
     switch (type) {
@@ -54,45 +58,38 @@ export default function DevisPage() {
 
           {/* Liste des types */}
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {TYPES.map(({ key, label, Icon, img }) => {
+            {TYPES.map(({ key, label, img }, idx) => {
               const active = type === key;
               return (
                 <button
                   key={key}
+                  type="button"
                   onClick={() => setType(key)}
                   className={[
                     "rounded-xl border p-4 text-left transition group h-full",
                     active ? "border-[#ffb400] bg-[#fff7e6] shadow"
-                           : "border-gray-200 bg-white hover:border-[#ffb400]/60 hover:shadow-md"
+                           : "border-gray-200 bg-white hover:border-[#ffb400]/60 hover:shadow-md",
                   ].join(" ")}
+                  aria-pressed={active}
                 >
                   <div className="flex items-center gap-3 h-full">
-                    {/* Image si présente, sinon icône */}
-                    {img ? (
-                      <div className={`relative w-10 h-10 overflow-hidden rounded-lg ring-1 ${active ? "ring-[#ffb400]" : "ring-gray-200"}`}>
-                        <Image
-                          src={img}
-                          alt={label}
-                          fill
-                          sizes="80px"
-                          className="object-cover"
-                          priority={false}
-                        />
-                      </div>
-                    ) : (
-                      <span
-                        className={[
-                          "inline-flex items-center justify-center rounded-lg p-2",
-                          active ? "bg-[#ffb400]/15 text-[#b36b00]" : "bg-gray-100 text-gray-700"
-                        ].join(" ")}
-                        aria-hidden
-                      >
-                        {Icon ? <Icon className="w-5 h-5" /> : null}
-                      </span>
-                    )}
+                    <div
+                      className={`relative w-10 h-10 overflow-hidden rounded-lg ring-1 ${
+                        active ? "ring-[#ffb400]" : "ring-gray-200"
+                      }`}
+                    >
+                      <Image
+                        src={img}
+                        alt={label || key}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                        priority={idx === 0}
+                      />
+                    </div>
 
                     <div className="flex items-center">
-                      <div className="font-semibold text-[#002147]">{label}</div>
+                      <div className="font-semibold text-[#002147]">{label || key}</div>
                     </div>
                   </div>
                 </button>

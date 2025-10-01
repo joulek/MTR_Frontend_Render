@@ -1,4 +1,3 @@
-// components/admin/devis/MultiDevisModal.jsx
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -83,10 +82,16 @@ export default function MultiDevisModal({
   // عميل الدفعة الأولى من الاختيار
   const rootClient = getClientFromDemand(demands[0]);
 
-  // PU helper
+  // PU helper (prix de l’article depuis la liste)
   const getPU = (articleId) => {
     const a = articles.find((x) => x._id === articleId);
     return Number(a?.prixHT ?? a?.priceHT ?? 0) || 0;
+  };
+
+  // NEW: prix actuel d’une ligne (priorité au champ modifiable "puht")
+  const getLinePU = (ln) => {
+    const v = Number(ln?.puht);
+    return Number.isFinite(v) && v >= 0 ? v : getPU(ln.articleId);
   };
 
   /* ------------------------------ Init عند الفتح ------------------------------ */
@@ -108,6 +113,7 @@ export default function MultiDevisModal({
         qty: Number(d?.quantite ?? 1) || 1,
         remisePct: 0,
         tvaPct: 19,
+        puht: 0, // NEW: prix unitaire modifiable par l'utilisateur
       }))
     );
 
@@ -206,10 +212,9 @@ export default function MultiDevisModal({
 
   /* ------------------------------ Totaux ------------------------------ */
   const totals = useMemo(() => {
-    let ht = 0,
-      ttc = 0;
+    let ht = 0, ttc = 0;
     for (const l of lines) {
-      const pu = getPU(l.articleId);
+      const pu = getLinePU(l); // NEW
       const q = Number(l.qty || 0);
       const r = Number(l.remisePct || 0);
       const v = Number(l.tvaPct || 0);
@@ -242,6 +247,7 @@ export default function MultiDevisModal({
         qty: Number(d?.quantite ?? 1) || 1,
         remisePct: 0,
         tvaPct: 19,
+        puht: 0, // NEW
       },
     ]);
     setPickerOpen(false);
@@ -260,6 +266,7 @@ export default function MultiDevisModal({
           qty: Number(l.qty || 1),
           remisePct: Number(l.remisePct || 0),
           tvaPct: Number(l.tvaPct || 0),
+          puht: Number(getLinePU(l).toFixed(3)), // NEW: envoyer le PU choisi/édité
         })),
         sendEmail: true,
       };
@@ -440,7 +447,7 @@ export default function MultiDevisModal({
 
               <tbody className="text-[#0B1E3A]">
                 {lines.map((ln, i) => {
-                  const pu = getPU(ln.articleId);
+                  const pu = getLinePU(ln); // NEW
                   const lht = Math.max(
                     0,
                     pu * Number(ln.qty || 0) * (1 - Number(ln.remisePct || 0) / 100)
@@ -464,8 +471,11 @@ export default function MultiDevisModal({
                           value={ln.articleId}
                           onChange={(e) => {
                             const v = e.target.value;
+                            const autoPU = getPU(v);
                             setLines((ls) =>
-                              ls.map((x, idx) => (idx === i ? { ...x, articleId: v } : x))
+                              ls.map((x, idx) =>
+                                idx === i ? { ...x, articleId: v, puht: autoPU } : x
+                              )
                             );
                           }}
                         >
@@ -483,8 +493,25 @@ export default function MultiDevisModal({
                         )}
                       </td>
 
-                      <td className="p-2 align-middle text-right tabular-nums">
-                        {getPU(ln.articleId).toFixed(3)}
+                      {/* PU HT editable */}
+                      <td className="p-2 align-middle text-right">
+                        <input
+                          type="number"
+                          min={0}
+                          step="0.001"
+                          value={Number(getLinePU(ln)).toFixed(3)}
+                          onChange={(e) => {
+                            const raw = Number(e.target.value);
+                            const v = Number.isFinite(raw) ? Math.max(0, raw) : 0;
+                            setLines((ls) =>
+                              ls.map((x, idx) =>
+                                idx === i ? { ...x, puht: +v.toFixed(3) } : x
+                              )
+                            );
+                          }}
+                          className="w-28 rounded-lg border border-slate-300 px-2 py-1.5 text-right shadow-sm focus:border-[#F7C600] focus:ring-2 focus:ring-[#F7C600]/30 outline-none tabular-nums"
+                          aria-label={T("table.puht", "PU HT")}
+                        />
                       </td>
 
                       <td className="p-2 align-middle text-right">
@@ -558,7 +585,7 @@ export default function MultiDevisModal({
           {/* Mobile cards */}
           <div className="md:hidden space-y-3">
             {lines.map((ln, i) => {
-              const pu = getPU(ln.articleId);
+              const pu = getLinePU(ln); // NEW
               const lht = Math.max(
                 0,
                 pu * Number(ln.qty || 0) * (1 - Number(ln.remisePct || 0) / 100)
@@ -590,7 +617,8 @@ export default function MultiDevisModal({
                       value={ln.articleId}
                       onChange={(e) => {
                         const v = e.target.value;
-                        setLines((ls) => ls.map((x, idx) => (idx === i ? { ...x, articleId: v } : x)));
+                        const autoPU = getPU(v);
+                        setLines((ls) => ls.map((x, idx) => (idx === i ? { ...x, articleId: v, puht: autoPU } : x)));
                       }}
                     >
                       <option value="">{T("selects.articlePlaceholder", "Choisir un article…")}</option>
@@ -607,9 +635,21 @@ export default function MultiDevisModal({
                       <label className="text-xs font-semibold text-slate-600">
                         {T("table.puht", "PU HT")}
                       </label>
-                      <div className="mt-1 rounded-lg border border-slate-200 px-2 py-2 text-right tabular-nums">
-                        {pu.toFixed(3)}
-                      </div>
+                      <input
+                        type="number"
+                        min={0}
+                        step="0.001"
+                        value={Number(getLinePU(ln)).toFixed(3)}
+                        onChange={(e) => {
+                          const raw = Number(e.target.value);
+                          const v = Number.isFinite(raw) ? Math.max(0, raw) : 0;
+                          setLines((ls) =>
+                            ls.map((x, idx) => (idx === i ? { ...x, puht: +v.toFixed(3) } : x))
+                          );
+                        }}
+                        className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-2 text-right shadow-sm focus:border-[#F7C600] focus:ring-2 focus:ring-[#F7C600]/30 outline-none tabular-nums"
+                        aria-label={T("table.puht", "PU HT")}
+                      />
                     </div>
                     <div>
                       <label className="text-xs font-semibold text-slate-600">

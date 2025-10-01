@@ -243,7 +243,6 @@
         "claim": "Réclamation",
         "myServices": "Mes services",
         "myQuotes": "Devis",
-        "myClaims": "Mes réclamations",
         "askQuote": "Demander un devis"
       },
       "actions": {
@@ -702,7 +701,8 @@
           "type": "Type demande devis",
           "files": "Fichiers joints",
           "createdAt": "Date d’envoi",
-          "order": "Commande"
+          "order": "Commande",
+          "total": "Total HT"
         },
         "actions": {
           "open": "Ouvrir",
@@ -724,7 +724,8 @@
           "cannotOpen": "Impossible d’ouvrir ce fichier.",
           "notAuthenticated": "Non authentifié. Veuillez vous reconnecter.",
           "forbidden": "Accès interdit : cette demande ne vous appartient pas.",
-          "cannotPlace": "Impossible d’envoyer la commande."
+          "cannotPlace": "Impossible d’envoyer la commande.",
+          "missingQuote": "Devis introuvable."
         },
         "aria": {
           "openPdf": "Ouvrir le PDF",

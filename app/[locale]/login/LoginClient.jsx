@@ -56,10 +56,8 @@ export default function LoginPage() {
 
         // Rediriger selon le rôle
         if (role === "admin") router.push(`/${locale}/admin`);
-        else if (role === "client")
-          router.push(
-            `/${locale}/client/devis`
-          ); // Redirection vers la page de devis pour un client
+        else if (role === "client") router.push(`/${locale}/client/devis`);
+        // Redirection vers la page de devis pour un client
         else router.push(`/${locale}/home`);
       }
     } catch {
@@ -91,29 +89,32 @@ export default function LoginPage() {
             {/* overlay aux couleurs du site */}
             {/* bloc centré */}
             <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center">
-              {/* ✅ Logo corrigé : position centré, responsive, sans marges négatives */}
+              {/* ✅ Logo corrigé : grand + textes remontés */}
               <Image
-                src="/logo_MTR.png"
+                src="/logo.png"
                 alt="MTR — Manufacture Tunisienne des Ressorts"
-                width={270} // ~ largeur par défaut desktop
-                height={90}
-                className="drop-shadow-xl w-[200px] md:w-[240px] lg:w-[260px] h-auto"
+                width={600}
+                height={500}
+                className="drop-shadow-xl w-[300px] md:w-[360px] lg:w-[420px] h-auto"
                 priority
               />
 
-              <h2
-                className="mt-6 max-w-md text-3xl font-extrabold leading-tight text-[#ffb400] md:text-4xl"
-                style={{ fontFamily: "'Lora', serif" }}
-              >
-                {t("joinClientSpace")}
-              </h2>
-
-              <p
-                className="mt-4 max-w-md text-sm font-bold  text-[#002147]/80 md:text-base"
-                style={{ fontFamily: "'Lora', serif" }}
-              >
-                {t("promoText")}
-              </p>
+              <div className="-mt-12">
+                {" "}
+                {/* 🔥 déplace tout le bloc texte vers le haut */}
+                <h2
+                  className="mt-2 max-w-md text-3xl font-extrabold leading-tight text-[#ffb400] md:text-4xl"
+                  style={{ fontFamily: "'Lora', serif" }}
+                >
+                  {t("joinClientSpace")}
+                </h2>
+                <p
+                  className="mt-1 max-w-md text-sm font-bold text-[#002147]/80 md:text-base"
+                  style={{ fontFamily: "'Lora', serif" }}
+                >
+                  {t("promoText")}
+                </p>
+              </div>
             </div>
           </div>
 
