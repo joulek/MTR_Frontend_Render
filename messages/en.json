@@ -869,11 +869,11 @@
           "ogAlt": "Preview of the My quotes page – MTR Industry"
         },
         "title": "My Quotes",
-        "subtitle": "All requests you have submitted, newest first.",
+        "subtitle": "All quotes you have submitted, newest first.",
         "searchPlaceholder": "Search by quote no., type…",
         "clear": "Clear",
         "loading": "Loading…",
-        "noData": "No requests found.",
+        "noData": "No quotes found.",
         "table": {
           "number": "Quote N°",
           "type": "Type",
@@ -1449,7 +1449,7 @@
       "client": {
         "claim": "Claim",
         "myServices": "My services",
-        "myQuotes": "Quotes",
+        "myQuotes": "My Quotes",
         "myClaims": "My claims",
         "askQuote": "Request a quote"
       },

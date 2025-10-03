@@ -242,7 +242,7 @@
       "client": {
         "claim": "Réclamation",
         "myServices": "Mes services",
-        "myQuotes": "Devis",
+        "myQuotes": "Mes Devis",
         "askQuote": "Demander un devis"
       },
       "actions": {
@@ -691,11 +691,11 @@
           "ogAlt": "Aperçu de la page Mes devis – MTR Manufacture Tunisienne des Ressorts"
         },
         "title": "Mes devis",
-        "subtitle": "Toutes vos demandes envoyées, triées du plus récent au plus ancien.",
+        "subtitle": "Tous devis, triés du plus récent au plus ancien.",
         "searchPlaceholder": "Rechercher par n° de devis, type…",
         "clear": "Effacer",
         "loading": "Chargement…",
-        "noData": "Aucune demande trouvée.",
+        "noData": "Aucun devis trouvé.",
         "table": {
           "number": "N° devis",
           "type": "Type ",
