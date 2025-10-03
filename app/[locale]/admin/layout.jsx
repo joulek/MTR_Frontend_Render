@@ -30,22 +30,19 @@ export default function AdminLayout({ children }) {
     { code: "en", label: "EN" },
   ];
 
-  const handleLogout = useCallback(async () => {
+  const handleLogout = useCallback(() => {
     try {
       localStorage.removeItem("token");
       sessionStorage.clear();
     } catch { }
-
-    // on attend réellement que le serveur efface les cookies
-    await fetch("/api/logout", { method: "POST", credentials: "include", cache: "no-store" })
-      .catch(() => { });
-
+    const url = "/api/logout";
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob([], { type: "application/json" }));
+    } else {
+      fetch(url, { method: "POST", credentials: "include", keepalive: true }).catch(() => { });
+    }
     router.replace(`/${locale}/login`);
-    router.refresh(); // force un nouveau rendu SSR
-    // fallback possible :
-    // window.location.replace(`/${locale}/login`);
   }, [router, locale]);
-
 
   const switchLocale = useCallback(
     (newLocale) => {
@@ -57,26 +54,12 @@ export default function AdminLayout({ children }) {
   );
 
   useEffect(() => {
-    const verify = async () => {
-      // Idéal : un endpoint qui renvoie 200 si session OK, 401 sinon
-      try {
-        const r = await fetch("/auth/user", { credentials: "include", cache: "no-store" });
-        if (!r.ok) throw new Error("not-auth");
-      } catch {
-        router.replace(`/${locale}/login`);
-        router.refresh();
-      }
+    const onResize = () => {
+      if (window.innerWidth >= 1024) setOpen(false);
     };
-
-    // au montage
-    verify();
-
-    // si la page est restaurée depuis la bfcache (clic "Précédent"), re-vérifier
-    const onShow = (e) => { if (e.persisted) verify(); };
-    window.addEventListener("pageshow", onShow);
-    return () => window.removeEventListener("pageshow", onShow);
-  }, [router, locale]);
-
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const rootAdmin = `/${locale}/admin`;
   const isActivePath = (href) => {
@@ -258,4 +241,4 @@ export default function AdminLayout({ children }) {
       </div>
     </div>
   );
-}
+}  
