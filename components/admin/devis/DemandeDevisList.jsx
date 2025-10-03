@@ -392,24 +392,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             </a>
                           </td>
 
-                          {/* PDF devis */}
-                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            {devisHref(r) ? (
-                              <a
-                                href={devisHref(r)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                                aria-label={t("actions.open")}
-                                title={t("actions.open")}
-                              >
-                                <FiFileText size={16} />
-                                {t("actions.open")}
-                              </a>
-                            ) : (
-                              <span className="text-gray-400">{dash}</span>
-                            )}
-                          </td>
 
                           {/* ✅ Pièces jointes */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
