@@ -99,7 +99,7 @@ export default function PrivacyPolicyClient() {
         <p>
           {t.rich("blocks.contact.p", {
             email: (chunks) => (
-              <a href="mailto:contact@mtr.tn" className="underline underline-offset-4">
+              <a href="mailto:contact@mtr-resssorts.tn" className="underline underline-offset-4">
                 {chunks}
               </a>
             ),
@@ -154,7 +154,7 @@ export default function PrivacyPolicyClient() {
                 <Link href={`/${locale}/help-desk`} className="rounded-full border border-[#F5B301] px-5 py-2 text-sm font-semibold text-[#0B2239] hover:bg-[#F5B301]">
                   {t("cta.helpCenter")}
                 </Link>
-                <a href="mailto:contact@mtr.tn" className="rounded-full bg-[#F5B301] px-5 py-2 text-sm font-semibold text-[#0B2239] hover:brightness-95">
+                <a href="mailto:contact@mtr-resssorts.tn" className="rounded-full bg-[#F5B301] px-5 py-2 text-sm font-semibold text-[#0B2239] hover:brightness-95">
                   {t("cta.writeEmail")}
                 </a>
               </div>

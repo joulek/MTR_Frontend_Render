@@ -96,8 +96,8 @@ export default function HelpDeskClient() {
     {
       icon: <Mail className="h-5 w-5 text-[#F5B301]" />,
       title: t("cards.email.title"),
-      lines: ["contact@mtr.tn", "Réponse sous 24h ouvrées"],
-      cta: { label: t("cards.email.cta"), href: "mailto:contact@mtr.tn" },
+      lines: ["contact@mtr-resssorts.tn", "Réponse sous 24h ouvrées"],
+      cta: { label: t("cards.email.cta"), href: "mailto:contact@mtr-resssorts.tn" },
     },
     {
       icon: <MessageSquare className="h-5 w-5 text-[#F5B301]" />,

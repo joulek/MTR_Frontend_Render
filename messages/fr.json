@@ -56,7 +56,7 @@
         },
         "contact": {
           "title": "Contact",
-          "p": "Pour toute question ou demande liée à vos données, contactez-nous à <email>contact@mtr.tn</email>. Vous pouvez aussi utiliser notre <help>centre d’aide</help>."
+          "p": "Pour toute question ou demande liée à vos données, contactez-nous à <email>contact@mtr-resssorts.tn</email>. Vous pouvez aussi utiliser notre <help>centre d’aide</help>."
         }
       },
       "cta": {
@@ -95,10 +95,10 @@
           },
           "email": {
             "title": "Écrire un e-mail",
-            "line1": "contact@mtr.tn",
+            "line1": "contact@mtr-resssorts.tn",
             "line2": "Réponse sous 24h ouvrées",
             "cta": "Écrire",
-            "href": "mailto:contact@mtr.tn"
+            "href": "mailto:contact@mtr-resssorts.tn"
           },
           "quote": {
             "title": "Demander un devis",
@@ -172,7 +172,7 @@
       },
       "contact": {
         "title": "Nous contacter",
-        "email": "support@mtr.com",
+        "email": "contact@mtr-resssorts.tn",
         "phone": "+216 98 333 883",
         "chat": "Chat en direct (9h–18h)"
       }
