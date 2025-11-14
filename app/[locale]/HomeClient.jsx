@@ -193,16 +193,17 @@ export default function HomeClient() {
   /* --------------------------- HERO SLIDER (CORRIGÉ) --------------------------- */
   function HeroCarousel() {
     const slides = [
-      { src: "/img1.jpg", slogan: "Flexibilité et performance pour tous vos projets." },
-      { src: "/img2.jpg", slogan: "Des solutions sur mesure, adaptées à vos exigences." },
-      { src: "/img3.jpg", slogan: "Une grande capacité avec une large gamme de produits." },
-      { src: "/img4.jpg", slogan: "La fiabilité en chaque ressort." },
-      { src: "/img5.jpg", slogan: "Votre partenaire en précision métallique." },
-      { src: "/img6.jpg", slogan: "Performance. Précision. Perfection." },
-      { src: "/img7.jpg", slogan: "La qualité, notre constante." },
-      { src: "/img8.jpg", slogan: "Des ressorts faits pour durer." },
-      { src: "/img9.jpg", slogan: "Solutions métalliques sur mesure." },
+      { src: "/img1.jpg", key: "s1" },
+      { src: "/img2.jpg", key: "s2" },
+      { src: "/img3.jpg", key: "s3" },
+      { src: "/img4.jpg", key: "s4" },
+      { src: "/img5.jpg", key: "s5" },
+      { src: "/img6.jpg", key: "s6" },
+      { src: "/img7.jpg", key: "s7" },
+      { src: "/img8.jpg", key: "s8" },
+      { src: "/img9.jpg", key: "s9" }
     ];
+
 
     const [index, setIndex] = useState(0);
 
@@ -325,7 +326,7 @@ export default function HomeClient() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.7 } }}
-className="absolute inset-0 z-[15] flex flex-col items-center justify-end pb-24 text-center text-white"
+          className="absolute inset-0 z-[15] flex flex-col items-center justify-end pb-24 text-center text-white"
         >
 
 
