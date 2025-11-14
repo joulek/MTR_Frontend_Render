@@ -10,7 +10,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
 /* ---------------------------- API backend ---------------------------- */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000").replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 
 /* ---------- Anim helpers ---------- */
@@ -190,6 +190,92 @@ export default function HomeClient() {
       </div>
     );
   }
+  /* --------------------------- HERO SLIDER (CORRIGÉ) --------------------------- */
+  function HeroCarousel() {
+    const slides = [
+      { src: "/img1.jpg", slogan: "Flexibilité et performance pour tous vos projets." },
+      { src: "/img2.jpg", slogan: "Des solutions sur mesure, adaptées à vos exigences." },
+      { src: "/img3.jpg", slogan: "Une grande capacité avec une large gamme de produits." },
+      { src: "/img4.jpg", slogan: "La fiabilité en chaque ressort." },
+      { src: "/img5.jpg", slogan: "Votre partenaire en précision métallique." },
+      { src: "/img6.jpg", slogan: "Performance. Précision. Perfection." },
+      { src: "/img7.jpg", slogan: "La qualité, notre constante." },
+      { src: "/img8.jpg", slogan: "Des ressorts faits pour durer." },
+      { src: "/img9.jpg", slogan: "Solutions métalliques sur mesure." },
+    ];
+
+    const [index, setIndex] = useState(0);
+
+    useEffect(() => {
+      const t = setInterval(() => {
+        setIndex((n) => (n + 1) % slides.length);
+      }, 4000);
+      return () => clearInterval(t);
+    }, []);
+
+    const go = (dir) => {
+      setIndex((i) => (i + (dir === "next" ? 1 : -1) + slides.length) % slides.length);
+    };
+
+    return (
+      <div className="relative h-[88vh] w-full overflow-hidden select-none">
+
+        {slides.map((s, i) => (
+          <div key={i} className="absolute inset-0">
+            {/* Image éclaircie */}
+            <Image
+              src={s.src}
+              alt="hero"
+              fill
+              priority={i === 0}
+              className={`object-cover transition-opacity duration-[1200ms] ${i === index ? "opacity-100" : "opacity-0"
+                }`}
+            />
+
+
+            {/* Slogan */}
+            <div
+              className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ${i === index ? "opacity-100" : "opacity-0"
+                }`}
+            >
+              <h1 className="px-4 text-center text-3xl font-extrabold text-white md:text-6xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.65)]">
+                {s.slogan}
+              </h1>
+            </div>
+          </div>
+        ))}
+
+        {/* Navigation */}
+        <button
+          onClick={() => go("prev")}
+          className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-black/30 px-4 py-2 text-white hover:bg-black/50 z-20"
+        >
+          ‹
+        </button>
+
+        <button
+          onClick={() => go("next")}
+          className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-black/30 px-4 py-2 text-white hover:bg-black/50 z-20"
+        >
+          ›
+        </button>
+
+
+        {/* Bullets */}
+        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2 z-20">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`h-3 w-3 rounded-full transition ${index === i ? "bg-[#F5B301]" : "bg-white/50 hover:bg-white"
+                }`}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
 
   function CategoryTilePro({ title, imgUrl, alt, href }) {
     return (
@@ -233,28 +319,30 @@ export default function HomeClient() {
       <SiteHeader />
 
       {/* HERO */}
-      <section
-        id="accueil"
-        className="relative -mt-10 min-h-[86vh] flex items-center justify-center bg-cover bg-center text-white"
-        style={{ backgroundImage: "url('/hero.jpg')" }}
-      >
-        <div className="absolute inset-0 bg-black/50" />
+      <section id="accueil" className="relative -mt-10">
+        <HeroCarousel />
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0, transition: { duration: 0.7 } }}
-          className="relative z-10 mx-auto max-w-4xl px-4 py-32 text-center"
+className="absolute inset-0 z-[15] flex flex-col items-center justify-end pb-24 text-center text-white"
         >
-          <h1 className="text-4xl font-extrabold leading-tight md:text-6xl">{t("hero.title")}</h1>
-          <p className="mt-6 text-lg text-gray-200 md:text-xl">{rich("hero.subtitle")}</p>
+
+
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <button
-              onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() =>
+                document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })
+              }
               className="rounded-full bg-[#F5B301] px-6 py-3 font-semibold text-[#0B2239] hover:brightness-95"
             >
               {t("hero.ctaContact")}
             </button>
+
             <button
-              onClick={() => document.getElementById("specialites")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() =>
+                document.getElementById("specialites")?.scrollIntoView({ behavior: "smooth" })
+              }
               className="rounded-full border border-[#F5B301] px-6 py-3 font-semibold text-[#F5B301] hover:bg-[#F5B301] hover:text-[#0B2239]"
             >
               {t("hero.ctaSpecialties")}
@@ -262,6 +350,7 @@ export default function HomeClient() {
           </div>
         </motion.div>
       </section>
+
 
       {/* PRÉSENTATION */}
       <motion.section id="presentation" className="bg-white py-16 md:py-24" variants={vSection} initial="hidden" whileInView="show" viewport={{ once: false, amount: 0.2 }}>
@@ -276,11 +365,11 @@ export default function HomeClient() {
                     <div className="text-[11px] uppercase text-slate-500">{t("presentation.years")}</div>
                   </div>
                   <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white py-3">
-                    <div className="text-2xl font-extrabold text-[#0B2239]">+500</div>
+                    <div className="text-2xl font-extrabold text-[#0B2239]">0,1–10</div>
                     <div className="text-[11px] uppercase text-slate-500">{t("presentation.wireRange")}</div>
                   </div>
                   <div className="flex flex-col items-center rounded-2xl border border-slate-200 bg-white py-3">
-                    <div className="text-2xl font-extrabold text-[#0B2239]">+1M</div>
+                    <div className="text-2xl font-extrabold text-[#0B2239]">2D/3D</div>
                     <div className="text-[11px] uppercase text-slate-500">{t("presentation.grids")}</div>
                   </div>
                 </div>
@@ -589,7 +678,6 @@ export default function HomeClient() {
                   <div>
                     <p className="text-sm text-slate-500">{t("contact.tel")}</p>
                     <p className="font-semibold text-[#0B2239]">+216 98 333 883</p>
-                    <p className="font-semibold text-[#0B2239]">+216 98 33 18 96</p>
                     <a
                       href="tel:+21698333883"
                       className="mt-3 inline-block rounded-full border border-[#F5B301] px-4 py-2 text-sm font-semibold text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
