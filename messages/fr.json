@@ -56,7 +56,7 @@
         },
         "contact": {
           "title": "Contact",
-          "p": "Pour toute question ou demande liée à vos données, contactez-nous à <email>contact@mtr.tn</email>. Vous pouvez aussi utiliser notre <help>centre d’aide</help>."
+          "p": "Pour toute question ou demande liée à vos données, contactez-nous à <email>contact@mtr-resssorts.tn</email>. Vous pouvez aussi utiliser notre <help>centre d’aide</help>."
         }
       },
       "cta": {
@@ -95,10 +95,10 @@
           },
           "email": {
             "title": "Écrire un e-mail",
-            "line1": "contact@mtr.tn",
+            "line1": "contact@mtr-resssorts.tn",
             "line2": "Réponse sous 24h ouvrées",
             "cta": "Écrire",
-            "href": "mailto:contact@mtr.tn"
+            "href": "mailto:contact@mtr-resssorts.tn"
           },
           "quote": {
             "title": "Demander un devis",
@@ -172,7 +172,7 @@
       },
       "contact": {
         "title": "Nous contacter",
-        "email": "support@mtr.com",
+        "email": "contact@mtr-resssorts.tn",
         "phone": "+216 98 333 883",
         "chat": "Chat en direct (9h–18h)"
       }
@@ -242,7 +242,7 @@
       "client": {
         "claim": "Réclamation",
         "myServices": "Mes services",
-        "myQuotes": "Devis",
+        "myQuotes": "Mes Devis",
         "askQuote": "Demander un devis"
       },
       "actions": {
@@ -690,15 +690,15 @@
           "description": "Consultez vos demandes de devis, ouvrez les PDF et confirmez vos commandes dans votre espace client.",
           "ogAlt": "Aperçu de la page Mes devis – MTR Manufacture Tunisienne des Ressorts"
         },
-        "title": "Mes demandes de devis",
-        "subtitle": "Toutes vos demandes envoyées, triées du plus récent au plus ancien.",
+        "title": "Mes devis",
+        "subtitle": "Tous devis, triés du plus récent au plus ancien.",
         "searchPlaceholder": "Rechercher par n° de devis, type…",
         "clear": "Effacer",
         "loading": "Chargement…",
-        "noData": "Aucune demande trouvée.",
+        "noData": "Aucun devis trouvé.",
         "table": {
-          "number": "N° demande devis",
-          "type": "Type demande devis",
+          "number": "N° devis",
+          "type": "Type ",
           "files": "Fichiers joints",
           "createdAt": "Date d’envoi",
           "order": "Commande",

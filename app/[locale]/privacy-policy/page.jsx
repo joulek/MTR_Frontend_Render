@@ -111,7 +111,7 @@ export default async function Page({ params }) {
       {
         "@type": "ContactPoint",
         contactType: "customer support",
-        email: "contact@mtr.tn",
+        email: "contact@mtr-resssorts.tn",
         availableLanguage: ["fr", "en"]
       }
     ],

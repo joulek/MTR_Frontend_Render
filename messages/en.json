@@ -49,7 +49,7 @@
         },
         "contact": {
           "title": "Contact",
-          "p": "For any question or request about your data, contact us at <email>contact@mtr.tn</email>. You can also use our <help>help desk</help>."
+          "p": "For any question or request about your data, contact us at <email>contact@mtr-resssorts.tn</email>. You can also use our <help>help desk</help>."
         }
       },
       "cta": {
@@ -868,15 +868,15 @@
           "description": "View your quote requests, open PDFs, and confirm your orders in your client area.",
           "ogAlt": "Preview of the My quotes page – MTR Industry"
         },
-        "title": "My Quote Requests",
-        "subtitle": "All requests you have submitted, newest first.",
+        "title": "My Quotes",
+        "subtitle": "All quotes you have submitted, newest first.",
         "searchPlaceholder": "Search by quote no., type…",
         "clear": "Clear",
         "loading": "Loading…",
-        "noData": "No requests found.",
+        "noData": "No quotes found.",
         "table": {
-          "number": "Quote request N°",
-          "type": "Quote request type",
+          "number": "Quote N°",
+          "type": "Type",
           "files": "Attachments",
           "createdAt": "Sent at",
           "order": "Order",
@@ -1325,10 +1325,10 @@
           },
           "email": {
             "title": "Write an email",
-            "line1": "contact@mtr.tn",
+            "line1": "contact@mtr-resssorts.tn",
             "line2": "Reply within 24h (business days)",
             "cta": "Write",
-            "href": "mailto:contact@mtr.tn"
+            "href": "mailto:contact@mtr-resssorts.tn"
           },
           "quote": {
             "title": "Request a quote",
@@ -1402,7 +1402,7 @@
       },
       "contact": {
         "title": "Contact us",
-        "email": "support@mtr.com",
+        "email": "contact@mtr-resssorts.tn",
         "phone": "+216 98 333 883",
         "chat": "Live chat (9am–6pm)"
       }
@@ -1449,7 +1449,7 @@
       "client": {
         "claim": "Claim",
         "myServices": "My services",
-        "myQuotes": "Quotes",
+        "myQuotes": "My Quotes",
         "myClaims": "My claims",
         "askQuote": "Request a quote"
       },

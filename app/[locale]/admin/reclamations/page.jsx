@@ -95,24 +95,17 @@ export default function AdminReclamationsPage() {
   async function viewPdfById(id) {
     try {
       setOpeningId(id);
-      const res = await fetch(
-        `${BACKEND}/api/reclamations/admin/${id}/pdf`,
-        { credentials: "include" }
-      );
-      if (!res.ok) {
-        alert(t("errors.attachmentUnavailable"));
-        return;
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank", "noopener,noreferrer");
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
+
+      // on ouvre directement l’URL backend (le serveur envoie déjà Content-Disposition avec le bon filename)
+      window.open(`${BACKEND}/api/reclamations/admin/${id}/pdf`, "_blank", "noopener,noreferrer");
+
     } catch {
       alert(t("errors.openPdf"));
     } finally {
       setOpeningId(null);
     }
   }
+
 
   async function viewDocByIndex(id, index) {
     try {
@@ -202,12 +195,12 @@ export default function AdminReclamationsPage() {
                       {t("table.number")}
                     </p>
                     <p className="font-semibold tabular-nums text-slate-900">
+                      <span className="inline-block h-2.5 w-2.5 rounded-full bg-yellow-400" />
                       {r.numero || "—"}
                     </p>
                   </div>
 
                   <div className="min-w-0 flex items-center gap-2">
-                    <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full bg-yellow-400" />
                     <p className="truncate font-semibold text-[#0B1E3A]">
                       {r.client || "—"}
                     </p>
@@ -231,9 +224,9 @@ export default function AdminReclamationsPage() {
                     <dd className="text-slate-800">
                       {fmtDateTime(
                         r.date ||
-                          r.createdAt ||
-                          r.updatedAt ||
-                          r?.demandePdf?.generatedAt
+                        r.createdAt ||
+                        r.updatedAt ||
+                        r?.demandePdf?.generatedAt
                       )}
                     </dd>
                   </div>
@@ -245,11 +238,10 @@ export default function AdminReclamationsPage() {
                     <button
                       onClick={() => viewPdfById(r._id)}
                       disabled={openingId === r._id}
-                      className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] ${
-                        openingId === r._id
-                          ? "cursor-wait animate-pulse"
-                          : "hover:bg-slate-50"
-                      }`}
+                      className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] ${openingId === r._id
+                        ? "cursor-wait animate-pulse"
+                        : "hover:bg-slate-50"
+                        }`}
                       aria-label={t("actions.openPdf")}
                       title={t("actions.openPdf")}
                     >
@@ -338,15 +330,10 @@ export default function AdminReclamationsPage() {
                       key={r._id}
                       className={i % 2 ? "bg-white" : "bg-gray-50/40"}
                     >
-                      <td className="px-4 py-3 tabular-nums">
-                        {r.numero || "—"}
-                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span className="inline-block h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                          <span className="text-[#0B1E3A] font-medium break-words">
-                            {r.client || "—"}
-                          </span>
+                          <span className="tabular-nums">{r.numero || "—"}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 capitalize">
@@ -355,9 +342,9 @@ export default function AdminReclamationsPage() {
                       <td className="px-4 py-3 whitespace-nowrap">
                         {fmtDateTime(
                           r.date ||
-                            r.createdAt ||
-                            r.updatedAt ||
-                            r?.demandePdf?.generatedAt
+                          r.createdAt ||
+                          r.updatedAt ||
+                          r?.demandePdf?.generatedAt
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -365,11 +352,10 @@ export default function AdminReclamationsPage() {
                           <button
                             onClick={() => viewPdfById(r._id)}
                             disabled={openingId === r._id}
-                            className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] ${
-                              openingId === r._id
-                                ? "cursor-wait animate-pulse"
-                                : "hover:bg-slate-50"
-                            }`}
+                            className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] ${openingId === r._id
+                              ? "cursor-wait animate-pulse"
+                              : "hover:bg-slate-50"
+                              }`}
                             aria-label={t("actions.openPdf")}
                             title={t("actions.openPdf")}
                           >
@@ -386,7 +372,7 @@ export default function AdminReclamationsPage() {
                       </td>
                       <td className="px-4 py-3">
                         {Array.isArray(r.piecesJointes) &&
-                        r.piecesJointes.length > 0 ? (
+                          r.piecesJointes.length > 0 ? (
                           <div className="flex flex-wrap gap-2">
                             {r.piecesJointes.map((p, idx) => (
                               <button

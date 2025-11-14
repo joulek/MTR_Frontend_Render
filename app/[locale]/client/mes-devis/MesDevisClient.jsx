@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { FiSearch, FiXCircle, FiFileText } from "react-icons/fi";
 import Pagination from "@/components/Pagination";
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL;
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/$/, "");
 
 /* -------------------- helpers -------------------- */
 function getCookie(name) {
@@ -50,10 +50,13 @@ function OpenChipDoc({ onClick, label = "Ouvrir", tooltip, className = "" }) {
   );
 }
 
-/* --- helpers clés/états robustes (au cas où devisId manque) --- */
+/* --- helpers clés/états robustes --- */
 const getRowId = (it) => it?.devisId || it?.devisNumero || it?.devisPdf || "";
 const getRowKey = (it, i) =>
   String(it?.devisId || it?.devisNumero || it?.devisPdf || `idx-${i}`);
+
+// ✅ construit l'URL PDF côté front pour éviter les soucis d'URL serveur
+const buildPdfUrl = (numero) => `${BACKEND}/files/devis/${numero}.pdf`;
 
 export default function MesDevisClient() {
   const t = useTranslations("auth.client.quotesPage");
@@ -78,7 +81,7 @@ export default function MesDevisClient() {
     setOrdered(readOrdered());
   }, []);
 
-  /* --------- fetch /api/client/devis --------- */
+  /* --------- fetch /api/devis/client/devis --------- */
   const fetchDevis = useCallback(async () => {
     try {
       setLoading(true);
@@ -90,12 +93,11 @@ export default function MesDevisClient() {
         limit: String(pageSize),
       });
 
-      // ✅ route correcte
       const res = await fetch(`${BACKEND}/api/devis/client/devis?` + params.toString(), {
         credentials: "include",
       });
       const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.message || "Fetch error");
+      if (!res.ok || !data?.success) throw new Error(data?.message || "Fetch error");
 
       setItems(Array.isArray(data.items) ? data.items : []);
       setTotal(Number(data.total || 0));
@@ -106,14 +108,10 @@ export default function MesDevisClient() {
     }
   }, [q, page, pageSize, t]);
 
-  useEffect(() => {
-    fetchDevis();
-  }, [fetchDevis]);
+  useEffect(() => { fetchDevis(); }, [fetchDevis]);
 
   // reset page si la recherche change
-  useEffect(() => {
-    setPage(1);
-  }, [q]);
+  useEffect(() => { setPage(1); }, [q]);
 
   /* --------- helpers UI --------- */
   const prettyDate = (iso) => {
@@ -131,34 +129,39 @@ export default function MesDevisClient() {
     }
   };
 
+  // ✅ ouverture directe d'un PDF public (avec fallback blob)
   const openUrlInNewTab = async (url) => {
     try {
-      const res = await fetch(url, { credentials: "include" });
-      if (!res.ok) {
-        setError(t("errors.fileNotFound") || "Fichier introuvable");
-        return;
-      }
-      const blob = await res.blob();
-      const obj = URL.createObjectURL(blob);
-      window.open(obj, "_blank", "noopener,noreferrer");
-      setTimeout(() => URL.revokeObjectURL(obj), 60000);
+      const w = window.open(url, "_blank", "noopener,noreferrer");
+      if (!w) throw new Error("popup_blocked");
     } catch {
-      setError(t("errors.cannotOpen") || "Impossible d’ouvrir le fichier");
+      try {
+        const res = await fetch(url, { credentials: "include" });
+        if (!res.ok) throw new Error("not_ok");
+        const blob = await res.blob();
+        const obj = URL.createObjectURL(blob);
+        window.open(obj, "_blank", "noopener,noreferrer");
+        setTimeout(() => URL.revokeObjectURL(obj), 60000);
+      } catch {
+        setError(t("errors.cannotOpen") || "Impossible d’ouvrir le fichier");
+      }
     }
   };
 
   const openDevisPdf = (it) => {
-    if (it?.devisPdf) openUrlInNewTab(it.devisPdf);
+    const url = it?.devisNumero ? buildPdfUrl(it.devisNumero) : (it?.devisPdf || "");
+    if (url) openUrlInNewTab(url);
+    else setError(t("errors.cannotOpen") || "Impossible d’ouvrir le fichier");
   };
 
   /* --------- ENVOI COMMANDE (avec devisId) --------- */
   const placeOrder = async (it) => {
     const devisId = it.devisId;
     const devisNumero = it.devisNumero;
-    const devisPdf = it.devisPdf;
+    const devisPdf = buildPdfUrl(it.devisNumero);
     const rowId = getRowId(it);
 
-    if (!devisId || !devisNumero || !devisPdf) {
+    if (!devisId || !devisNumero) {
       setError(t("errors.missingQuote") || "Devis manquant ou incomplet");
       return;
     }
@@ -180,7 +183,7 @@ export default function MesDevisClient() {
         credentials: "include",
         headers,
         body: JSON.stringify({
-          devisId,       // ✅ on envoie l’ID du devis
+          devisId,
           devisNumero,
           devisPdf,
           demandeNumeros: Array.isArray(it.demandeNumeros) ? it.demandeNumeros : [],

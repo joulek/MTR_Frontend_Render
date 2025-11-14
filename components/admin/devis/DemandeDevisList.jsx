@@ -49,14 +49,20 @@ function useDebounced(value, delay = 350) {
   return v;
 }
 
-// 🔹 label client
+/* ---------------------------- Helpers d'affichage ---------------------------- */
+// 🔹 label client (adapté au payload /admin/devis/all : user { prenom, nom, email })
 function getClientLabel(r) {
   if (r?.clientName && r.clientName.trim()) return r.clientName.trim();
-  const prenom = r?.client?.prenom || r?.client?.firstName || "";
-  const nom = r?.client?.nom || r?.client?.lastName || "";
+
+  const u = r?.user || r?.client || {};
+  const prenom = u?.prenom || u?.firstName || "";
+  const nom = u?.nom || u?.lastName || "";
   const full = `${prenom} ${nom}`.trim();
+
   if (full) return full;
   if (typeof r?.client === "string" && r.client.trim()) return r.client.trim();
+  if (u?.email) return u.email;
+
   return "";
 }
 
@@ -114,23 +120,23 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
     [tTypes]
   );
 
-  // Construit une "ligne indexable" pour la recherche locale
+  // Construit une "ligne indexable" pour la recherche locale (alignée sur /admin/devis/all)
   const makeSearchHaystack = useCallback(
     (r) => {
-      const demande = r.demandeNumero || r._id || "";
-      const typeTxt = typeLabel(r.type);
-      const client = getClientLabel(r);
-      const dateTxt = formatDate(r.date);
-
-      // on inclut aussi les valeurs brutes pour couvrir plus de cas
-      const rawDate = r?.date ? new Date(r.date).toISOString() : "";
+      const demande = r?.numero || r?._id || "";
+      const typeTxt = typeLabel(r?.type);
       const rawType = r?.type || "";
+      const client = getClientLabel(r);
 
-      return norm(
-        [demande, typeTxt, rawType, client, dateTxt, rawDate]
-          .filter(Boolean)
-          .join(" | ")
-      );
+      const dt = r?.createdAt ? new Date(r.createdAt) : null;
+      const dateTxt = dt
+        ? `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+        : dash;
+      const rawDate = dt ? dt.toISOString() : "";
+
+      const email = r?.user?.email || "";
+
+      return norm([demande, typeTxt, rawType, client, email, dateTxt, rawDate].filter(Boolean).join(" | "));
     },
     [typeLabel]
   );
@@ -153,7 +159,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           limit: String(effectiveLimit),
         });
 
-        const res = await fetch(`${API}/devis/demandes/compact?` + params.toString(), {
+        const res = await fetch(`${API}/admin/devis/all?` + params.toString(), {
           credentials: "include",
           cache: "no-store",
         });
@@ -165,7 +171,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
           const items = Array.isArray(data.items) ? data.items : [];
           setAllRowsLocal(items);
           setRows(items); // valeur brute (sera re-slicée plus bas)
-          setTotal(items.length); // total avant filtre (réel on le mettra après filtre dans computed)
+          setTotal(items.length); // total avant filtre
         } else {
           setAllRowsLocal([]); // pas utilisé
           setRows(Array.isArray(data.items) ? data.items : []);
@@ -346,23 +352,29 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             />
                           </td>
 
+                          {/* Demande (numero) */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
-                              <span className="font-mono">{r.demandeNumero || dash}</span>
+                              <span className="font-mono">{r.numero || dash}</span>
                             </div>
                           </td>
 
-                          <td className="p-2.5 border-b border-gray-200 capitalize">{typeLabel(r.type)}</td>
+                          {/* Type */}
+                          <td className="p-2.5 border-b border-gray-200 capitalize">
+                            <span>{typeLabel(r.type) || dash}</span>
+                          </td>
 
+                          {/* Client */}
                           <td className="p-2.5 border-b border-gray-200">
                             <span className="block truncate max-w-[18rem]" title={clientLabel || ""}>
                               {clientLabel || dash}
                             </span>
                           </td>
 
+                          {/* Date (createdAt) */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            {formatDate(r.date)}
+                            {formatDate(r.createdAt)}
                           </td>
 
                           {/* PDF DDV */}
@@ -380,24 +392,6 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                             </a>
                           </td>
 
-                          {/* PDF devis */}
-                          <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
-                            {devisHref(r) ? (
-                              <a
-                                href={devisHref(r)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                                aria-label={t("actions.open")}
-                                title={t("actions.open")}
-                              >
-                                <FiFileText size={16} />
-                                {t("actions.open")}
-                              </a>
-                            ) : (
-                              <span className="text-gray-400">{dash}</span>
-                            )}
-                          </td>
 
                           {/* ✅ Pièces jointes */}
                           <td className="p-2.5 border-b border-gray-200 whitespace-nowrap">
@@ -483,7 +477,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                           }
                         />
                         <span className="h-2.5 w-2.5 rounded-full bg-[#F7C600]" />
-                        <span className="font-mono">{r.demandeNumero || dash}</span>
+                        <span className="font-mono">{r.numero || dash}</span>
                       </div>
 
                       {(ddvHref(r) || devisHref(r)) ? (
@@ -510,7 +504,7 @@ export default function DemandeDevisList({ type = "all", query = "" }) {
                       </div>
                       <div>
                         <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.date")}</p>
-                        <p className="truncate">{formatDate(r.date)}</p>
+                        <p className="truncate">{formatDate(r.createdAt)}</p>
                       </div>
                       <div className="col-span-2">
                         <p className="text-[11px] font-semibold text-gray-500">{t("table.headers.client")}</p>

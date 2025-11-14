@@ -1,1 +1,1 @@
-export const SITE_URL = "https://mtr.tn"; // remplace par ton domaine
+export const SITE_URL = "https://mtr-ressorts.tn"; // remplace par ton domaine

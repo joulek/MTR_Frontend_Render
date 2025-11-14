@@ -460,7 +460,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
 
       {/* NEW (mobile): Réclamer */}
       <Link
-        href={`/${locale}/client/reclamation`}
+        href={`/${locale}/client/reclamations`}
         onClick={() => setOpen(false)}
         className="rounded px-3 py-2 hover:bg-slate-50 text-[14px]"
       >
@@ -540,7 +540,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
         localStorage.removeItem("rememberMe");
       } catch {}
       // rechargement propre
-      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}`);
+      window.location.replace(`/${typeof locale === "string" ? locale : "fr"}/login`);
     }
   }
 
@@ -788,6 +788,16 @@ export default function SiteHeader({ mode = "public", onLogout }) {
                   >
                     {t("client.askQuote")}
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      (onLogout || handleLogout)();
+                    }}
+                    className="mt-2 rounded-xl bg-red-600/90 px-4 py-2 text-center text-[15px] font-semibold text-white shadow hover:brightness-95"
+                  >
+                    {t("userMenu.logout")}
+                  </button>
                 </>
               ) : (
                 <>
