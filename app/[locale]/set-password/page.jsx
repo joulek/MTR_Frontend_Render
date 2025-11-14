@@ -3,7 +3,7 @@ import SetPasswordClient from "./SetPasswordClient";
 import { getTranslations } from "next-intl/server";
 import Script from "next/script";
 
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL).replace(/\/$/, "");
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL);
 
 // ⬇️ SEO côté serveur
 export async function generateMetadata(props) {

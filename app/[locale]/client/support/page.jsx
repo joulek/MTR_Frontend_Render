@@ -2,7 +2,7 @@
 import SupportPageClient from "./SupportPageClient";
 import { getTranslations } from "next-intl/server";
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.mtr-industry.tn").replace(/\/$/, "");
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.mtr-industry.tn");
 
 export async function generateMetadata(props) {
   // ✅ Next 15 : params est une Promise

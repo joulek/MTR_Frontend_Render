@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { getTranslations } from "next-intl/server";
 import Script from "next/script";
 
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL).replace(/\/$/, "");
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL);
 
 // Composant client (garde ton fichier avec "use client")
 const ReclamationClient = dynamic(() => import("./ReclamationClient"));

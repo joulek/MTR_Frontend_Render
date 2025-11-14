@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 import Pagination from "@/components/Pagination";
 
 /* ---------------------------- API backend ---------------------------- */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL).replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL);
 const API = `${BACKEND}/api`;
 
 const CARD_WRAPPER = "mx-auto w-full max-w-6xl px-3 sm:px-6";

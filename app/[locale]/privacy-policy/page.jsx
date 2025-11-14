@@ -2,7 +2,7 @@ import Script from "next/script";
 import PrivacyPolicyClient from "./PrivacyPolicyClient";
 import { getTranslations } from "next-intl/server";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mtr-backend-render.onrender.com";
 
 export async function generateMetadata({ params }) {
  const { locale } = await params;

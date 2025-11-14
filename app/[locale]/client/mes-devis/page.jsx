@@ -3,7 +3,7 @@ import MesDevisClient from "./MesDevisClient";
 import { getTranslations } from "next-intl/server";
 import Script from "next/script";
 
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ).replace(/\/$/, "");
+const APP_URL = (process.env.NEXT_PUBLIC_APP_URL );
 
 export async function generateMetadata(props) {
   // ✅ Next 15 : params est une Promise
