@@ -240,8 +240,9 @@ export default function HomeClient() {
                 }`}
             >
               <h1 className="px-4 text-center text-3xl font-extrabold text-white md:text-6xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.65)]">
-                {s.slogan}
+                {t(`hero.${s.key}`)}
               </h1>
+
             </div>
           </div>
         ))}
