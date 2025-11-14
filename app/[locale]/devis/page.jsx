@@ -2,8 +2,8 @@
 import DevisClient from "./DevisClient";
 import { getTranslations } from "next-intl/server";
 
-const APP_URL =
-  (process.env.NEXT_PUBLIC_APP_URL ).replace(/\/$/, "");
+
+const APP_URL = process.env.NEXT_PUBLIC_SITE_URL 
 
 // ---------- SEO ----------
 export async function generateMetadata({ params }) {

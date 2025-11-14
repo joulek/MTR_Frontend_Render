@@ -2,7 +2,7 @@ import Script from "next/script";
 import HelpDeskClient from "./HelpDeskClient";
 import { getTranslations } from "next-intl/server";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://example.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ;
 
 /** Metadata côté server (SEO) */
 export async function generateMetadata({ params }) {
