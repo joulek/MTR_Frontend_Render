@@ -3,7 +3,7 @@ import ForgotPasswordClient from "./ForgotPasswordClient";
 import { getTranslations } from "next-intl/server";
 import Script from "next/script";
 
-const APP_URL = (process.env.NEXT_PUBLIC_APP_URL).replace(/\/$/, "");
+const APP_URL = process.env.NEXT_PUBLIC_SITE_URL 
 
 export async function generateMetadata(props) {
   // ✅ Next 15 : params est une Promise
