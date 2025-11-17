@@ -193,13 +193,13 @@ export default function HomeClient() {
   /* --------------------------- HERO SLIDER (CORRIGÉ) --------------------------- */
   function HeroCarousel() {
     const slides = [
+      { src: "/img7.jpg", key: "s7" },
       { src: "/img1.jpg", key: "s1" },
       { src: "/img2.jpg", key: "s2" },
       { src: "/img3.jpg", key: "s3" },
       { src: "/img4.jpg", key: "s4" },
       { src: "/img5.jpg", key: "s5" },
       { src: "/img6.jpg", key: "s6" },
-      { src: "/img7.jpg", key: "s7" },
       { src: "/img8.jpg", key: "s8" },
       { src: "/img9.jpg", key: "s9" }
     ];
