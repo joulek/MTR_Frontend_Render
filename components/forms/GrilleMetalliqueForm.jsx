@@ -7,7 +7,7 @@ import Image from "next/image";
 import grilleImg from "@/public/devis/grille.png";
 
 /* ====== Config & helpers ====== */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com").replace(/\/$/, "");
 
 // lecture cookie sans RegExp (compatible Next/Webpack)
 function getCookie(name) {

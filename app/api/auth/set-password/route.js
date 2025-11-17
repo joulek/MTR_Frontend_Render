@@ -1,6 +1,6 @@
 // app/api/auth/set-password/route.js
 import { NextResponse } from "next/server";
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com";
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {

@@ -9,7 +9,7 @@ import forgetImg from "@/public/forget_icon.png";
 // 🔹 Header
 import SiteHeader from "@/components/SiteHeader";
 
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com").replace(/\/$/, "");
 
 export default function ForgotPasswordClient() {
   const t = useTranslations("auth");

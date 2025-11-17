@@ -6,7 +6,7 @@ import { FiX, FiTrash2, FiPlus, FiSearch } from "react-icons/fi";
 
 const BACKEND =
   process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://mtr-backend-render.onrender.com";
+  "https://backend-mtr-final.onrender.com";
 
 // الأنواع المسموحة للبحث عن demandes أخرى لنفس العميل
 const DEFAULT_KINDS = ["compression", "torsion", "traction", "fil", "grille", "autre"];

@@ -18,7 +18,7 @@ const inter = Inter({
 /* ---------------------------- API backend ---------------------------- */
 const BACKEND = (
   process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://mtr-backend-render.onrender.com"
+  "https://backend-mtr-final.onrender.com"
 ).replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 

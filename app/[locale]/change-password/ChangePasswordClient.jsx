@@ -16,7 +16,7 @@ function stripEndSlashes(s) {
 // lazy getter: يتفادى التقييم أثناء bundling ويضمن string دايمًا
 function backend() {
   const env = process.env.NEXT_PUBLIC_BACKEND_URL;
-  const base = env ? String(env) : "https://mtr-backend-render.onrender.com";
+  const base = env ? String(env) : "https://backend-mtr-final.onrender.com";
   return stripEndSlashes(base);
 }
 function lstripSlashes(s) {

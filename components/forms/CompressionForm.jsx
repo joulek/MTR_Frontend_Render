@@ -31,7 +31,7 @@ export default function CompressionForm() {
   const [ok, setOk] = useState("");
   const [err, setErr] = useState("");
   const [user, setUser] = useState(null);
-  const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://mtr-backend-render.onrender.com").replace(/\/$/, "");
+  const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com").replace(/\/$/, "");
 
 
   // ⚠️ même calcul que dans AutreArticleForm (pas d’état dérivé asynchrone)

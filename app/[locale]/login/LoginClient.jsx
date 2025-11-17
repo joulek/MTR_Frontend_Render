@@ -29,7 +29,7 @@ export default function LoginPage() {
     try {
       const BACKEND =
         process.env.NEXT_PUBLIC_BACKEND_URL ||
-        "https://mtr-backend-render.onrender.com";
+        "https://backend-mtr-final.onrender.com";
 
       const res = await fetch(`${BACKEND}/api/auth/login`, {
         method: "POST",
