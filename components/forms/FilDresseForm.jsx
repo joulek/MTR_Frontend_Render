@@ -7,7 +7,7 @@ import Image from "next/image";
 import schemaImg from "@/public/devis/dresser.png";
 
 /* ====== Config & helpers ====== */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/$/, "");
 
 // lecture cookie sans RegExp (compatible Next/Webpack)
 function getCookie(name) {

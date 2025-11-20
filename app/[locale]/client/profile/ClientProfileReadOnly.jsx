@@ -8,7 +8,7 @@ import SiteFooter from "@/components/SiteFooter"; // ⬅️ AJOUT
 
 const NAVY = "#0B1E3A";
 const YELLOW = "#F7C600";
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 /* ---------- UI PRIMITIVES ---------- */
 

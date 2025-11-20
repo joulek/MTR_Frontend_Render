@@ -5,14 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Facebook, Linkedin, MoreVertical, User, LogOut } from "lucide-react";
-import { Inter } from "next/font/google";
+
 import { useTranslations } from "next-intl";
 
-/* -------- Police -------- */
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
 
 /* ---------------------------- API backend ---------------------------- */
 const BACKEND = (
@@ -403,7 +398,7 @@ export default function SiteHeader({ mode = "public", onLogout }) {
   }
 
   return (
-    <header className={`${inter.className} sticky top-0 z-40`}>
+    <header className="sticky top-0 z-40">
       {/* top bar */}
       <div className="bg-[#0B2239] text-white">
         <div className="mx-auto max-w-screen-2xl px-2 sm:px-4">

@@ -10,7 +10,7 @@ import positionsImg from "@/public/devis/traction01.png";
 import accrochesImg from "@/public/devis/traction02.png";
 
 /* ====== Config & helpers ====== */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com").replace(/\/$/, "");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "").replace(/\/$/, "");
 
 // lecture cookie sans RegExp
 function getCookie(name) {

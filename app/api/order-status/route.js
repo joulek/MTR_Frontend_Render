@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 const BACKEND =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com";
+  process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);

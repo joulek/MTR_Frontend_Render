@@ -1,7 +1,7 @@
 // app/api/login/route.js
 import { NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 export async function POST(request) {
   try {

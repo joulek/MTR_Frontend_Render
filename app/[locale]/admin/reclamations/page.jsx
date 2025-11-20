@@ -6,8 +6,7 @@ import Pagination from "@/components/Pagination";
 import { FiXCircle, FiFileText } from "react-icons/fi";
 
 const BACKEND =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://backend-mtr-final.onrender.com";
+  process.env.NEXT_PUBLIC_BACKEND_URL ;
 
 /* ------ Helpers de date ------ */
 const toDate = (v) => {

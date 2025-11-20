@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 export async function GET(request) {
   try {

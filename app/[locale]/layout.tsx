@@ -1,16 +1,23 @@
 // app/[locale]/layout.tsx
+
 import "../globals.css";
 import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import { ReactNode } from "react";
 
-// ⬇️ AJOUTS
 import CookieBanner from "@/components/CookieBanner";
 import AnalyticsGate from "@/components/AnalyticsGate";
 
 export function generateStaticParams() {
   return [{ locale: "fr" }, { locale: "en" }];
 }
+
+// 🟢 Ajout pour corriger le warning metadataBase +
+export const metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
+};
 
 async function getMessages(locale: string) {
   try {
@@ -25,15 +32,15 @@ export default async function LocaleLayout({
   params,
 }: {
   children: ReactNode;
-  params: Promise<{ locale: string }>; // Next 15
+  params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params; // await le promise params
+  const { locale } = await params;
   const messages = await getMessages(locale);
 
   return (
     <>
-      {/* ⬇️ Head local à ce layout (App Router) */}
-      <head>
+      {/* 🚨 Supprimé la font Inter */}
+      {/* <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -44,15 +51,11 @@ export default async function LocaleLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-      </head>
+      </head> */}
 
       <NextIntlClientProvider locale={locale} messages={messages}>
         {children}
-
-        {/* ⬇️ Bannière cookies visible si pas encore de consentement */}
         <CookieBanner />
-
-        {/* ⬇️ Charge GA (ou autres scripts) seulement si consentement analytics = true */}
         <AnalyticsGate />
       </NextIntlClientProvider>
     </>

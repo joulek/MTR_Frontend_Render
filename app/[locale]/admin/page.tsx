@@ -21,7 +21,7 @@ import {
   Line,
 } from "recharts";
 
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL );
 
 /* -------------------- helpers -------------------- */
 function iso(d: Date) {

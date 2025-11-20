@@ -16,8 +16,7 @@ import Pagination from "@/components/Pagination";
 
 /* ---------- BACKEND origin (toujours https, sans slash final) ---------- */
 const BACKEND = (
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://backend-mtr-final.onrender.com"
+  process.env.NEXT_PUBLIC_BACKEND_URL
 );
 const CARD_WRAPPER = "mx-auto w-full max-w-6xl px-3 sm:px-6";
 

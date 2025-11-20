@@ -10,7 +10,7 @@ import MultiDevisModal from "@/components/admin/devis/MultiDevisModal.jsx";
 
 /* ---------------------------- API backend ---------------------------- */
 const BACKEND = (
-  process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com"
+  process.env.NEXT_PUBLIC_BACKEND_URL || ""
 ).replace(/\/$/, "");
 const API = `${BACKEND}/api`;
 

@@ -3,14 +3,21 @@ import type { NextConfig } from "next";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com";
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const nextConfig: NextConfig = {
+  webpack(config) {
+    // 🔥 remplace tous les imports "next/font/google" par une version vide → plus d’appel à Google
+    const path = require("path");
+
+config.resolve.alias["next/font/google"] = path.resolve(__dirname, "./emptyFont.js");
+    return config;
+  },
   images: {
     unoptimized: true,
-    domains: ["mtr-backend-render.onrender.com"],
+    domains: ["http://localhost:4000"],
     remotePatterns: [
-      { protocol: "https", hostname: "mtr-backend-render.onrender.com", pathname: "/uploads/**" },
+      { protocol: "https", hostname: "http://localhost:4000", pathname: "/uploads/**" },
     ],
   },
   async rewrites() {

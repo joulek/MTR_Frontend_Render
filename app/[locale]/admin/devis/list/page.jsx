@@ -7,7 +7,7 @@ import { FiSearch, FiXCircle, FiFileText, FiChevronDown } from "react-icons/fi";
 import Pagination from "@/components/Pagination";
 
 /* --------------------------- Constants --------------------------- */
-const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL || "https://backend-mtr-final.onrender.com");
+const BACKEND = (process.env.NEXT_PUBLIC_BACKEND_URL);
 const FETCH_OPTS = { method: "GET", cache: "no-store", credentials: "include" };
 
 /* ---------------------------- Helpers ---------------------------- */
