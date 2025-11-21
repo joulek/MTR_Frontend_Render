@@ -697,9 +697,9 @@ export default function HomeClient() {
                   </div>
                   <div>
                     <p className="text-sm text-slate-500">{t("contact.mail")}</p>
-                    <p className="font-semibold text-[#0B2239]">contact@mtr.tn</p>
+                    <p className="font-semibold text-[#0B2239]">contact@mtr-ressorts.tn</p>
                     <a
-                      href="mailto:contact@mtr.tn"
+                      href="mailto:contact@mtr-ressorts.tn"
                       className="mt-3 inline-block rounded-full border border-[#F5B301] px-4 py-2 text-sm font-semibold text-[#0B2239] hover:bg-[#F5B301] hover:text-[#0B2239]"
                     >
                       {t("contact.mailBtn")}

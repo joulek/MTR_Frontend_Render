@@ -338,12 +338,7 @@ export default function MultiDevisModal({
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {/* Bouton Ajouter */}
           <div className="mb-4 flex justify-between items-center">
-            <h4 className="text-sm font-semibold text-slate-700">
-              {T("header.selectedDemands", "Demandes sélectionnées : {count}").replace(
-                "{count}",
-                String(lines.length)
-              )}
-            </h4>
+           
 
             <div className="relative">
               <button

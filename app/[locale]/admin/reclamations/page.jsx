@@ -324,74 +324,89 @@ export default function AdminReclamationsPage() {
                 </thead>
 
                 <tbody className="divide-y divide-gray-100">
-                  {rows.map((r, i) => (
-                    <tr
-                      key={r._id}
-                      className={i % 2 ? "bg-white" : "bg-gray-50/40"}
-                    >
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <span className="inline-block h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                          <span className="tabular-nums">{r.numero || "—"}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 capitalize">
-                        {r.typeDoc?.replace("_", " ") || "—"}
-                      </td>
-                      <td className="px-4 py-3 whitespace-nowrap">
-                        {fmtDateTime(
-                          r.date ||
-                          r.createdAt ||
-                          r.updatedAt ||
-                          r?.demandePdf?.generatedAt
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {r.pdf ? (
-                          <button
-                            onClick={() => viewPdfById(r._id)}
-                            disabled={openingId === r._id}
-                            className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] ${openingId === r._id
-                              ? "cursor-wait animate-pulse"
-                              : "hover:bg-slate-50"
-                              }`}
-                            aria-label={t("actions.openPdf")}
-                            title={t("actions.openPdf")}
-                          >
-                            <FiFileText size={16} />
-                            {openingId === r._id
-                              ? t("actions.opening")
-                              : t("actions.open")}
-                          </button>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full bg-gray-200 text-gray-600 px-2.5 py-1 text-xs">
-                            {t("pdf.noneShort")}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        {Array.isArray(r.piecesJointes) &&
-                          r.piecesJointes.length > 0 ? (
-                          <div className="flex flex-wrap gap-2">
-                            {r.piecesJointes.map((p, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => viewDocByIndex(r._id, idx)}
-                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
-                                title={p?.mimetype || ""}
-                              >
-                                <FiFileText size={16} />
-                                {t("actions.open")}
-                              </button>
-                            ))}
-                          </div>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+  {rows.map((r, i) => (
+    <tr
+      key={r._id}
+      className={i % 2 ? "bg-white" : "bg-gray-50/40"}
+    >
+      {/* N° */}
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-yellow-400" />
+          <span className="tabular-nums">{r.numero || "—"}</span>
+        </div>
+      </td>
+
+      {/* CLIENT */}
+      <td className="px-4 py-3">
+        <span className="font-medium">{r.client || "—"}</span>
+      </td>
+
+      {/* TYPE DOC */}
+      <td className="px-4 py-3 capitalize">
+        {r.typeDoc?.replace("_", " ") || "—"}
+      </td>
+
+      {/* DATE */}
+      <td className="px-4 py-3 whitespace-nowrap">
+        {fmtDateTime(
+          r.date ||
+          r.createdAt ||
+          r.updatedAt ||
+          r?.demandePdf?.generatedAt
+        )}
+      </td>
+
+      {/* PDF */}
+      <td className="px-4 py-3">
+        {r.pdf ? (
+          <button
+            onClick={() => viewPdfById(r._id)}
+            disabled={openingId === r._id}
+            className={`inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm text-[#0B1E3A] ${
+              openingId === r._id
+                ? "cursor-wait animate-pulse"
+                : "hover:bg-slate-50"
+            }`}
+            aria-label={t("actions.openPdf")}
+            title={t("actions.openPdf")}
+          >
+            <FiFileText size={16} />
+            {openingId === r._id
+              ? t("actions.openingPdf")
+              : t("actions.openPdf")}
+          </button>
+        ) : (
+          <span className="inline-flex items-center rounded-full bg-gray-200 text-gray-600 px-2.5 py-1 text-xs">
+            {t("pdf.noneShort")}
+          </span>
+        )}
+      </td>
+
+      {/* PIÈCES JOINTES */}
+      <td className="px-4 py-3">
+        {Array.isArray(r.piecesJointes) && r.piecesJointes.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {r.piecesJointes.map((p, idx) => (
+              <button
+                key={idx}
+                onClick={() => viewDocByIndex(r._id, idx)}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 text-[#0B1E3A]"
+                title={p?.mimetype || ""}
+              >
+                <FiFileText size={16} />
+                {p?.filename || `pj_${idx + 1}`}
+              </button>
+            ))}
+          </div>
+        ) : (
+          "—"
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
+
               </table>
             </div>
           </div>

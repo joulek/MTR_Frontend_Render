@@ -32,31 +32,32 @@ function pickName(item, locale = "fr") {
 }
 
 /** URL image sûre (accepte string/objet) */
-function toUrlSafe(input = "") {
-  try {
-    let src = input;
-    if (!src) return "/placeholder.png";
-    if (typeof src === "object") src = src?.url || src?.src || src?.path || src?.filename || src?.fileName || src?.name || "";
-    if (!src) return "/placeholder.png";
+const toUrlSafe = (src) => {
+  if (!src) return "/placeholder.png";
 
-    let s = String(src).trim().replace(/\\/g, "/");
-    if (/^(data|blob):/i.test(s)) return s;
-    if (s.startsWith("/placeholder") || s.startsWith("/images")) return s;
+  // Si src est un objet (comme dans mongoose: {url:"..."})
+  if (typeof src === "object") {
+    src =
+      src.url ||
+      src.src ||
+      src.path ||
+      src.filename ||
+      src.fileName ||
+      src.name ||
+      "";
+  }
 
-    if (/^https?:\/\//i.test(s)) {
-      const u = new URL(s);
-      if (/(^|\.)(localhost|127\.0\.0\.1)$/i.test(u.hostname)) {
-        u.protocol = "https:"; u.hostname = BACKEND_HOST; u.port = "";
-        if (!u.pathname.startsWith("/uploads/")) u.pathname = `/uploads/${u.pathname.replace(/^\/+/, "")}`;
-        return u.toString();
-      }
-      if (u.hostname === BACKEND_HOST && u.protocol !== "https:") { u.protocol = "https:"; u.port = ""; return u.toString(); }
-      return u.toString();
-    }
-    const path = s.startsWith("/uploads/") ? s : `/uploads/${s.replace(/^\/+/, "")}`;
-    return `https://${BACKEND_HOST}${path}`;
-  } catch { return "/placeholder.png"; }
-}
+  if (!src) return "/placeholder.png";
+
+  // Si c'est déjà une URL complète
+  if (typeof src === "string" && src.startsWith("http")) {
+    return src;
+  }
+
+  // Sinon : on construit l'URL depuis BACKEND
+  return `${BACKEND}${src.startsWith("/") ? "" : "/"}${src}`;
+};
+
 
 /* Forcer liste */
 const FORCE_LIST_SLUGS = new Set(["ressorts"]);

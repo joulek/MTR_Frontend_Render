@@ -7,7 +7,7 @@ import SiteHeader from "@/components/SiteHeader";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ------------------------------- Config API ------------------------------- */
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL ;
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND_URL;
 const API = `${BACKEND}/api`;
 
 /* ------------------------------- Utils texte ------------------------------ */
@@ -19,11 +19,12 @@ const pick = (obj: any, frKey: string, enKey: string, locale = "fr") =>
 
 /* ------------------------------- Utils image ------------------------------ */
 const PLACEHOLDER = "/placeholder.png";
-const BACKEND_HOST = "mtr-backend-render.onrender.com";
+const BACKEND_HOST = "localhost:4000"; // IMPORTANT : sans protocole !!
 
 const toUrl = (src: any = "") => {
   try {
     if (!src) return PLACEHOLDER;
+
     if (typeof src === "object") {
       src =
         src?.url ||
@@ -35,12 +36,13 @@ const toUrl = (src: any = "") => {
         "";
     }
     if (!src) return PLACEHOLDER;
+
     let s = String(src).trim().replace(/\\/g, "/");
 
-    // data/blob
+    // (=1) data/blob
     if (/^(data|blob):/i.test(s)) return s;
 
-    // chemins locaux déjà publics
+    // (=2) chemins locaux (public)
     if (
       s.startsWith("/placeholder") ||
       s.startsWith("/images") ||
@@ -50,30 +52,27 @@ const toUrl = (src: any = "") => {
     )
       return s;
 
-    // URL absolue
+    // (=3) URL absolue
     if (/^https?:\/\//i.test(s)) {
       const u = new URL(s);
+      const isDev = process.env.NODE_ENV !== "production";
 
-      // dev → backend prod
+      // localhost → forcer URL propre
       if (/(^|\.)(localhost|127\.0\.0\.1)$/i.test(u.hostname)) {
-        u.protocol = "https:";
+        u.protocol = isDev ? "http:" : "https:";
         u.hostname = BACKEND_HOST;
         u.port = "";
-        if (!u.pathname.startsWith("/uploads/")) {
+        if (!u.pathname.startsWith("/uploads/"))
           u.pathname = `/uploads/${u.pathname.replace(/^\/+/, "")}`;
-        }
         return u.toString();
       }
 
-      // forcer https sur domaine backend
-      if (u.hostname === BACKEND_HOST && u.protocol !== "https:") {
-        u.protocol = "https:";
-        u.port = "";
-        return u.toString();
-      }
-
-      // page https, res http → https
-      if (typeof window !== "undefined" && window.location.protocol === "https:" && u.protocol === "http:") {
+      // Sécurité HTTPS si page HTTPS
+      if (
+        typeof window !== "undefined" &&
+        window.location.protocol === "https:" &&
+        u.protocol === "http:"
+      ) {
         u.protocol = "https:";
         return u.toString();
       }
@@ -81,15 +80,20 @@ const toUrl = (src: any = "") => {
       return u.toString();
     }
 
-    // chemin relatif → /uploads
-    const path = s.startsWith("/uploads/") ? s : `/uploads/${s.replace(/^\/+/, "")}`;
-    return `https://${BACKEND_HOST}${path}`;
+    // (=4) chemin relatif → backend
+    const isDev = process.env.NODE_ENV !== "production";
+    const protocol = isDev ? "http" : "https";
+    const path = s.startsWith("/uploads/")
+      ? s
+      : `/uploads/${s.replace(/^\/+/, "")}`;
+
+    return `${protocol}://${BACKEND_HOST}${path}`;
   } catch {
     return PLACEHOLDER;
   }
 };
 
-/* ------- Petit composant d’image en ratio fixe, non rognée (contain) ------- */
+/* ------- Composant image ratio fixe ------- */
 function RatioContainImage({
   src,
   alt = "",
@@ -101,7 +105,7 @@ function RatioContainImage({
   alt?: string;
   sizes?: string;
   priority?: boolean;
-  ratio?: string; // ex: aspect-[1/1], aspect-[16/9], aspect-[4/3]
+  ratio?: string;
 }) {
   return (
     <div className={`relative w-full ${ratio}`}>
@@ -129,7 +133,6 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
-
   const [activeIdx, setActiveIdx] = useState(0);
   const [lightbox, setLightbox] = useState(false);
 
@@ -139,12 +142,18 @@ export default function ProductDetailPage() {
       try {
         setLoading(true);
         setErr("");
-        let res = await fetch(`${API}/produits/${productId}`, { cache: "no-store" });
+
+        let res = await fetch(`${API}/produits/${productId}`, {
+          cache: "no-store",
+        });
         if (!res.ok) {
-          const res2 = await fetch(`${API}/products/${productId}`, { cache: "no-store" });
+          const res2 = await fetch(`${API}/products/${productId}`, {
+            cache: "no-store",
+          });
           if (!res2.ok) throw new Error(`HTTP ${res.status} / ${res2.status}`);
           res = res2;
         }
+
         const data = await res.json();
         if (!alive) return;
         setProduct(data);
@@ -159,20 +168,29 @@ export default function ProductDetailPage() {
     };
   }, [productId]);
 
-  const name = product ? pick(product, "name_fr", "name_en", locale) : "";
-  const desc = product ? pick(product, "description_fr", "description_en", locale) : "";
+  const name = product
+    ? pick(product, "name_fr", "name_en", locale)
+    : "";
+  const desc = product
+    ? pick(product, "description_fr", "description_en", locale)
+    : "";
 
   const imagesRaw: any[] =
-    Array.isArray(product?.images) && product.images.length ? product.images : [PLACEHOLDER];
+    Array.isArray(product?.images) && product.images.length
+      ? product.images
+      : [PLACEHOLDER];
+const imgUrl = (i: number) => {
+  const it = imagesRaw[i] ?? imagesRaw[0];
+  let raw =
+    typeof it === "string"
+      ? it
+      : it?.url || it?.src || it?.path || it?.filename || it?.fileName || it?.name || "";
 
-  const imgUrl = (i: number) => {
-    const it = imagesRaw[i] ?? imagesRaw[0];
-    const raw =
-      typeof it === "string"
-        ? it
-        : it?.url || it?.src || it?.path || it?.filename || it?.fileName || it?.name || "";
-    return toUrl(raw);
-  };
+  if (!raw) return PLACEHOLDER;
+
+  if (raw.startsWith("http")) return raw;
+  return `${BACKEND}${raw.startsWith("/") ? "" : "/"}${raw}`;
+};
 
   const imgTitle = (i: number) => {
     const it = imagesRaw[i] ?? imagesRaw[0];
@@ -182,6 +200,7 @@ export default function ProductDetailPage() {
 
   const cols = Math.max(1, Math.ceil(Math.sqrt(imagesRaw.length || 1)));
 
+  // Détection clavier
   const onKey = useCallback(
     (e: KeyboardEvent) => {
       if (!lightbox || !imagesRaw?.length) return;
@@ -201,7 +220,6 @@ export default function ProductDetailPage() {
     <>
       <SiteHeader onLogout={undefined} />
       <main className="bg-slate-50 min-h-screen relative overflow-x-hidden">
-        {/* décor confiné */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#F5B301]/15 blur-3xl" />
           <div className="absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-[#0B2239]/10 blur-3xl" />
@@ -225,17 +243,23 @@ export default function ProductDetailPage() {
               {String(slug || "").replace(/-/g, " ")}
             </button>
             <span className="mx-2">/</span>
-            <span className="text-slate-700 font-semibold">{name || "Produit"}</span>
+            <span className="text-slate-700 font-semibold">
+              {name || "Produit"}
+            </span>
           </motion.nav>
 
-          {/* Titre + description */}
+          {/* Titre */}
           <motion.header initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[#0B2239]">{name || "—"}</h1>
-            <div className="mt-3 h-[6px] w-40 rounded-full bg-gradient-to-r from-[#F5B301] via-[#F5B301] to-transparent" />
-            {!!desc && <p className="mt-5 max-w-4xl text-slate-700 leading-relaxed">{desc}</p>}
+            <h1 className="text-3xl md:text-4xl font-extrabold text-[#0B2239]">
+              {name || "—"}
+            </h1>
+            <div className="mt-3 h-[6px] w-40 rounded-full bg-gradient-to-r from-[#F5B301] to-transparent" />
+            {!!desc && (
+              <p className="mt-5 max-w-4xl text-slate-700 leading-relaxed">{desc}</p>
+            )}
           </motion.header>
 
-          {/* Grille d’images — 1 colonne en mobile, dynamique dès md */}
+          {/* Images */}
           <section className="mt-10">
             {loading ? (
               <div
@@ -244,7 +268,6 @@ export default function ProductDetailPage() {
               >
                 {Array.from({ length: Math.max(4, cols * cols) }).map((_, i) => (
                   <div key={i} className="rounded-3xl bg-white ring-1 ring-slate-200 shadow-sm">
-                    {/* Skeleton ratio fixe */}
                     <div className="relative w-full aspect-[4/3] bg-slate-200 animate-pulse rounded-3xl" />
                   </div>
                 ))}
@@ -262,18 +285,14 @@ export default function ProductDetailPage() {
                   <motion.button
                     key={i}
                     type="button"
-                    onClick={() => {
-                      setActiveIdx(i);
-                      setLightbox(true);
-                    }}
+                    onClick={() => (setActiveIdx(i), setLightbox(true))}
                     variants={{ hidden: { opacity: 0, y: 14, scale: 0.985 }, show: { opacity: 1, y: 0, scale: 1 } }}
                     whileHover={{ y: -5, scale: 1.005 }}
                     whileTap={{ scale: 0.99 }}
                     className="group relative overflow-hidden rounded-3xl bg-white/95 ring-1 ring-slate-200 shadow-md hover:shadow-2xl transition-all duration-300 focus:outline-none"
                     aria-label={`Agrandir l’image ${i + 1}`}
                   >
-                    <div className="pointer-events-none absolute inset-0 rounded-3xl ring-0 ring-[#F5B301]/0 group-hover:ring-[4px] group-hover:ring-[#F5B301]/25 transition-all duration-300" />
-                    {/* Image non rognée, ratio constant */}
+                    <div className="pointer-events-none absolute inset-0 rounded-3xl group-hover:ring-[4px] group-hover:ring-[#F5B301]/25 transition-all duration-300" />
                     <RatioContainImage
                       src={imgUrl(i)}
                       alt={imgTitle(i)}
@@ -288,12 +307,14 @@ export default function ProductDetailPage() {
           </section>
 
           {err && (
-            <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">{err}</div>
+            <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+              {err}
+            </div>
           )}
         </div>
       </main>
 
-      {/* Lightbox plein écran */}
+      {/* Lightbox */}
       <AnimatePresence>
         {lightbox && (
           <motion.div
@@ -303,15 +324,9 @@ export default function ProductDetailPage() {
             className="fixed inset-0 z-[100] bg-black/90 overflow-hidden"
             onClick={() => setLightbox(false)}
           >
-            {/* bouton fermer */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setLightbox(false);
-              }}
-              className="absolute right-4 top-4 z-[200] h-10 w-10 rounded-full bg-white/90 text-[#0B2239] shadow grid place-items-center focus:outline-none focus:ring-2 focus:ring-[#F5B301]"
-              aria-label="Fermer la visionneuse"
-              type="button"
+              onClick={(e) => (e.stopPropagation(), setLightbox(false))}
+              className="absolute right-4 top-4 z-[200] h-10 w-10 rounded-full bg-white/90 text-[#0B2239] shadow grid place-items-center"
             >
               ✕
             </button>
@@ -319,37 +334,28 @@ export default function ProductDetailPage() {
             {imagesRaw.length > 1 && (
               <>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveIdx((i) => (i - 1 + imagesRaw.length) % imagesRaw.length);
-                  }}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-[150] rounded-full bg-white/90 px-3 py-2 text-[#0B2239] shadow"
-                  aria-label="Précédent"
+                  onClick={(e) => (e.stopPropagation(), setActiveIdx((i) => (i - 1 + imagesRaw.length) % imagesRaw.length))}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 px-3 py-2 rounded-full"
                 >
                   ‹
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveIdx((i) => (i + 1) % imagesRaw.length);
-                  }}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-[150] rounded-full bg-white/90 px-3 py-2 text-[#0B2239] shadow"
-                  aria-label="Suivant"
+                  onClick={(e) => (e.stopPropagation(), setActiveIdx((i) => (i + 1) % imagesRaw.length))}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 px-3 py-2 rounded-full"
                 >
                   ›
                 </button>
               </>
             )}
 
-            {/* image agrandie : contain (jamais rognée) */}
             <div className="absolute inset-0 p-10 z-[100]" onClick={(e) => e.stopPropagation()}>
               <Image
                 src={imgUrl(activeIdx)}
                 alt={imgTitle(activeIdx)}
                 fill
-                className="object-contain"
                 sizes="100vw"
                 priority
+                className="object-contain"
               />
             </div>
           </motion.div>

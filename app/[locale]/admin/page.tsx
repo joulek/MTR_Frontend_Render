@@ -39,53 +39,73 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [authLoading, setAuthLoading] = useState(true);
-  const [role, setRole] = useState<string | null>(null);
-  const [allowed, setAllowed] = useState(false);
+  // "checking" = on ne sait pas encore
+  // "allowed"  = admin confirmé
+  const [status, setStatus] = useState<"checking" | "allowed">("checking");
 
   useEffect(() => {
     let cancelled = false;
+
     (async () => {
       try {
-        const r = await fetch(`${BACKEND}/api/auth/whoami`, { credentials: "include" });
+        const r = await fetch(`${BACKEND}/api/auth/whoami`, {
+          credentials: "include",
+        });
+
         if (!r.ok) {
           if (r.status === 401) {
-            router.replace(`/${locale}/login?next=${encodeURIComponent(pathname)}`);
+            // pas connecté → direct login
+            router.replace(
+              `/${locale}/login?next=${encodeURIComponent(pathname)}`
+            );
             return;
           }
-          setAllowed(false);
-          setAuthLoading(false);
+          // autre erreur → on le renvoie aussi au login
+          router.replace(
+            `/${locale}/login?next=${encodeURIComponent(pathname)}`
+          );
           return;
         }
-        const j = await r.json();
+
+        const user = await r.json();
         if (cancelled) return;
-        const rle = j.role || "";
-        setRole(rle);
-        setAllowed(rle === "admin");
+
+        const role = user.role || "";
+
+        if (role !== "admin") {
+          // ❌ PAS ADMIN → redirection immédiate vers /unauthorized
+          router.replace(`/${locale}/login`);
+          return; // très important : on NE rendra jamais le dashboard
+        }
+
+        // ✅ ADMIN → on peut enfin autoriser le rendu
+        setStatus("allowed");
       } catch {
-        router.replace(`/${locale}/login?next=${encodeURIComponent(pathname)}`);
+        router.replace(
+          `/${locale}/login?next=${encodeURIComponent(pathname)}`
+        );
         return;
-      } finally {
-        if (!cancelled) setAuthLoading(false);
       }
     })();
+
     return () => {
       cancelled = true;
     };
   }, [locale, pathname, router]);
 
-  if (authLoading) return <PageLoader label={t("loader.dashboard")} />;
-
-  if (!allowed) {
+  // ⚠️ Tant qu'on est en "checking" → on ne rend RIEN du dashboard
+  // Tu peux mettre un tout petit loader si tu veux, mais pas le contenu admin.
+  if (status !== "allowed") {
     return (
-      <div className="p-3 sm:p-6">
-        <Callout type="warn" title={t("accessDenied.title")}>
-          {t("accessDenied.body", { role: role || "?" })}
-        </Callout>
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <p className="text-sm text-gray-500">
+          {t("loader.dashboard") || "Chargement…"}
+        </p>
       </div>
     );
   }
 
+  // 🎯 Ici on est SÛR que c'est un admin → on peut afficher le dashboard
   return (
     <div className="p-3 sm:p-4 lg:p-6">
       <div className="mx-auto max-w-7xl space-y-6">
@@ -101,7 +121,6 @@ export default function AdminDashboardPage() {
       </div>
     </div>
   );
-}
 
 /* -------------------- Dashboard body -------------------- */
 function DashboardBody() {
@@ -598,4 +617,5 @@ function QuickBtn({ onClick, children }: { onClick: () => void; children: React.
       {children}
     </button>
   );
+}
 }
