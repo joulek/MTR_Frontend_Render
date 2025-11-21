@@ -211,7 +211,11 @@
       "column": {
         "company": "Entreprise",
         "resources": "Ressources",
-        "contacts": "Contacts"
+        "contacts": "Contacts",
+        "email": "Email",
+        "servicecontact": "Service Contact",
+        "commercial": "Service Commercial"
+      
       },
       "links": {
         "about": "À propos",

@@ -1418,7 +1418,9 @@
       "column": {
         "company": "Company",
         "resources": "Resources",
-        "contacts": "Contacts"
+        "contacts": "Contacts",
+        "servicecontact": "Contact service",
+        "commercial": "Commercial service"
       },
       "links": {
         "about": "About",
