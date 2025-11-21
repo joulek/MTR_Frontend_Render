@@ -1378,7 +1378,7 @@
         },
         "visit": {
           "title": "Visit us",
-          "address": "Industrial Zone Sfax, Tunisia",
+          "address": "Industrial Zone El Ons, Tunis Road Km 10 P.O. Box 237, Sakiet Ezzit 3021 – Sfax, TUNISIA",
           "mapTitle": "MTR location",
           "openInMaps": "Open in Google Maps"
         }
@@ -1585,7 +1585,7 @@
       "mail": "Email",
       "mailBtn": "Write",
       "address": "Address",
-      "addrValue": "Industrial Zone Sfax, Tunisia",
+      "addrValue": "Industrial Zone El Ons, Tunis Road Km 10 P.O. Box 237, Sakiet Ezzit 3021 – Sfax, TUNISIA",
       "mapBtn": "View on map"
     },
     "map": {

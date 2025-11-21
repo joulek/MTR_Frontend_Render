@@ -337,9 +337,7 @@ export default function MultiDevisModal({
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {/* Bouton Ajouter */}
-          <div className="mb-4 flex justify-between items-center">
-           
-
+          <div className="mb-4 flex justify-end items-center">
             <div className="relative">
               <button
                 onClick={() => {
