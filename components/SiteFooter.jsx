@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Facebook, Linkedin, ArrowUp, ChevronRight } from "lucide-react";
+import { Facebook, Linkedin, ArrowUp, ChevronRight, Mail } from "lucide-react";
 
 export default function SiteFooter({ locale = "fr" }) {
   const t = useTranslations("auth.footer");
@@ -23,16 +23,37 @@ export default function SiteFooter({ locale = "fr" }) {
   ];
 
   const contacts = [
-    { name: "Chorki Hbaeib", phone: "+216 74 850 999 / 74 863 888 ", tel: "tel:+216 74 850 999 / 74 863 888 " },
-    { name: "Mohamed Hbaeib", phone: "+216 74 858 863 / 74 864 863", tel: "tel:+216 74 858 863 / 74 864 863" },
+    {
+      name: "Chorki Hbaeib",
+      phone: "+216 74 850 999 / 74 863 888",
+      tel: "tel:+21674850999",
+    },
+    {
+      name: "Mohamed Hbaeib",
+      phone: "+216 74 858 863 / 74 864 863",
+      tel: "tel:+21674858863",
+    },
+  ];
+
+  const emails = [
+    {
+      label: "Service Contact",
+      email: "contact@mtr-ressorts.tn",
+      mailto: "mailto:contact@mtr-ressorts.tn",
+    },
+    {
+      label: "Service Commercial",
+      email: "commercial@mtr-ressorts.tn",
+      mailto: "mailto:commercial@mtr-ressorts.tn",
+    },
   ];
 
   return (
     <footer className="relative mt-0 bg-[#0B2239] text-white">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_20%_10%,rgba(255,255,255,0.05),transparent),radial-gradient(50%_40%_at_80%_60%,rgba(245,179,1,0.08),transparent)]" />
 
-      {/* grille principale (bleu marine) */}
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 md:grid-cols-4">
+      {/* Grille principale */}
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 py-14 md:grid-cols-5">
         {/* Col 1 : Brand */}
         <div>
           <h4 className="text-xl font-extrabold">MTR</h4>
@@ -45,7 +66,6 @@ export default function SiteFooter({ locale = "fr" }) {
               rel="noopener noreferrer"
               className="rounded-full bg-white/10 p-2 hover:bg-white/20"
               aria-label="Facebook"
-              title="Facebook"
             >
               <Facebook className="h-4 w-4" />
             </a>
@@ -55,7 +75,6 @@ export default function SiteFooter({ locale = "fr" }) {
               rel="noopener noreferrer"
               className="rounded-full bg-white/10 p-2 hover:bg-white/20"
               aria-label="LinkedIn"
-              title="LinkedIn"
             >
               <Linkedin className="h-4 w-4" />
             </a>
@@ -64,11 +83,11 @@ export default function SiteFooter({ locale = "fr" }) {
               target="_blank"
               rel="noopener noreferrer"
               className="rounded-full bg-white/10 p-2 hover:bg-white/20"
-              title="WhatsApp : +216 98 333 883"
               aria-label="WhatsApp"
+              title="+216 98 333 883"
             >
-              <svg viewBox="0 0 24 24" className="h-4 w-4 text-green-500" fill="currentColor" aria-hidden="true">
-                <path d="M20.52 3.48A11.9 11.9 0 0012 .07 11.93 11.93 0 001.6 17.93L.07 24l6.2-1.63A11.93 11.93 0 0012 23.84h.01C18.6 23.84 24 18.48 24 11.9c0-3.2-1.25-6.2-3.48-8.42zM12 21.5c-1.9 0-3.73-.5-5.34-1.46l-.38-.23-3.67.97.98-3.58-.25-.37A9.93 9.93 0 1122 11.9c0 5.5-4.48 9.6-10 9.6zm5.14-7.44c-.28-.14-1.64-.8-1.9-.9-.26-.1-.45-.14-.64.14-.19.27-.73.9-.9 1.09-.17.19-.34.21-.62.07-.28-.14-1.17-.43-2.23-1.36-.82-.73-1.37-1.64-1.53-1.91-.16-.27-.02-.42.12-.55.12-.12.28-.32.42-.48.14-.16.19-.27.28-.46.09-.19.05-.35-.02-.48-.07-.14-.64-1.55-.88-2.13-.23-.56-.47-.49-.64-.5h-.55c-.19 0-.5.07-.76.35-.26.27-1 1-1 2.43 0 1.43 1.03 2.82 1.18 3.01.14.19 2.03 3.09 4.93 4.33.69.3 1.23.48 1.65.61.69.22 1.32.19 1.82.12.56-.08 1.64-.67 1.87-1.32.23-.65.23-1.21.16-1.32-.07-.12-.26-.19-.54-.33z" />
+              <svg viewBox="0 0 24 24" className="h-4 w-4 text-green-500" fill="currentColor">
+                <path d="M20.52 3.48A11.9 11.9 0 0012 .07A..." />
               </svg>
             </a>
           </div>
@@ -81,7 +100,7 @@ export default function SiteFooter({ locale = "fr" }) {
             {company.map((l, i) => (
               <li key={i}>
                 <Link href={l.href} className="group inline-flex items-center gap-2 hover:text-[#F5B301]">
-                  <ChevronRight className="h-4 w-4 opacity-60 transition group-hover:text-[#F5B301]" />
+                  <ChevronRight className="h-4 w-4 opacity-60" />
                   {l.label}
                 </Link>
               </li>
@@ -96,7 +115,7 @@ export default function SiteFooter({ locale = "fr" }) {
             {resources.map((l, i) => (
               <li key={i}>
                 <Link href={l.href} className="group inline-flex items-center gap-2 hover:text-[#F5B301]">
-                  <ChevronRight className="h-4 w-4 opacity-60 transition group-hover:text-[#F5B301]" />
+                  <ChevronRight className="h-4 w-4 opacity-60" />
                   {l.label}
                 </Link>
               </li>
@@ -106,23 +125,37 @@ export default function SiteFooter({ locale = "fr" }) {
 
         {/* Col 4 : Contacts */}
         <div>
-          <h5 className="text-lg font-semibold">{t("column.contacts", { default: "Contacts" })}</h5>
+          <h5 className="text-lg font-semibold">{t("column.contacts")}</h5>
           <ul className="mt-4 space-y-3 text-sm text-white/80">
             {contacts.map((c, i) => (
               <li key={i} className="flex flex-col">
                 <span className="font-semibold">{c.name}</span>
-                <div className="flex items-center gap-2">
-                  <a href={c.tel} className="hover:text-[#F5B301]" dir="ltr" aria-label={`${c.name} téléphone`}>
-                    {c.phone}
-                  </a>
-                </div>
+                <a href={c.tel} className="hover:text-[#F5B301]" dir="ltr">
+                  {c.phone}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Col 5 : Emails */}
+        <div>
+          <h5 className="text-lg font-semibold">Email</h5>
+          <ul className="mt-4 space-y-3 text-sm text-white/80">
+            {emails.map((e, i) => (
+              <li key={i} className="flex flex-col">
+                <span className="font-semibold">{e.label}</span>
+                <a href={e.mailto} className="hover:text-[#F5B301] flex items-center gap-2">
+                  <Mail className="h-4 w-4 opacity-70" />
+                  {e.email}
+                </a>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      {/* Barre du bas SEULEMENT en jaune */}
+      {/* Barre inférieure */}
       <div className="bg-[#F5B301]">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-sm text-[#0B2239] md:flex-row">
           <p className="font-medium">
@@ -145,14 +178,10 @@ export default function SiteFooter({ locale = "fr" }) {
       {/* Back to top */}
       <a
         href="#accueil"
-        className="fixed bottom-6 right-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#F5B301] text-[#0B2239] shadow-xl ring-1 ring-black/10 border border-[#0B2239] transition hover:-translate-y-0.5"
-        aria-label={t("backToTop")}
-        title={t("backToTop")}
+        className="fixed bottom-6 right-6 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#F5B301] text-[#0B2239] shadow-xl border border-[#0B2239] hover:-translate-y-0.5"
       >
         <ArrowUp className="h-5 w-5" />
       </a>
-
-
     </footer>
   );
 }

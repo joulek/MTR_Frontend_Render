@@ -79,7 +79,8 @@ if (pathname === '/') {
 
  export const config = {
   matcher: [
-    '/((?!api|_next|.*\\..*).*)' // 👉 Now middleware runs on ALL frontend routes (including "/")
+    '/((?!api|_next|.*\\..*).*)' ,// 👉 Now middleware runs on ALL frontend routes (including "/")
+    '/((?!api|_next|.*\\..*|set-password).*)'
   ]
 };
 
